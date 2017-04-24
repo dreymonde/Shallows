@@ -29,6 +29,22 @@ public enum Result<Value> {
     
 }
 
+extension Optional {
+    
+    public struct UnwrapError : Error {
+        init() { }
+    }
+    
+    public func tryUnwrap() throws -> Wrapped {
+        if let wrapped = self {
+            return wrapped
+        } else {
+            throw UnwrapError()
+        }
+    }
+    
+}
+
 internal func shallows_print(_ item: Any) {
     if ShallowsLog.isEnabled {
         print(item)

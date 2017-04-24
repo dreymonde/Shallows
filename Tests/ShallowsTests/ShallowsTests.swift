@@ -10,22 +10,6 @@ import Foundation
 import XCTest
 @testable import Shallows
 
-extension Optional {
-    
-    struct UnwrapError : Error {
-        init() { }
-    }
-    
-    func tryUnwrap() throws -> Wrapped {
-        if let wrapped = self {
-            return wrapped
-        } else {
-            throw UnwrapError()
-        }
-    }
-    
-}
-
 class ShallowsTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
@@ -72,7 +56,12 @@ class ShallowsTests: XCTestCase {
             .mapValues(transformIn: { try String.init(data: $0, encoding: .utf8).tryUnwrap() },
                        transformOut: { try $0.data(using: .utf8).tryUnwrap() })
         let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
-        let main = memCache.bothWayCombined(with: diskCache)
+        let nscache = NSCacheCache<NSString, NSString>(cache: .init(), name: "nscache")
+            .makeCache()
+            .mapKeys({ (str: String) in str as NSString })
+            .mapValues(transformIn: { $0 as String },
+                       transformOut: { $0 as NSString })
+        let main = memCache.bothWayCombined(with: nscache.bothWayCombined(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
         main.retrieve(forKey: "my-life", completion: { print($0) })
     }

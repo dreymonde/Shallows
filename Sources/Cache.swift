@@ -138,3 +138,16 @@ extension Cache {
     }
     
 }
+
+extension Cache {
+    
+    public func mapValues<OtherValue : RawRepresentable>() -> Cache<Key, OtherValue> where OtherValue.RawValue == Value {
+        return mapValues(transformIn: { try OtherValue(rawValue: $0).tryUnwrap() },
+                         transformOut: { $0.rawValue })
+    }
+    
+    public func mapKeys<OtherKey : RawRepresentable>() -> Cache<OtherKey, Value> where OtherKey.RawValue == Key {
+        return mapKeys({ $0.rawValue })
+    }
+    
+}
