@@ -142,7 +142,7 @@ extension Cache {
 extension Cache {
     
     public func mapValues<OtherValue : RawRepresentable>() -> Cache<Key, OtherValue> where OtherValue.RawValue == Value {
-        return mapValues(transformIn: { try OtherValue(rawValue: $0).tryUnwrap() },
+        return mapValues(transformIn: throwing(OtherValue.init(rawValue:)),
                          transformOut: { $0.rawValue })
     }
     

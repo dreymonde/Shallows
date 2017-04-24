@@ -45,6 +45,12 @@ extension Optional {
     
 }
 
+internal func throwing<In, Out>(_ block: @escaping (In) -> Out?) -> (In) throws -> Out {
+    return { input in
+        try block(input).tryUnwrap()
+    }
+}
+
 internal func shallows_print(_ item: Any) {
     if ShallowsLog.isEnabled {
         print(item)
