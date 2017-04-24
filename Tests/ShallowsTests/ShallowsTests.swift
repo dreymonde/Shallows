@@ -71,8 +71,10 @@ class ShallowsTests: XCTestCase {
             .makeCache()
             .mapValues(transformIn: { try String.init(data: $0, encoding: .utf8).tryUnwrap() },
                        transformOut: { try $0.data(using: .utf8).tryUnwrap() })
+        let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
+        let main = memCache.bothWayCombined(with: diskCache)
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
-        diskCache.retrieve(forKey: "my-life", completion: { print($0) })
+        main.retrieve(forKey: "my-life", completion: { print($0) })
     }
     
     static var allTests = [

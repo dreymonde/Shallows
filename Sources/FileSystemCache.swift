@@ -11,10 +11,19 @@ public final class FileSystemCache : CacheProtocol {
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
-    public init(directoryURL: URL, name: String) {
+    public init(directoryURL: URL, name: String? = nil) {
         self.directoryURL = directoryURL
-        self.name = name
-        self.queue = DispatchQueue(label: "\(name)-file-system-cache-queue")
+        self.name = name ?? "file-system-cache"
+        self.queue = DispatchQueue(label: "\(self.name)-file-system-cache-queue")
+    }
+    
+    public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
+                                   appending pathComponent: String,
+                                   domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
+                                   name: String? = nil) -> FileSystemCache {
+        let paths = NSSearchPathForDirectoriesInDomains(directory, domainMask, true)
+        let url = URL(fileURLWithPath: paths.first!).appendingPathComponent(pathComponent, isDirectory: true)
+        return FileSystemCache(directoryURL: url, name: name)
     }
     
     public enum Error : Swift.Error {
