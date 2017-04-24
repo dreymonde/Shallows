@@ -49,3 +49,36 @@ extension ReadOnlyCacheProtocol {
     }
     
 }
+
+extension ReadOnlyCache {
+    
+    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> ReadOnlyCache<OtherKey, Value> {
+        return ReadOnlyCache<OtherKey, Value>(name: name, retrieve: { key, completion in
+            do {
+                let newKey = try transform(key)
+                self.retrieve(forKey: newKey, completion: completion)
+            } catch {
+                completion(.failure(error))
+            }
+        })
+    }
+    
+    public func mapValues<OtherValue>(_ transform: @escaping (Value) throws -> OtherValue) -> ReadOnlyCache<Key, OtherValue> {
+        return ReadOnlyCache<Key, OtherValue>(name: name, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: { (result) in
+                switch result {
+                case .success(let value):
+                    do {
+                        let newValue = try transform(value)
+                        completion(.success(newValue))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            })
+        })
+    }
+    
+}

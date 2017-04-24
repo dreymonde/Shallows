@@ -91,3 +91,50 @@ extension CacheProtocol {
     }
     
 }
+
+extension Cache {
+    
+    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> Cache<OtherKey, Value> {
+        return Cache<OtherKey, Value>(name: name, retrieve: { key, completion in
+            do {
+                let newKey = try transform(key)
+                self.retrieve(forKey: newKey, completion: completion)
+            } catch {
+                completion(.failure(error))
+            }
+        }, set: { value, key, completion in
+            do {
+                let newKey = try transform(key)
+                self.set(value, forKey: newKey, completion: completion)
+            } catch {
+                completion(.failure(error))
+            }
+        })
+    }
+    
+    public func mapValues<OtherValue>(transformIn: @escaping (Value) throws -> OtherValue, transformOut: @escaping (OtherValue) throws -> Value) -> Cache<Key, OtherValue> {
+        return Cache<Key, OtherValue>(name: name, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: { (result) in
+                switch result {
+                case .success(let value):
+                    do {
+                        let newValue = try transformIn(value)
+                        completion(.success(newValue))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            })
+        }, set: { (value, key, completion) in
+            do {
+                let newValue = try transformOut(value)
+                self.set(newValue, forKey: key, completion: completion)
+            } catch {
+                completion(.failure(error))
+            }
+        })
+    }
+    
+}

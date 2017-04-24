@@ -10,6 +10,22 @@ import Foundation
 import XCTest
 @testable import Shallows
 
+extension Optional {
+    
+    struct UnwrapError : Error {
+        init() { }
+    }
+    
+    func tryUnwrap() throws -> Wrapped {
+        if let wrapped = self {
+            return wrapped
+        } else {
+            throw UnwrapError()
+        }
+    }
+    
+}
+
 class ShallowsTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
@@ -43,6 +59,20 @@ class ShallowsTests: XCTestCase {
         combined1.set(35, forKey: "Inter")
         meme2.retrieve(forKey: "Inter", completion: { print($0) })
         full.retrieve(forKey: "Nothing", completion: { print($0) })
+    }
+    
+    func testFileSystemCache() {
+        let url = URL.init(fileURLWithPath: "/Users/oleg/Desktop/CacheTest")
+        do {
+            try FileManager.default.removeItem(at: url)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        } catch { }
+        let diskCache = FileSystemCache(directoryURL: url, name: "desktop-disk")
+            .makeCache()
+            .mapValues(transformIn: { try String.init(data: $0, encoding: .utf8).tryUnwrap() },
+                       transformOut: { try $0.data(using: .utf8).tryUnwrap() })
+        diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
+        diskCache.retrieve(forKey: "my-life", completion: { print($0) })
     }
     
     static var allTests = [
