@@ -37,6 +37,10 @@
 		7C00D0891EAE35EA004F7657 /* FileSystemCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */; };
 		7C00D08A1EAE35EA004F7657 /* FileSystemCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */; };
 		7C00D08B1EAE35EA004F7657 /* FileSystemCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */; };
+		7C00D08D1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */; };
+		7C00D08E1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */; };
+		7C00D08F1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */; };
+		7C00D0901EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */; };
 		DD7502861C68FDDC006590AF /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9971BEFF375002C0205 /* ShallowsTests.swift */; };
 		DD7502881C68FEDE006590AF /* Shallows.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6DA0F1BF000BD002C0205 /* Shallows.framework */; };
 		DD7502921C690C7A006590AF /* Shallows.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6D9F01BEFFFBE002C0205 /* Shallows.framework */; };
@@ -81,6 +85,7 @@
 		7C00D07D1EAD4EE6004F7657 /* WritableCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WritableCache.swift; path = Sources/WritableCache.swift; sourceTree = "<group>"; };
 		7C00D0821EAE34C1004F7657 /* NSCacheCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSCacheCache.swift; path = Sources/NSCacheCache.swift; sourceTree = "<group>"; };
 		7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FileSystemCache.swift; path = Sources/FileSystemCache.swift; sourceTree = "<group>"; };
+		7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SynchronizedCache.swift; path = Sources/SynchronizedCache.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* Shallows.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Shallows.plist; sourceTree = "<group>"; };
 		AD2FAA281CD0B6E100659CF4 /* ShallowsTests.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ShallowsTests.plist; sourceTree = "<group>"; };
 		DD75027A1C68FCFC006590AF /* Shallows-macOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shallows-macOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -153,6 +158,7 @@
 				7C00D07D1EAD4EE6004F7657 /* WritableCache.swift */,
 				7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */,
 				7C00D0821EAE34C1004F7657 /* NSCacheCache.swift */,
+				7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */,
 				52D6D9971BEFF375002C0205 /* ShallowsTests.swift */,
 				52D6D99C1BEFF38C002C0205 /* Configs */,
 				52D6D97D1BEFF229002C0205 /* Products */,
@@ -484,6 +490,7 @@
 				7C00D0751EAD4ECF004F7657 /* MemoryCache.swift in Sources */,
 				7C00D0711EAD4ECF004F7657 /* Cache.swift in Sources */,
 				7C00D0881EAE35EA004F7657 /* FileSystemCache.swift in Sources */,
+				7C00D08D1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */,
 				52D6D9981BEFF375002C0205 /* Shallows.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -506,6 +513,7 @@
 				7C00D0771EAD4ECF004F7657 /* MemoryCache.swift in Sources */,
 				7C00D0731EAD4ECF004F7657 /* Cache.swift in Sources */,
 				7C00D08A1EAE35EA004F7657 /* FileSystemCache.swift in Sources */,
+				7C00D08F1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */,
 				52D6D9EA1BEFFFA4002C0205 /* Shallows.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,6 +528,7 @@
 				7C00D0781EAD4ECF004F7657 /* MemoryCache.swift in Sources */,
 				7C00D0741EAD4ECF004F7657 /* Cache.swift in Sources */,
 				7C00D08B1EAE35EA004F7657 /* FileSystemCache.swift in Sources */,
+				7C00D0901EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */,
 				52D6DA091BF00081002C0205 /* Shallows.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -534,6 +543,7 @@
 				7C00D0761EAD4ECF004F7657 /* MemoryCache.swift in Sources */,
 				7C00D0721EAD4ECF004F7657 /* Cache.swift in Sources */,
 				7C00D0891EAE35EA004F7657 /* FileSystemCache.swift in Sources */,
+				7C00D08E1EAF5CE1004F7657 /* SynchronizedCache.swift in Sources */,
 				52D6DA261BF00118002C0205 /* Shallows.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

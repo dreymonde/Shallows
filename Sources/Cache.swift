@@ -112,7 +112,8 @@ extension Cache {
         })
     }
     
-    public func mapValues<OtherValue>(transformIn: @escaping (Value) throws -> OtherValue, transformOut: @escaping (OtherValue) throws -> Value) -> Cache<Key, OtherValue> {
+    public func mapValues<OtherValue>(transformIn: @escaping (Value) throws -> OtherValue,
+                          transformOut: @escaping (OtherValue) throws -> Value) -> Cache<Key, OtherValue> {
         return Cache<Key, OtherValue>(name: name, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {

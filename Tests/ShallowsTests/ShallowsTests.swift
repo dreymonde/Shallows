@@ -46,13 +46,12 @@ class ShallowsTests: XCTestCase {
     }
     
     func testFileSystemCache() {
-        let url = URL.init(fileURLWithPath: "/Users/oleg/Desktop/CacheTest")
+        let diskCache_raw = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp")
         do {
-            try FileManager.default.removeItem(at: url)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.removeItem(at: diskCache_raw.directoryURL)
         } catch { }
-        let diskCache = FileSystemCache(directoryURL: url, name: "desktop-disk")
-            .makeCache()
+        let expectation = self.expectation(description: "On retrieve")
+        let diskCache = diskCache_raw.makeCache()
             .mapValues(transformIn: { try String.init(data: $0, encoding: .utf8).tryUnwrap() },
                        transformOut: { try $0.data(using: .utf8).tryUnwrap() })
         let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
@@ -63,7 +62,24 @@ class ShallowsTests: XCTestCase {
                        transformOut: { $0 as NSString })
         let main = memCache.bothWayCombined(with: nscache.bothWayCombined(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
-        main.retrieve(forKey: "my-life", completion: { print($0) })
+        main.retrieve(forKey: "my-life", completion: {
+            XCTAssertEqual($0.asOptional, "I was just a little boy")
+            expectation.fulfill()
+        })
+        waitForExpectations(timeout: 5.0)
+        do {
+            try FileManager.default.removeItem(at: diskCache_raw.directoryURL)
+        } catch { }
+    }
+    
+    func testRawRepresentable() {
+        enum Keys : String {
+            case a, b, c
+        }
+        let memCache = MemoryCache<String, Int>(storage: [:]).makeCache().mapKeys() as Cache<Keys, Int>
+        memCache.set(10, forKey: .a)
+        memCache.retrieve(forKey: .a, completion: { XCTAssertEqual($0.asOptional, 10) })
+        memCache.retrieve(forKey: .b, completion: { XCTAssertNil($0.asOptional) })
     }
     
     static var allTests = [
