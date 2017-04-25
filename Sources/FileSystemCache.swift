@@ -31,11 +31,16 @@ public final class FileSystemCache : CacheProtocol {
         case cantCreateFile
     }
     
-    public func set(_ value: Data, forKey fileName: String, completion: @escaping (Result<Void>) -> ()) {
+    public func fileName(for key: String) -> String {
+        guard let data = key.data(using: .utf8) else { return key }
+        return data.base64EncodedString(options: [])
+    }
+    
+    public func set(_ value: Data, forKey key: String, completion: @escaping (Result<Void>) -> ()) {
         queue.async {
             do {
                 try self.createDirectoryURLIfNotExisting()
-                let path = self.directoryURL.appendingPathComponent(fileName).path
+                let path = self.directoryURL.appendingPathComponent(self.fileName(for: key)).path
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
@@ -61,9 +66,9 @@ public final class FileSystemCache : CacheProtocol {
         }
     }
     
-    public func retrieve(forKey fileName: String, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
         queue.async {
-            let path = self.directoryURL.appendingPathComponent(fileName)
+            let path = self.directoryURL.appendingPathComponent(self.fileName(for: key))
             do {
                 let data = try Data(contentsOf: path)
                 completion(.success(data))
