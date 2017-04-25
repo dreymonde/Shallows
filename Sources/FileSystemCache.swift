@@ -20,10 +20,10 @@ public final class FileSystemCache : CacheProtocol {
     public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
                                    appending pathComponent: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
-                                   name: String? = nil) -> FileSystemCache {
+                                   cacheName: String? = nil) -> FileSystemCache {
         let paths = NSSearchPathForDirectoriesInDomains(directory, domainMask, true)
         let url = URL(fileURLWithPath: paths.first!).appendingPathComponent(pathComponent, isDirectory: true)
-        return FileSystemCache(directoryURL: url, name: name)
+        return FileSystemCache(directoryURL: url, name: cacheName)
     }
     
     public enum Error : Swift.Error {

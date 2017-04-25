@@ -9,7 +9,7 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     public let cache: NSCache<Key, Value>
     public let name: String
     
-    public init(cache: NSCache<Key, Value>, name: String = "\(NSCache<Key, Value>.self)") {
+    public init(cache: NSCache<Key, Value> = NSCache(), name: String = "\(NSCache<Key, Value>.self)") {
         self.cache = cache
         self.name = name
     }
