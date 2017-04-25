@@ -82,6 +82,26 @@ class ShallowsTests: XCTestCase {
         memCache.retrieve(forKey: .b, completion: { XCTAssertNil($0.asOptional) })
     }
     
+    func testJSONMapping() {
+        let dict: [String : Any] = ["json": 15]
+        let memCache = MemoryCache<Int, Data>(storage: [:]).makeCache().mapJSONDictionary()
+        memCache.set(dict, forKey: 10)
+        memCache.retrieve(forKey: 10) { (result) in
+            print(result)
+            XCTAssertEqual(result.asOptional! as NSDictionary, dict as NSDictionary)
+        }
+    }
+    
+    func testPlistMapping() {
+        let dict: [String : Any] = ["plist": 15]
+        let memCache = MemoryCache<Int, Data>(storage: [:]).makeCache().mapPlistDictionary(format: .binary)
+        memCache.set(dict, forKey: 10)
+        memCache.retrieve(forKey: 10) { (result) in
+            print(result)
+            XCTAssertEqual(result.asOptional! as NSDictionary, dict as NSDictionary)
+        }
+    }
+    
     static var allTests = [
         ("testExample", testExample),
     ]

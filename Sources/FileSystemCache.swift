@@ -92,7 +92,7 @@ extension Cache where Value == Data {
                                    transformOut: { $0 })
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat) -> Cache<Key, Any> {
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, Any> {
         return mapValues(transformIn: { data in
             var formatRef = format
             return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
@@ -101,7 +101,7 @@ extension Cache where Value == Data {
         })
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat) -> Cache<Key, [String : Any]> {
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, [String : Any]> {
         return mapPlist(format: format).mapValues(transformIn: { try ($0 as? [String : Any]).tryUnwrap() },
                                                   transformOut: { $0 })
     }
