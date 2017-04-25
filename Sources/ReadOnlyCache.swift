@@ -1,4 +1,4 @@
-public protocol ReadOnlyCacheProtocol : CacheDesign {
+public protocol ReadableCacheProtocol : CacheDesign {
     
     associatedtype Key
     associatedtype Value
@@ -7,7 +7,7 @@ public protocol ReadOnlyCacheProtocol : CacheDesign {
     
 }
 
-public final class ReadOnlyCache<Key, Value> : ReadOnlyCacheProtocol {
+public final class ReadOnlyCache<Key, Value> : ReadableCacheProtocol {
     
     public let name: String
     
@@ -18,7 +18,7 @@ public final class ReadOnlyCache<Key, Value> : ReadOnlyCacheProtocol {
         self.name = name
     }
     
-    public init<CacheType : ReadOnlyCacheProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
+    public init<CacheType : ReadableCacheProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
         self._retrieve = cache.retrieve
         self.name = cache.name
     }
@@ -29,13 +29,13 @@ public final class ReadOnlyCache<Key, Value> : ReadOnlyCacheProtocol {
     
 }
 
-extension ReadOnlyCacheProtocol {
+extension ReadableCacheProtocol {
     
     public func makeReadOnly() -> ReadOnlyCache<Key, Value> {
         return ReadOnlyCache(self)
     }
     
-    public func combined<CacheType : ReadOnlyCacheProtocol>(with cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+    public func combinedNoSet<CacheType : ReadableCacheProtocol>(with cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return ReadOnlyCache(name: "\(self.name) - \(cache.name)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
                 if firstResult.isFailure {

@@ -34,8 +34,8 @@ class ShallowsTests: XCTestCase {
         let meme1 = MemoryCache<String, Int>(storage: ["Some" : 15], name: "First-Back")
         let meme2 = MemoryCache<String, Int>(storage: ["Other" : 20], name: "Second-Back")//.makeReadOnly()
         
-        let combined1 = meme1.bothWayCombined(with: meme2)
-        let full = memeMain.combined(with: combined1)
+        let combined1 = meme1.combinedSetBoth(with: meme2)
+        let full = memeMain.combinedNoSet(with: combined1)
         //combined1.retrieve(forKey: "Other", completion: { print($0) })
         //meme1.retrieve(forKey: "Other", completion: { print($0) })
         full.retrieve(forKey: "Some", completion: { print($0) })
@@ -60,7 +60,7 @@ class ShallowsTests: XCTestCase {
             .mapKeys({ (str: String) in str as NSString })
             .mapValues(transformIn: { $0 as String },
                        transformOut: { $0 as NSString })
-        let main = memCache.bothWayCombined(with: nscache.bothWayCombined(with: diskCache))
+        let main = memCache.combinedSetBoth(with: nscache.combinedSetBoth(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
         main.retrieve(forKey: "my-life", completion: {
             XCTAssertEqual($0.asOptional, "I was just a little boy")

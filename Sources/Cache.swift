@@ -4,7 +4,7 @@ public protocol CacheDesign {
     
 }
 
-public protocol CacheProtocol : ReadOnlyCacheProtocol, WritableCacheProtocol { }
+public protocol CacheProtocol : ReadableCacheProtocol, WritableCacheProtocol { }
 
 public struct Cache<Key, Value> : CacheProtocol {
     
@@ -43,11 +43,18 @@ extension CacheProtocol {
         return Cache(self)
     }
     
-    public func bothWayRetrieve<CacheType : ReadOnlyCacheProtocol>(forKey key: Key, backedBy cache: CacheType, completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+    public func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
+                                backedBy cache: CacheType,
+                                pushToFront: Bool,
+                                completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
                 shallows_print("Cache (\(self.name)) miss for key: \(key). Attempting to retrieve from \(cache.name)")
                 cache.retrieve(forKey: key, completion: { (secondResult) in
+                    if !pushToFront {
+                        completion(secondResult)
+                        return
+                    }
                     if case .success(let value) = secondResult {
                         shallows_print("Success retrieving \(key) from \(cache.name). Setting value back to \(self.name)")
                         self.set(value, forKey: key, completion: { _ in completion(secondResult) })
@@ -74,19 +81,27 @@ extension CacheProtocol {
         })
     }
     
-    public func bothWayCombined<CacheType : CacheProtocol>(with cache: CacheType) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+    public func combinedSetBoth<CacheType : CacheProtocol>(with cache: CacheType) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return Cache<Key, Value>(name: "\(self.name) <-> \(cache.name)", retrieve: { (key, completion) in
-            self.bothWayRetrieve(forKey: key, backedBy: cache, completion: completion)
+            self.retrieve(forKey: key, backedBy: cache, pushToFront: true, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: cache, completion: completion)
         })
     }
     
-    public func bothWayCombined<CacheType : ReadOnlyCacheProtocol>(with cache: CacheType) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+    public func combinedSetFront<CacheType : ReadableCacheProtocol>(with cache: CacheType) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return Cache<Key, Value>(name: "\(self.name) <- \(cache.name)", retrieve: { (key, completion) in
-            self.bothWayRetrieve(forKey: key, backedBy: cache, completion: completion)
+            self.retrieve(forKey: key, backedBy: cache, pushToFront: true, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, completion: completion)
+        })
+    }
+    
+    public func combinedSetBack<CacheType : CacheProtocol>(with cache: CacheType) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+        return Cache<Key, Value>(name: "\(self.name) -> \(cache.name)", retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: cache, pushToFront: false, completion: completion)
+        }, set: { (value, key, completion) in
+            self.set(value, forKey: key, pushingTo: cache, completion: completion)
         })
     }
     
