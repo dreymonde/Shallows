@@ -79,3 +79,31 @@ public final class FileSystemCache : CacheProtocol {
     }
     
 }
+
+extension Cache where Value == Data {
+    
+    public func mapJSON() -> Cache<Key, Any> {
+        return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: []) },
+                         transformOut: { try JSONSerialization.data(withJSONObject: $0, options: []) })
+    }
+    
+    public func mapJSONDictionary() -> Cache<Key, [String : Any]> {
+        return mapJSON().mapValues(transformIn: { try ($0 as? [String : Any]).tryUnwrap() },
+                                   transformOut: { $0 })
+    }
+    
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat) -> Cache<Key, Any> {
+        return mapValues(transformIn: { data in
+            var formatRef = format
+            return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
+        }, transformOut: { plist in
+            return try PropertyListSerialization.data(fromPropertyList: plist, format: format, options: 0)
+        })
+    }
+    
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat) -> Cache<Key, [String : Any]> {
+        return mapPlist(format: format).mapValues(transformIn: { try ($0 as? [String : Any]).tryUnwrap() },
+                                                  transformOut: { $0 })
+    }
+    
+}

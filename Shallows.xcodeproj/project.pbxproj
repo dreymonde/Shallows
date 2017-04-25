@@ -153,9 +153,9 @@
 			children = (
 				52D6D9961BEFF375002C0205 /* Shallows.swift */,
 				7C00D06E1EAD4ECF004F7657 /* Cache.swift */,
-				7C00D06F1EAD4ECF004F7657 /* MemoryCache.swift */,
 				7C00D0701EAD4ECF004F7657 /* ReadOnlyCache.swift */,
 				7C00D07D1EAD4EE6004F7657 /* WritableCache.swift */,
+				7C00D06F1EAD4ECF004F7657 /* MemoryCache.swift */,
 				7C00D0871EAE35EA004F7657 /* FileSystemCache.swift */,
 				7C00D0821EAE34C1004F7657 /* NSCacheCache.swift */,
 				7C00D08C1EAF5CE1004F7657 /* SynchronizedCache.swift */,
