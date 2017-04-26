@@ -46,10 +46,8 @@ class ShallowsTests: XCTestCase {
     }
     
     func testFileSystemCache() {
-        let diskCache_raw = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp")
-        do {
-            try FileManager.default.removeItem(at: diskCache_raw.directoryURL)
-        } catch { }
+        let diskCache_raw = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-1")
+        diskCache_raw.pruneOnDeinit = true
         let expectation = self.expectation(description: "On retrieve")
         let diskCache = diskCache_raw.makeCache()
             .mapString(withEncoding: .utf8)
@@ -66,9 +64,6 @@ class ShallowsTests: XCTestCase {
             expectation.fulfill()
         })
         waitForExpectations(timeout: 5.0)
-        do {
-            try FileManager.default.removeItem(at: diskCache_raw.directoryURL)
-        } catch { }
     }
     
     func testRawRepresentable() {
@@ -102,7 +97,7 @@ class ShallowsTests: XCTestCase {
     }
     
     func testSingleElementCache() {
-        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "tmp_shallows_tests_will_prune")
+        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-2")
         diskCache.pruneOnDeinit = true
         print(diskCache.directoryURL)
         let singleElementCache = MemoryCache<String, String>().makeCache().mapKeys({ "only_key" }) as Cache<Void, String>

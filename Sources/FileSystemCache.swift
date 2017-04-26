@@ -52,10 +52,6 @@ public final class FileSystemCache : CacheProtocol {
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
-                    do {
-                        try self.fileManager.setAttributes([.modificationDate : Date()],
-                                                       ofItemAtPath: path)
-                    } catch { }
                     completion(.success())
                 } else {
                     completion(.failure(Error.cantCreateFile))
