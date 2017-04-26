@@ -8,6 +8,8 @@ public final class FileSystemCache : CacheProtocol {
     public let name: String
     public let directoryURL: URL
     
+    internal var pruneOnDeinit: Bool = false
+    
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
@@ -15,6 +17,12 @@ public final class FileSystemCache : CacheProtocol {
         self.directoryURL = directoryURL
         self.name = name ?? "file-system-cache"
         self.queue = DispatchQueue(label: "\(self.name)-file-system-cache-queue")
+    }
+    
+    deinit {
+        if pruneOnDeinit {
+            do { try fileManager.removeItem(at: directoryURL) } catch { }
+        }
     }
     
     public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
@@ -44,6 +52,10 @@ public final class FileSystemCache : CacheProtocol {
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
+                    do {
+                        try self.fileManager.setAttributes([.modificationDate : Date()],
+                                                       ofItemAtPath: path)
+                    } catch { }
                     completion(.success())
                 } else {
                     completion(.failure(Error.cantCreateFile))
@@ -104,6 +116,11 @@ extension Cache where Value == Data {
     public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, [String : Any]> {
         return mapPlist(format: format).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                                   transformOut: { $0 })
+    }
+    
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Cache<Key, String> {
+        return mapValues(transformIn: throwing({ String(data: $0, encoding: encoding) }),
+                         transformOut: throwing({ $0.data(using: encoding) }))
     }
     
 }

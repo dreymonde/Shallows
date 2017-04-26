@@ -167,3 +167,19 @@ extension Cache {
     }
     
 }
+
+extension ReadableCacheProtocol where Key == Void {
+    
+    public func retrieve(completion: @escaping (Result<Value>) -> ()) {
+        retrieve(forKey: (), completion: completion)
+    }
+    
+}
+
+extension WritableCacheProtocol where Key == Void {
+    
+    public func set(_ value: Value, completion: @escaping (Result<Void>) -> () = { _ in }) {
+        set(value, forKey: (), completion: completion)
+    }
+    
+}

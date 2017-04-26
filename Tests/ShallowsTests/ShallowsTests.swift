@@ -52,8 +52,7 @@ class ShallowsTests: XCTestCase {
         } catch { }
         let expectation = self.expectation(description: "On retrieve")
         let diskCache = diskCache_raw.makeCache()
-            .mapValues(transformIn: { try String.init(data: $0, encoding: .utf8).tryUnwrap() },
-                       transformOut: { try $0.data(using: .utf8).tryUnwrap() })
+            .mapString(withEncoding: .utf8)
         let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
         let nscache = NSCacheCache<NSString, NSString>(cache: .init(), name: "nscache")
             .makeCache()
@@ -99,6 +98,21 @@ class ShallowsTests: XCTestCase {
         memCache.retrieve(forKey: 10) { (result) in
             print(result)
             XCTAssertEqual(result.asOptional! as NSDictionary, dict as NSDictionary)
+        }
+    }
+    
+    func testSingleElementCache() {
+        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "tmp_shallows_tests_will_prune")
+        diskCache.pruneOnDeinit = true
+        print(diskCache.directoryURL)
+        let singleElementCache = MemoryCache<String, String>().makeCache().mapKeys({ "only_key" }) as Cache<Void, String>
+        let finalCache = singleElementCache.combinedSetBack(with: diskCache.makeCache()
+            .mapKeys({ "only_key" })
+            .mapString(withEncoding: .utf8)
+        )
+        finalCache.set("Five-Four")
+        finalCache.retrieve { (result) in
+            XCTAssertEqual(result.asOptional, "Five-Four")
         }
     }
     
