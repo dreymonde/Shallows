@@ -88,7 +88,7 @@ extension Cache where Value == Data {
     }
     
     public func mapJSONDictionary() -> Cache<Key, [String : Any]> {
-        return mapJSON().mapValues(transformIn: { try ($0 as? [String : Any]).tryUnwrap() },
+        return mapJSON().mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                    transformOut: { $0 })
     }
     
@@ -102,7 +102,7 @@ extension Cache where Value == Data {
     }
     
     public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, [String : Any]> {
-        return mapPlist(format: format).mapValues(transformIn: { try ($0 as? [String : Any]).tryUnwrap() },
+        return mapPlist(format: format).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                                   transformOut: { $0 })
     }
     

@@ -35,7 +35,7 @@ extension Optional {
         init() { }
     }
     
-    public func tryUnwrap() throws -> Wrapped {
+    public func unwrap() throws -> Wrapped {
         if let wrapped = self {
             return wrapped
         } else {
@@ -47,7 +47,7 @@ extension Optional {
 
 internal func throwing<In, Out>(_ block: @escaping (In) -> Out?) -> (In) throws -> Out {
     return { input in
-        try block(input).tryUnwrap()
+        try block(input).unwrap()
     }
 }
 
