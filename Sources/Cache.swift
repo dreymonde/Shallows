@@ -43,6 +43,25 @@ extension CacheProtocol {
         return Cache(self)
     }
     
+    public func update(forKey key: Key, _ modify: @escaping (inout Value) -> (), completion: @escaping (Result<Value>) -> () = {_ in }) {
+        retrieve(forKey: key) { (result) in
+            switch result {
+            case .success(var value):
+                modify(&value)
+                self.set(value, forKey: key, completion: { (setResult) in
+                    switch setResult {
+                    case .success:
+                        completion(.success(value))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                })
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     public func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
                                 backedBy cache: CacheType,
                                 pushToFront: Bool,

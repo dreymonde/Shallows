@@ -111,6 +111,28 @@ class ShallowsTests: XCTestCase {
         }
     }
     
+    func testSync() throws {
+        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
+        diskCache.pruneOnDeinit = true
+        let stringCache = diskCache.makeCache().mapString().makeSyncCache()
+        try stringCache.set("Sofar", forKey: "kha")
+        let back = try stringCache.retrieve(forKey: "kha")
+        XCTAssertEqual(back, "Sofar")
+    }
+    
+    func testUpdate() {
+        let cache = MemoryCache<Int, Int>(name: "mem")
+        cache.storage[10] = 15
+        let expectation = self.expectation(description: "On update")
+        cache.update(forKey: 10, { $0 += 5 }) { (result) in
+            XCTAssertEqual(result.asOptional, 20)
+            let check = try! cache.makeSyncCache().retrieve(forKey: 10)
+            XCTAssertEqual(check, 20)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5.0)
+    }
+    
     static var allTests = [
         ("testExample", testExample),
     ]
