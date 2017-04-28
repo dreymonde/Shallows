@@ -54,8 +54,8 @@ fileprivate extension Result {
 
 extension CacheProtocol {
     
-    public func makeSyncCache() -> SyncCache<Key, Value> {
-        return SyncCache.init(name: self.name + "-sync", retrieve: { (key) throws -> Value in
+    public var sync: SyncCache<Key, Value> {
+        return SyncCache(name: self.name + "-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
@@ -74,6 +74,18 @@ extension CacheProtocol {
             semaphore.wait()
             return try r_result!.value()
         })
+    }
+    
+}
+
+extension SyncCache where Key == Void {
+    
+    public func retrieve() throws -> Value {
+        return try retrieve(forKey: ())
+    }
+    
+    public func set(_ value: Value) throws {
+        try set(value, forKey: ())
     }
     
 }

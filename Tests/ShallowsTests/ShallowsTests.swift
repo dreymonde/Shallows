@@ -114,7 +114,7 @@ class ShallowsTests: XCTestCase {
     func testSync() throws {
         let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         diskCache.pruneOnDeinit = true
-        let stringCache = diskCache.makeCache().mapString().makeSyncCache()
+        let stringCache = diskCache.makeCache().mapString().sync
         try stringCache.set("Sofar", forKey: "kha")
         let back = try stringCache.retrieve(forKey: "kha")
         XCTAssertEqual(back, "Sofar")
@@ -126,7 +126,7 @@ class ShallowsTests: XCTestCase {
         let expectation = self.expectation(description: "On update")
         cache.update(forKey: 10, { $0 += 5 }) { (result) in
             XCTAssertEqual(result.asOptional, 20)
-            let check = try! cache.makeSyncCache().retrieve(forKey: 10)
+            let check = try! cache.sync.retrieve(forKey: 10)
             XCTAssertEqual(check, 20)
             expectation.fulfill()
         }
