@@ -29,8 +29,8 @@ public final class FileSystemCache : CacheProtocol {
                                    appending pathComponent: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
                                    cacheName: String? = nil) -> FileSystemCache {
-        let paths = NSSearchPathForDirectoriesInDomains(directory, domainMask, true)
-        let url = URL(fileURLWithPath: paths.first!).appendingPathComponent(pathComponent, isDirectory: true)
+        let urls = FileManager.default.urls(for: directory, in: domainMask)
+        let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
         return FileSystemCache(directoryURL: url, name: cacheName)
     }
     
