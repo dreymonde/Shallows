@@ -10,6 +10,8 @@ import Foundation
 import XCTest
 @testable import Shallows
 
+extension String : Error { }
+
 class ShallowsTests: XCTestCase {
 
     override func setUp() {
@@ -97,7 +99,7 @@ class ShallowsTests: XCTestCase {
         print(diskCache.directoryURL)
         let singleElementCache = MemoryCache<String, String>().makeCache().mapKeys({ "only_key" }) as Cache<Void, String>
         let finalCache = singleElementCache.combinedSetBack(with: diskCache.makeCache()
-            .mapKeys({ "only_key" })
+            .singleKey("only_key")
             .mapString(withEncoding: .utf8)
         )
         finalCache.set("Five-Four")
@@ -126,6 +128,51 @@ class ShallowsTests: XCTestCase {
             expectation.fulfill()
         }
         waitForExpectations(timeout: 5.0)
+    }
+    
+    func testMapKeysFailing() {
+        let cache = MemoryCache<Int, Int>()
+        let mapped: Cache<Int, Int> = cache.makeCache().mapKeys({ _ in throw "Test failable keys mappings" })
+        let sync = mapped.sync
+        XCTAssertThrowsError(try sync.retrieve(forKey: 10))
+        XCTAssertThrowsError(try sync.set(-20, forKey: 5))
+    }
+    
+    func testRawRepresentableValues() throws {
+        
+        enum Values : String {
+            case some, other, another
+        }
+        
+        let fileCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
+        fileCache.pruneOnDeinit = true
+        
+        let finalCache = fileCache.makeCache()
+            .mapString(withEncoding: .utf8)
+            .singleKey("single")
+            .mapValues() as Cache<Void, Values>
+        let sync = finalCache.sync
+        try sync.set(.some)
+        XCTAssertEqual(try sync.retrieve(), .some)
+        try sync.set(.another)
+        XCTAssertEqual(try sync.retrieve(), .another)
+    }
+    
+    func testCombinedSetFront() throws {
+        let front = MemoryCache<Int, Int>()
+        let back = MemoryCache<Int, Int>()
+        let combined = front.combinedSetFront(with: back).sync
+        print(combined.name)
+        back.storage[1] = 1
+        let firstCombined = try combined.retrieve(forKey: 1)
+        XCTAssertEqual(firstCombined, 1)
+        let firstFront = try front.sync.retrieve(forKey: 1)
+        XCTAssertEqual(firstFront, 1)
+        try combined.set(10, forKey: 1)
+        let secondFront = try front.sync.retrieve(forKey: 1)
+        XCTAssertEqual(secondFront, 10)
+        let secondBack = try back.sync.retrieve(forKey: 1)
+        XCTAssertEqual(secondBack, 1)
     }
     
     static var allTests = [

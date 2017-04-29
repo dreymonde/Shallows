@@ -55,7 +55,7 @@ fileprivate extension Result {
 extension CacheProtocol {
     
     public var sync: SyncCache<Key, Value> {
-        return SyncCache(name: self.name + "-sync", retrieve: { (key) throws -> Value in
+        return SyncCache(name: "\(self.name)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
