@@ -187,6 +187,14 @@ extension Cache {
     
 }
 
+extension Cache {
+    
+    public func singleKey(_ key: Key) -> Cache<Void, Value> {
+        return mapKeys({ key })
+    }
+    
+}
+
 extension ReadableCacheProtocol where Key == Void {
     
     public func retrieve(completion: @escaping (Result<Value>) -> ()) {

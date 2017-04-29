@@ -82,3 +82,19 @@ extension ReadOnlyCache {
     }
     
 }
+
+extension ReadOnlyCache {
+    
+    public func mapKeys<OtherKey : RawRepresentable>() -> ReadOnlyCache<OtherKey, Value> where OtherKey.RawValue == Key {
+        return mapKeys({ $0.rawValue })
+    }
+    
+}
+
+extension ReadOnlyCache {
+    
+    public func singleKey(_ key: Key) -> ReadOnlyCache<Void, Value> {
+        return mapKeys({ key })
+    }
+    
+}
