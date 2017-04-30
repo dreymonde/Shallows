@@ -41,8 +41,8 @@ class ShallowsTests: XCTestCase {
         let meme1 = MemoryCache<String, Int>(storage: ["Some" : 15], name: "First-Back")
         let meme2 = MemoryCache<String, Int>(storage: ["Other" : 20], name: "Second-Back")//.makeReadOnly()
         
-        let combined1 = meme1.combinedSetBoth(with: meme2)
-        let full = memeMain.combinedNoSet(with: combined1)
+        let combined1 = meme1.combined(with: meme2)
+        let full = memeMain.backed(by: combined1)
         //combined1.retrieve(forKey: "Other", completion: { print($0) })
         //meme1.retrieve(forKey: "Other", completion: { print($0) })
         full.retrieve(forKey: "Some", completion: { print($0) })
@@ -64,7 +64,7 @@ class ShallowsTests: XCTestCase {
             .mapKeys({ (str: String) in str as NSString })
             .mapValues(transformIn: { $0 as String },
                        transformOut: { $0 as NSString })
-        let main = memCache.combinedSetBoth(with: nscache.combinedSetBoth(with: diskCache))
+        let main = memCache.combined(with: nscache.combined(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
         main.retrieve(forKey: "my-life", completion: {
             XCTAssertEqual($0.asOptional, "I was just a little boy")
@@ -108,7 +108,7 @@ class ShallowsTests: XCTestCase {
         diskCache.pruneOnDeinit = true
         print(diskCache.directoryURL)
         let singleElementCache = MemoryCache<String, String>().makeCache().mapKeys({ "only_key" }) as Cache<Void, String>
-        let finalCache = singleElementCache.combinedSetBack(with: diskCache.makeCache()
+        let finalCache = singleElementCache.combined(with: diskCache.makeCache()
             .singleKey("only_key")
             .mapString(withEncoding: .utf8)
         )
@@ -171,7 +171,7 @@ class ShallowsTests: XCTestCase {
     func testCombinedSetFront() throws {
         let front = MemoryCache<Int, Int>()
         let back = MemoryCache<Int, Int>()
-        let combined = front.combinedSetFront(with: back).sync
+        let combined = front.combined(with: back, pullingFromBack: true, pushingToBack: false).sync
         print(combined.name)
         back.storage[1] = 1
         let firstCombined = try combined.retrieve(forKey: 1)
@@ -188,7 +188,7 @@ class ShallowsTests: XCTestCase {
     func testRetrievePullStrategy() {
         let front = MemoryCache<String, String>(name: "Front")
         let back = MemoryCache<String, String>(storage: ["A": "Alba"], name: "Back")
-        front.retrieve(forKey: "A", backedBy: back, pullFromBack: .never, completion: { print($0) })
+        front.retrieve(forKey: "A", backedBy: back, shouldPullFromBack: false, completion: { print($0) })
         print(front.storage["A"] as Any)
     }
     

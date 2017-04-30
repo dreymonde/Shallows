@@ -35,7 +35,7 @@ extension ReadableCacheProtocol {
         return ReadOnlyCache(self)
     }
     
-    public func combinedNoSet<CacheType : ReadableCacheProtocol>(with cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+    public func backed<CacheType : ReadableCacheProtocol>(by cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return ReadOnlyCache(name: "\(self.name) - \(cache.name)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
                 if firstResult.isFailure {
