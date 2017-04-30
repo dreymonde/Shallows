@@ -12,6 +12,16 @@ import XCTest
 
 extension String : Error { }
 
+extension FileSystemCache {
+    
+    static func test(number: Int) -> FileSystemCache {
+        let cache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-\(number)")
+        cache.pruneOnDeinit = true
+        return cache
+    }
+    
+}
+
 class ShallowsTests: XCTestCase {
 
     override func setUp() {
@@ -173,6 +183,13 @@ class ShallowsTests: XCTestCase {
         XCTAssertEqual(secondFront, 10)
         let secondBack = try back.sync.retrieve(forKey: 1)
         XCTAssertEqual(secondBack, 1)
+    }
+    
+    func testRetrievePullStrategy() {
+        let front = MemoryCache<String, String>(name: "Front")
+        let back = MemoryCache<String, String>(storage: ["A": "Alba"], name: "Back")
+        front.retrieve(forKey: "A", backedBy: back, pullFromBack: .never, completion: { print($0) })
+        print(front.storage["A"] as Any)
     }
     
     static var allTests = [
