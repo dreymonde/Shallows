@@ -37,6 +37,19 @@ public struct Cache<Key, Value> : CacheProtocol {
     
 }
 
+internal func cacheConnectionSignFromOptions(pullingFromBack: Bool, pushingToBack: Bool) -> String {
+    switch (pullingFromBack, pushingToBack) {
+    case (true, true):
+        return "<->"
+    case (true, false):
+        return "<-"
+    case (false, true):
+        return "->"
+    case (false, false):
+        return "-"
+    }
+}
+
 extension CacheProtocol {
     
     public func makeCache() -> Cache<Key, Value> {
@@ -107,7 +120,7 @@ extension CacheProtocol {
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                          pullingFromBack: Bool = true,
                          pushingToBack: Bool = true) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return Cache<Key, Value>(name: "\(self.name)+\(cache.name)", retrieve: { (key, completion) in
+        return Cache<Key, Value>(name: "(\(self.name))\(cacheConnectionSignFromOptions(pullingFromBack: pullingFromBack, pushingToBack: pushingToBack))(\(cache.name))", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
         }, set: { (value, key, completion) in
             if pushingToBack {
