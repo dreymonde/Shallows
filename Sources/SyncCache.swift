@@ -39,7 +39,24 @@ public struct SyncCache<Key, Value> {
     
 }
 
-fileprivate extension Result {
+public struct ReadOnlySyncCache<Key, Value> {
+    
+    public let name: String
+    
+    private let _retrieve: (Key) throws -> Value
+
+    public init(name: String, retrieve: @escaping (Key) throws -> Value) {
+        self.name = name
+        self._retrieve = retrieve
+    }
+    
+    public func retrieve(forKey key: Key) throws -> Value {
+        return try _retrieve(key)
+    }
+
+}
+
+internal extension Result {
     
     func value() throws -> Value {
         switch self {
@@ -52,9 +69,26 @@ fileprivate extension Result {
     
 }
 
+extension ReadOnlyCache {
+    
+    public func makeSyncCache() -> ReadOnlySyncCache<Key, Value> {
+        return ReadOnlySyncCache(name: "\(self.name)-sync", retrieve: { (key) throws -> Value in
+            let semaphore = DispatchSemaphore(value: 0)
+            var r_result: Result<Value>?
+            self.retrieve(forKey: key, completion: { (result) in
+                r_result = result
+                semaphore.signal()
+            })
+            semaphore.wait()
+            return try r_result!.value()
+        })
+    }
+    
+}
+
 extension CacheProtocol {
     
-    public var sync: SyncCache<Key, Value> {
+    public func makeSyncCache() -> SyncCache<Key, Value> {
         return SyncCache(name: "\(self.name)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
@@ -86,6 +120,14 @@ extension SyncCache where Key == Void {
     
     public func set(_ value: Value) throws {
         try set(value, forKey: ())
+    }
+    
+}
+
+extension ReadOnlySyncCache where Key == Void {
+    
+    public func retrieve() throws -> Value {
+        return try retrieve(forKey: ())
     }
     
 }

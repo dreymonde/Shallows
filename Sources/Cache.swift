@@ -4,6 +4,14 @@ public protocol CacheDesign {
     
 }
 
+extension CacheDesign {
+    
+    public var name: String {
+        return String(describing: Self.self)
+    }
+    
+}
+
 public protocol CacheProtocol : ReadableCacheProtocol, WritableCacheProtocol { }
 
 public struct Cache<Key, Value> : CacheProtocol {

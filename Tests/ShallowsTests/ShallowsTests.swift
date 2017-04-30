@@ -121,7 +121,7 @@ class ShallowsTests: XCTestCase {
     func testSync() throws {
         let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         diskCache.pruneOnDeinit = true
-        let stringCache = diskCache.makeCache().mapString().sync
+        let stringCache = diskCache.makeCache().mapString().makeSyncCache()
         try stringCache.set("Sofar", forKey: "kha")
         let back = try stringCache.retrieve(forKey: "kha")
         XCTAssertEqual(back, "Sofar")
@@ -133,7 +133,7 @@ class ShallowsTests: XCTestCase {
         let expectation = self.expectation(description: "On update")
         cache.update(forKey: 10, { $0 += 5 }) { (result) in
             XCTAssertEqual(result.asOptional, 20)
-            let check = try! cache.sync.retrieve(forKey: 10)
+            let check = try! cache.makeSyncCache().retrieve(forKey: 10)
             XCTAssertEqual(check, 20)
             expectation.fulfill()
         }
@@ -143,7 +143,7 @@ class ShallowsTests: XCTestCase {
     func testMapKeysFailing() {
         let cache = MemoryCache<Int, Int>()
         let mapped: Cache<Int, Int> = cache.makeCache().mapKeys({ _ in throw "Test failable keys mappings" })
-        let sync = mapped.sync
+        let sync = mapped.makeSyncCache()
         XCTAssertThrowsError(try sync.retrieve(forKey: 10))
         XCTAssertThrowsError(try sync.set(-20, forKey: 5))
     }
@@ -161,7 +161,7 @@ class ShallowsTests: XCTestCase {
             .mapString(withEncoding: .utf8)
             .singleKey("single")
             .mapValues() as Cache<Void, Values>
-        let sync = finalCache.sync
+        let sync = finalCache.makeSyncCache()
         try sync.set(.some)
         XCTAssertEqual(try sync.retrieve(), .some)
         try sync.set(.another)
@@ -171,17 +171,17 @@ class ShallowsTests: XCTestCase {
     func testCombinedSetFront() throws {
         let front = MemoryCache<Int, Int>()
         let back = MemoryCache<Int, Int>()
-        let combined = front.combined(with: back, pullingFromBack: true, pushingToBack: false).sync
+        let combined = front.combined(with: back, pullingFromBack: true, pushingToBack: false).makeSyncCache()
         print(combined.name)
         back.storage[1] = 1
         let firstCombined = try combined.retrieve(forKey: 1)
         XCTAssertEqual(firstCombined, 1)
-        let firstFront = try front.sync.retrieve(forKey: 1)
+        let firstFront = try front.makeSyncCache().retrieve(forKey: 1)
         XCTAssertEqual(firstFront, 1)
         try combined.set(10, forKey: 1)
-        let secondFront = try front.sync.retrieve(forKey: 1)
+        let secondFront = try front.makeSyncCache().retrieve(forKey: 1)
         XCTAssertEqual(secondFront, 10)
-        let secondBack = try back.sync.retrieve(forKey: 1)
+        let secondBack = try back.makeSyncCache().retrieve(forKey: 1)
         XCTAssertEqual(secondBack, 1)
     }
     

@@ -22,7 +22,7 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
         }
     }
     
-    public init(storage: [Key : Value] = [:], name: String = "MemoryCache\(Key.self):\(Value.self)") {
+    public init(storage: [Key : Value] = [:], name: String = "memory-cache-\(Key.self):\(Value.self)") {
         self._storage = storage
         self.name = name
     }

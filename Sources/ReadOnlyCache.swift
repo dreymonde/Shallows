@@ -7,7 +7,7 @@ public protocol ReadableCacheProtocol : CacheDesign {
     
 }
 
-public final class ReadOnlyCache<Key, Value> : ReadableCacheProtocol {
+public struct ReadOnlyCache<Key, Value> : ReadableCacheProtocol {
     
     public let name: String
     
