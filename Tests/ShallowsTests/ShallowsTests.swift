@@ -23,7 +23,7 @@ extension FileSystemCache {
 }
 
 class ShallowsTests: XCTestCase {
-
+    
     override func setUp() {
         ShallowsLog.isEnabled = true
     }
@@ -194,5 +194,5 @@ class ShallowsTests: XCTestCase {
     
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
-    ]
+        ]
 }

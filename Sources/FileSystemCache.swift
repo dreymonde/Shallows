@@ -1,10 +1,7 @@
 import Foundation
 
 public final class FileSystemCache : CacheProtocol {
-    
-    public typealias Key = String
-    public typealias Value = Data
-    
+        
     public let name: String
     public let directoryURL: URL
     

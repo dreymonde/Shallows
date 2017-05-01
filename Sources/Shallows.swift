@@ -18,6 +18,10 @@ public enum Result<Value> {
         return false
     }
     
+    public var isSuccess: Bool {
+        return !isFailure
+    }
+    
     public var asOptional: Value? {
         switch self {
         case .success(let value):
@@ -45,7 +49,7 @@ extension Optional {
     
 }
 
-internal func throwing<In, Out>(_ block: @escaping (In) -> Out?) -> (In) throws -> Out {
+public func throwing<In, Out>(_ block: @escaping (In) -> Out?) -> (In) throws -> Out {
     return { input in
         try block(input).unwrap()
     }
