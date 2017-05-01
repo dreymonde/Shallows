@@ -101,13 +101,9 @@ It does several things:
 2. If disk cache stores a value, it will be pulled to memory cache and returned to a user.
 3. When setting an image, it will be set both to memory and disk cache.
 
---
+Great things about composing caches is that in the end, you still has your `Cache<Key, Value>` instance. That means that you can recompose cache layers however you want without breaking the usage code. It also makes the code that depends on `Cache` very easy to test.
 
 The huge advantage of **Shallows** is that it doesn't try to hide the actual mechanism - the behavior of your caches is perfectly clear, and still very simple to understand and easy to use. You control how many layers your cache has, how it acts and what it stores. **Shallows** is not an end-product - instead, it's a tool that will help you build exactly what you need.
-
---
-
-Great things about composing caches is that in the end, you still has your `Cache<Key, Value>` instance. That means that you can recompose cache layers however you want without breaking the usage code. It also makes the code that depends on `Cache` very easy to test.
 
 #### Read-only cache
 
@@ -129,11 +125,7 @@ let cache = MemoryCache<String, String>()
     .makeReadOnly() // ReadOnlyCache<String, String>
 ```
 
---
-
-There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
-
---
+**NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
 
 #### Single element cache
 
@@ -185,7 +177,7 @@ public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                      pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value
 ```
 
-And `pullingFromBack` and `pushingToBack` by are both `true` by default.
+And `pullingFromBack` and `pushingToBack` are both `true` by default.
 
 - "Pulling from back" means that when "back" cache will be hit and success, the retrieved value will be set to the "front" cache also.
 - "Pushing to back" means that when the value is set to the "front" cache, it will also be set to the "back" cache.
@@ -202,6 +194,8 @@ func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -
 ```
 
 Where `Key` and `Value` are associated types.
+
+**NOTE:** Please be aware that you should care about thread-safety of your implementation. Very often `retrieve` and `set` will not be called from the main thread, so you should make sure that no race conditions will occur.
 
 To use it as `Cache<Key, Value>` instance, simply call `.makeCache()` on it:
 
