@@ -209,7 +209,7 @@ You shouldn't. Technically you can, but really **Shallows** is not the best opti
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.1.0
+github "dreymonde/Shallows" ~> 0.1.1
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
