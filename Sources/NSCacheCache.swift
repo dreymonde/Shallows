@@ -28,3 +28,55 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     }
     
 }
+
+extension Cache where Key == NSString {
+    
+    public func toNonObjCKeys() -> Cache<String, Value> {
+        return mapKeys({ $0 as NSString })
+    }
+    
+}
+
+extension Cache where Value == NSString {
+    
+    public func toNonObjCValues() -> Cache<Key, String> {
+        return mapValues(transformIn: { $0 as String },
+                         transformOut: { $0 as NSString })
+    }
+    
+}
+
+extension Cache where Key == NSURL {
+    
+    public func toNonObjCKeys() -> Cache<URL, Value> {
+        return mapKeys({ $0 as NSURL })
+    }
+    
+}
+
+extension Cache where Value == NSURL {
+    
+    public func toNonObjCValues() -> Cache<Key, URL> {
+        return mapValues(transformIn: { $0 as URL },
+                         transformOut: { $0 as NSURL })
+    }
+    
+}
+
+extension Cache where Key == NSIndexPath {
+    
+    public func toNonObjCKeys() -> Cache<IndexPath, Value> {
+        return mapKeys({ $0 as NSIndexPath })
+    }
+    
+}
+
+extension Cache where Value == NSIndexPath {
+    
+    public func toNonObjCValues() -> Cache<Key, IndexPath> {
+        return mapValues(transformIn: { $0 as IndexPath },
+                         transformOut: { $0 as NSIndexPath })
+    }
+    
+}
+

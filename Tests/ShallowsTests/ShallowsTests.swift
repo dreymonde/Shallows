@@ -61,9 +61,8 @@ class ShallowsTests: XCTestCase {
         let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
         let nscache = NSCacheCache<NSString, NSString>(cache: .init(), name: "nscache")
             .makeCache()
-            .mapKeys({ (str: String) in str as NSString })
-            .mapValues(transformIn: { $0 as String },
-                       transformOut: { $0 as NSString })
+            .toNonObjCKeys()
+            .toNonObjCValues()
         let main = memCache.combined(with: nscache.combined(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
         main.retrieve(forKey: "my-life", completion: {
