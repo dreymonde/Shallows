@@ -18,7 +18,6 @@ Using **Shallows** for two-step JSON cache (memory and disk):
 ```swift
 let memoryJSONCache = MemoryCache<String, [String : Any]>()
 let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-json-cache")
-    .makeCache()
     .mapJSONDictionary()
 let combinedCache = memoryJSONCache.combined(with: diskCache)
 combinedCache.retrieve(forKey: "Higgins") { (result) in
@@ -81,8 +80,8 @@ The concept of keys and values transformations is really powerful and it lies in
 ```swift
 // FileSystemCache is a cache of String : Data
 let fileSystemCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-caches-1")
-let imageCache = fileSystemCache.makeCache().mapValues(transformIn: { try UIImage(data: $0).unwrap() },
-                                                       transformOut: { try UIImagePNGRepresentation($0).unwrap() })
+let imageCache = fileSystemCache.mapValues(transformIn: { try UIImage(data: $0).unwrap() },
+                                           transformOut: { try UIImagePNGRepresentation($0).unwrap() })
 ```
 
 Now you have an instance of type `Cache<String, UIImage>` which can be used to store images without much fuss.
@@ -117,7 +116,6 @@ Read-only caches can also be mapped and composed:
 
 ```swift
 let immutableFileCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-immutable")
-    .makeCache()
     .mapString(withEncoding: .utf8)
     .makeReadOnly()
 let cache = MemoryCache<String, String>()
@@ -133,7 +131,6 @@ You can have a cache with keys `Void`. That means that you can store only one el
 
 ```swift
 let settingsCache = FileSystemCache.inDirectory(.documentDirectory, appending: "settings")
-    .makeCache()
     .mapJSONDictionary()
     .singleKey("settings") // Cache<Void, [String : Any]>
 settingsCache.retrieve { (result) in
@@ -147,7 +144,6 @@ Caches in **Shallows** are asynchronous by it's nature. However, in some situati
 
 ```swift
 let strings = FileSystemCache.inDirectory(.cachesDirectory, appending: "strings")
-    .makeCache()
     .mapString(withEncoding: .utf8)
     .makeSyncCache() // SyncCache<String, String>
 let existing = try strings.retrieve(forKey: "hello")

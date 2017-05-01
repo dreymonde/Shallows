@@ -56,11 +56,10 @@ class ShallowsTests: XCTestCase {
         let diskCache_raw = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-1")
         diskCache_raw.pruneOnDeinit = true
         let expectation = self.expectation(description: "On retrieve")
-        let diskCache = diskCache_raw.makeCache()
+        let diskCache = diskCache_raw
             .mapString(withEncoding: .utf8)
         let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
         let nscache = NSCacheCache<NSString, NSString>(cache: .init(), name: "nscache")
-            .makeCache()
             .toNonObjCKeys()
             .toNonObjCValues()
         let main = memCache.combined(with: nscache.combined(with: diskCache))
@@ -76,7 +75,7 @@ class ShallowsTests: XCTestCase {
         enum Keys : String {
             case a, b, c
         }
-        let memCache = MemoryCache<String, Int>(storage: [:]).makeCache().mapKeys() as Cache<Keys, Int>
+        let memCache = MemoryCache<String, Int>(storage: [:]).mapKeys() as Cache<Keys, Int>
         memCache.set(10, forKey: .a)
         memCache.retrieve(forKey: .a, completion: { XCTAssertEqual($0.asOptional, 10) })
         memCache.retrieve(forKey: .b, completion: { XCTAssertNil($0.asOptional) })
@@ -84,7 +83,7 @@ class ShallowsTests: XCTestCase {
     
     func testJSONMapping() {
         let dict: [String : Any] = ["json": 15]
-        let memCache = MemoryCache<Int, Data>(storage: [:]).makeCache().mapJSONDictionary()
+        let memCache = MemoryCache<Int, Data>(storage: [:]).mapJSONDictionary()
         memCache.set(dict, forKey: 10)
         memCache.retrieve(forKey: 10) { (result) in
             print(result)
@@ -94,7 +93,7 @@ class ShallowsTests: XCTestCase {
     
     func testPlistMapping() {
         let dict: [String : Any] = ["plist": 15]
-        let memCache = MemoryCache<Int, Data>(storage: [:]).makeCache().mapPlistDictionary(format: .binary)
+        let memCache = MemoryCache<Int, Data>(storage: [:]).mapPlistDictionary(format: .binary)
         memCache.set(dict, forKey: 10)
         memCache.retrieve(forKey: 10) { (result) in
             print(result)
@@ -106,8 +105,8 @@ class ShallowsTests: XCTestCase {
         let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-2")
         diskCache.pruneOnDeinit = true
         print(diskCache.directoryURL)
-        let singleElementCache = MemoryCache<String, String>().makeCache().mapKeys({ "only_key" }) as Cache<Void, String>
-        let finalCache = singleElementCache.combined(with: diskCache.makeCache()
+        let singleElementCache = MemoryCache<String, String>().mapKeys({ "only_key" }) as Cache<Void, String>
+        let finalCache = singleElementCache.combined(with: diskCache
             .singleKey("only_key")
             .mapString(withEncoding: .utf8)
         )
@@ -120,7 +119,7 @@ class ShallowsTests: XCTestCase {
     func testSync() throws {
         let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         diskCache.pruneOnDeinit = true
-        let stringCache = diskCache.makeCache().mapString().makeSyncCache()
+        let stringCache = diskCache.mapString().makeSyncCache()
         try stringCache.set("Sofar", forKey: "kha")
         let back = try stringCache.retrieve(forKey: "kha")
         XCTAssertEqual(back, "Sofar")
@@ -141,7 +140,7 @@ class ShallowsTests: XCTestCase {
     
     func testMapKeysFailing() {
         let cache = MemoryCache<Int, Int>()
-        let mapped: Cache<Int, Int> = cache.makeCache().mapKeys({ _ in throw "Test failable keys mappings" })
+        let mapped: Cache<Int, Int> = cache.mapKeys({ _ in throw "Test failable keys mappings" })
         let sync = mapped.makeSyncCache()
         XCTAssertThrowsError(try sync.retrieve(forKey: 10))
         XCTAssertThrowsError(try sync.set(-20, forKey: 5))
@@ -156,7 +155,7 @@ class ShallowsTests: XCTestCase {
         let fileCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         fileCache.pruneOnDeinit = true
         
-        let finalCache = fileCache.makeCache()
+        let finalCache = fileCache
             .mapString(withEncoding: .utf8)
             .singleKey("single")
             .mapValues() as Cache<Void, Values>

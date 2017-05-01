@@ -85,7 +85,7 @@ public final class FileSystemCache : CacheProtocol {
     
 }
 
-extension Cache where Value == Data {
+extension CacheProtocol where Value == Data {
     
     public func mapJSON() -> Cache<Key, Any> {
         return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: []) },

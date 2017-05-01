@@ -150,7 +150,7 @@ extension CacheProtocol {
     
 }
 
-extension Cache {
+extension CacheProtocol {
     
     public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> Cache<OtherKey, Value> {
         return Cache<OtherKey, Value>(name: name, retrieve: { key, completion in
@@ -198,7 +198,7 @@ extension Cache {
     
 }
 
-extension Cache {
+extension CacheProtocol {
     
     public func mapValues<OtherValue : RawRepresentable>() -> Cache<Key, OtherValue> where OtherValue.RawValue == Value {
         return mapValues(transformIn: throwing(OtherValue.init(rawValue:)),
@@ -211,7 +211,7 @@ extension Cache {
     
 }
 
-extension Cache {
+extension CacheProtocol {
     
     public func singleKey(_ key: Key) -> Cache<Void, Value> {
         return mapKeys({ key })
