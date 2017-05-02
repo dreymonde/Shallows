@@ -1,6 +1,63 @@
 import Foundation
 
 public final class FileSystemCache : CacheProtocol {
+    
+    public static func fileName(for key: String) -> String {
+        guard let data = key.data(using: .utf8) else { return key }
+        return data.base64EncodedString(options: [])
+    }
+    
+    public typealias Key = String
+    public typealias Value = Data
+    
+    public var directoryURL: URL {
+        return raw.directoryURL
+    }
+    
+    public var name: String {
+        return raw.name
+    }
+    
+    internal var pruneOnDeinit: Bool {
+        get { return raw.pruneOnDeinit }
+        set { raw.pruneOnDeinit = newValue }
+    }
+    
+    public let raw: RawFileSystemCache
+    private let rawMapped: Cache<String, Data>
+    
+    init(directoryURL: URL, name: String? = nil) {
+        self.raw = RawFileSystemCache(directoryURL: directoryURL, name: name)
+        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
+    }
+    
+    public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
+                                   appending pathComponent: String,
+                                   domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
+                                   cacheName: String? = nil) -> FileSystemCache {
+        let urls = FileManager.default.urls(for: directory, in: domainMask)
+        let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
+        return FileSystemCache(directoryURL: url, name: cacheName)
+    }
+    
+    public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
+        rawMapped.retrieve(forKey: key, completion: completion)
+    }
+    
+    public func set(_ value: Data, forKey key: String, completion: @escaping (Result<Void>) -> ()) {
+        rawMapped.set(value, forKey: key, completion: completion)
+    }
+    
+}
+
+public final class RawFileSystemCache : CacheProtocol {
+    
+    public struct FileName {
+        public let fileName: String
+        init(_ fileName: String) {
+            self.fileName = fileName
+        }
+    }
         
     public let name: String
     public let directoryURL: URL
@@ -22,30 +79,16 @@ public final class FileSystemCache : CacheProtocol {
         }
     }
     
-    public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
-                                   appending pathComponent: String,
-                                   domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
-                                   cacheName: String? = nil) -> FileSystemCache {
-        let urls = FileManager.default.urls(for: directory, in: domainMask)
-        let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return FileSystemCache(directoryURL: url, name: cacheName)
-    }
-    
     public enum Error : Swift.Error {
         case cantCreateDirectory(Swift.Error)
         case cantCreateFile
     }
     
-    public func fileName(for key: String) -> String {
-        guard let data = key.data(using: .utf8) else { return key }
-        return data.base64EncodedString(options: [])
-    }
-    
-    public func set(_ value: Data, forKey key: String, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Data, forKey key: FileName, completion: @escaping (Result<Void>) -> ()) {
         queue.async {
             do {
                 try self.createDirectoryURLIfNotExisting()
-                let path = self.directoryURL.appendingPathComponent(self.fileName(for: key)).path
+                let path = self.directoryURL.appendingPathComponent(key.fileName).path
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
@@ -71,9 +114,9 @@ public final class FileSystemCache : CacheProtocol {
         }
     }
     
-    public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey key: FileName, completion: @escaping (Result<Data>) -> ()) {
         queue.async {
-            let path = self.directoryURL.appendingPathComponent(self.fileName(for: key))
+            let path = self.directoryURL.appendingPathComponent(key.fileName)
             do {
                 let data = try Data(contentsOf: path)
                 completion(.success(data))
