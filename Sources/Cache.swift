@@ -139,7 +139,7 @@ extension CacheProtocol {
         })
     }
     
-    public func combined<ReadableCacheType : ReadableCacheProtocol>(with cache: ReadableCacheType,
+    public func backed<ReadableCacheType : ReadableCacheProtocol>(by cache: ReadableCacheType,
                          pullingFromBack: Bool = true) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
         return Cache<Key, Value>(name: "\(self.name)+\(cache.name)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)

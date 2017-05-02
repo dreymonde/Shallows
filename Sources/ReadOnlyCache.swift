@@ -36,7 +36,7 @@ extension ReadableCacheProtocol {
     }
     
     public func backed<CacheType : ReadableCacheProtocol>(by cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return ReadOnlyCache(name: "\(self.name) - \(cache.name)", retrieve: { (key, completion) in
+        return ReadOnlyCache(name: "\(self.name)-\(cache.name)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
                 if firstResult.isFailure {
                     shallows_print("Cache (\(self.name)) miss for key: \(key). Attempting to retrieve from \(cache.name)")
