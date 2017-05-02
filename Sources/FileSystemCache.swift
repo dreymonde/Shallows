@@ -117,3 +117,30 @@ extension CacheProtocol where Value == Data {
     }
     
 }
+
+extension ReadOnlyCache where Value == Data {
+    
+    public func mapJSON() -> ReadOnlyCache<Key, Any> {
+        return mapValues({ try JSONSerialization.jsonObject(with: $0, options: []) })
+    }
+    
+    public func mapJSONDictionary() -> ReadOnlyCache<Key, [String : Any]> {
+        return mapJSON().mapValues(throwing({ $0 as? [String : Any] }))
+    }
+    
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, Any> {
+        return mapValues({ data in
+            var formatRef = format
+            return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
+        })
+    }
+    
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, [String : Any]> {
+        return mapPlist(format: format).mapValues(throwing({ $0 as? [String : Any] }))
+    }
+    
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyCache<Key, String> {
+        return mapValues(throwing({ String(data: $0, encoding: encoding) }))
+    }
+    
+}

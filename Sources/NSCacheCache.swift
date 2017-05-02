@@ -46,6 +46,22 @@ extension CacheProtocol where Value == NSString {
     
 }
 
+extension ReadOnlyCache where Key == NSString {
+    
+    public func toNonObjCKeys() -> ReadOnlyCache<String, Value> {
+        return mapKeys({ $0 as NSString })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSString {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, String> {
+        return mapValues({ $0 as String })
+    }
+    
+}
+
 extension CacheProtocol where Key == NSURL {
     
     public func toNonObjCKeys() -> Cache<URL, Value> {
@@ -59,6 +75,22 @@ extension CacheProtocol where Value == NSURL {
     public func toNonObjCValues() -> Cache<Key, URL> {
         return mapValues(transformIn: { $0 as URL },
                          transformOut: { $0 as NSURL })
+    }
+    
+}
+
+extension ReadOnlyCache where Key == NSURL {
+    
+    public func toNonObjCKeys() -> ReadOnlyCache<URL, Value> {
+        return mapKeys({ $0 as NSURL })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSURL {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, URL> {
+        return mapValues({ $0 as URL })
     }
     
 }
@@ -80,3 +112,18 @@ extension CacheProtocol where Value == NSIndexPath {
     
 }
 
+extension ReadOnlyCache where Key == NSIndexPath {
+    
+    public func toNonObjCKeys() -> ReadOnlyCache<IndexPath, Value> {
+        return mapKeys({ $0 as NSIndexPath })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSIndexPath {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, IndexPath> {
+        return mapValues({ $0 as IndexPath })
+    }
+    
+}

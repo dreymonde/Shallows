@@ -85,6 +85,10 @@ extension ReadOnlyCache {
 
 extension ReadOnlyCache {
     
+    public func mapValues<OtherValue : RawRepresentable>() -> ReadOnlyCache<Key, OtherValue> where OtherValue.RawValue == Value {
+        return mapValues(throwing(OtherValue.init(rawValue:)))
+    }
+    
     public func mapKeys<OtherKey : RawRepresentable>() -> ReadOnlyCache<OtherKey, Value> where OtherKey.RawValue == Key {
         return mapKeys({ $0.rawValue })
     }
