@@ -234,3 +234,11 @@ extension WritableCacheProtocol where Key == Void {
     }
     
 }
+
+extension CacheProtocol where Key == Void {
+    
+    public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (Result<Value>) -> () = {_ in }) {
+        self.update(forKey: (), modify, completion: completion)
+    }
+    
+}
