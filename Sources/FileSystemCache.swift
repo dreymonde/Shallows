@@ -54,7 +54,7 @@ public final class RawFileSystemCache : CacheProtocol {
     
     public struct FileName {
         public let fileName: String
-        init(_ fileName: String) {
+        public init(_ fileName: String) {
             self.fileName = fileName
         }
     }
