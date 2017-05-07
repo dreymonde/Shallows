@@ -1,6 +1,6 @@
 import Foundation
 
-internal protocol FileSystemCacheProtocol : CacheProtocol {
+public protocol FileSystemCacheProtocol : CacheProtocol {
     
     init(directoryURL: URL, cacheName: String?)
     
@@ -42,7 +42,7 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     public let raw: RawFileSystemCache
     private let rawMapped: Cache<String, Data>
     
-    init(directoryURL: URL, cacheName: String? = nil) {
+    public init(directoryURL: URL, cacheName: String? = nil) {
         self.raw = RawFileSystemCache(directoryURL: directoryURL, cacheName: cacheName)
         self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
     }
