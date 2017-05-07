@@ -6,6 +6,11 @@ public protocol CacheDesign {
 
 extension CacheDesign {
     
+    @available(*, deprecated, renamed: "cacheName")
+    public var name: String {
+        return cacheName
+    }
+    
     public var cacheName: String {
         return String(describing: Self.self)
     }
@@ -21,9 +26,9 @@ public struct Cache<Key, Value> : CacheProtocol {
     private let _retrieve: (Key, @escaping (Result<Value>) -> ()) -> ()
     private let _set: (Value, Key, @escaping (Result<Void>) -> ()) -> ()
     
-    public init(cacheName: String/* = "Unnamed cache \(Key.self) : \(Value.self)"*/,
-        retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> (),
-        set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
+    public init(cacheName: String,
+                retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> (),
+                set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
         self._retrieve = retrieve
         self._set = set
         self.cacheName = cacheName
