@@ -240,6 +240,31 @@ class ShallowsTests: XCTestCase {
         XCTAssertEqual(mainVillain, "Scarecrow")
     }
     
+    func testLatestStrategy() {
+        let expectation10 = self.expectation(description: "On 10, true")
+        let expectation15 = self.expectation(description: "On 15, true")
+        var complete1: ((Result<Int>) -> ())?
+        let cache1 = ReadOnlyCache<Void, Int>(cacheName: "", retrieve: { _, completion in complete1 = completion })
+        let cache2 = ReadOnlyCache<Void, Bool>(cacheName: "", retrieve: { _, completion in completion(.success(true)) })
+        let zipped = zip(cache1, cache2, withStrategy: .latest)
+        zipped.retrieve { (res) in
+            let (num, bool) = res.asOptional!
+            if num == 10, bool {
+                expectation10.fulfill()
+            }
+            if num == 15, bool {
+                expectation15.fulfill()
+            }
+        }
+        DispatchQueue.global().async {
+            complete1!(.success(10))
+        }
+        DispatchQueue.global().async {
+            complete1!(.success(15))
+        }
+        waitForExpectations(timeout: 5.0)
+    }
+    
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
     ]

@@ -8,21 +8,21 @@
 
 import Dispatch
 
-public final class CompletionContainer<A, B> {
+fileprivate final class CompletionContainer<A, B> {
     
-    public struct Strategy {
+    fileprivate struct Strategy {
         
         private let _check: (inout [A], inout [B], (A, B) -> ()) -> ()
         
-        public init(check: @escaping (inout [A], inout [B], (A, B) -> ()) -> ()) {
+        fileprivate init(check: @escaping (inout [A], inout [B], (A, B) -> ()) -> ()) {
             self._check = check
         }
         
-        public func checkContainers(_ a: inout [A], _ b: inout [B], complete: (A, B) -> ()) {
+        fileprivate func checkContainers(_ a: inout [A], _ b: inout [B], complete: (A, B) -> ()) {
             _check(&a, &b, complete)
         }
         
-        public static var sameOrder: Strategy {
+        fileprivate static var sameOrder: Strategy {
             return Strategy { ase, bis, complete in
                 var cnt = 0
                 while !ase.isEmpty && !bis.isEmpty {
@@ -35,7 +35,7 @@ public final class CompletionContainer<A, B> {
             }
         }
         
-        public static var latest: Strategy {
+        fileprivate static var latest: Strategy {
             return Strategy { ase, bis, complete in
                 if let lastA = ase.last, let lastB = bis.last {
                     complete(lastA, lastB)
@@ -52,44 +52,34 @@ public final class CompletionContainer<A, B> {
     
     private let completion: (A, B) -> ()
     
-    public init(strategy: Strategy, completion: @escaping (A, B) -> ()) {
+    fileprivate init(strategy: Strategy, completion: @escaping (A, B) -> ()) {
         self.strategy = strategy
         self.completion = completion
     }
     
-    public func complete(with a: A...) {
+    fileprivate func complete(with a: A...) {
         completeA(with: a)
     }
     
-    public func complete(with b: B...) {
+    fileprivate func complete(with b: B...) {
         completeB(with: b)
     }
     
-    public func completeA(with a: [A]) {
+    fileprivate func completeA(with a: [A]) {
         queue.async {
             self.ase.append(contentsOf: a)
             self.check()
         }
     }
     
-    public func completeB(with b: [B]) {
+    fileprivate func completeB(with b: [B]) {
         queue.async {
             self.bis.append(contentsOf: b)
             self.check()
         }
     }
 
-    
     private func check() {
-        // dispatchPrecondition(condition: .onQueue(queue))
-//        var cnt = 0
-//        while !ase.isEmpty && !bis.isEmpty {
-//            cnt += 1
-//            print(cnt)
-//            let a = ase.removeFirst()
-//            let b = bis.removeFirst()
-//            completion(a, b)
-//        }
         strategy.checkContainers(&ase, &bis, complete: self.completion)
     }
     
@@ -127,9 +117,23 @@ public func zip<Value1, Value2>(_ lhs: Result<Value1>, _ rhs: Result<Value2>) ->
     }
 }
 
-public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyCache<Key, Value1>, _ rhs: ReadOnlyCache<Key, Value2>) -> ReadOnlyCache<Key, (Value1, Value2)> {
+public enum ZipCompletionStrategy {
+    case latest
+    case withSameIndex
+    
+    fileprivate func containerStrategy<T, U>() -> CompletionContainer<T, U>.Strategy {
+        switch self {
+        case .latest:
+            return .latest
+        case .withSameIndex:
+            return .sameOrder
+        }
+    }
+}
+
+public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyCache<Key, Value1>, _ rhs: ReadOnlyCache<Key, Value2>, withStrategy strategy: ZipCompletionStrategy = .latest) -> ReadOnlyCache<Key, (Value1, Value2)> {
     return ReadOnlyCache(cacheName: lhs.cacheName + "+" + rhs.cacheName, retrieve: { (key, completion) in
-        let container = CompletionContainer<Result<Value1>, Result<Value2>>(strategy: .sameOrder) { left, right in
+        let container = CompletionContainer<Result<Value1>, Result<Value2>>(strategy: strategy.containerStrategy()) { left, right in
             completion(zip(left, right))
         }
         lhs.retrieve(forKey: key, completion: { container.complete(with: $0) })
@@ -137,15 +141,15 @@ public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyCache<Key, Value1>, _ rhs: R
     })
 }
 
-public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _ rhs: Cache2) -> Cache<Cache1.Key, (Cache1.Value, Cache2.Value)> where Cache1.Key == Cache2.Key {
+public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _ rhs: Cache2, withStrategy strategy: ZipCompletionStrategy = .latest) -> Cache<Cache1.Key, (Cache1.Value, Cache2.Value)> where Cache1.Key == Cache2.Key {
     return Cache(cacheName: lhs.cacheName + "+" + rhs.cacheName, retrieve: { (key, completion) in
-        let container = CompletionContainer<Result<Cache1.Value>, Result<Cache2.Value>>(strategy: .sameOrder, completion: { (left, right) in
+        let container = CompletionContainer<Result<Cache1.Value>, Result<Cache2.Value>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
             completion(zip(left, right))
         })
         lhs.retrieve(forKey: key, completion: { container.complete(with: $0) })
         rhs.retrieve(forKey: key, completion: { container.complete(with: $0) })
     }, set: { (value, key, completion) in
-        let container = CompletionContainer<Result<Void>, Result<Void>>(strategy: .sameOrder, completion: { (left, right) in
+        let container = CompletionContainer<Result<Void>, Result<Void>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
             let zipped = zip(left, right)
             switch zipped {
             case .success:
