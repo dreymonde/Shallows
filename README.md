@@ -37,7 +37,7 @@ combinedCache.set(["name": "Mark", "rating": 1], forKey: "Selby") { (result) in
 A main type of **Shallows** is `Cache<Key, Value>`. It's an abstract, type-erased structure which doesn't contain any logic -- it needs to be provided with one. The most basic one is `MemoryCache`:
 
 ```swift
-let cache = MemoryCache<String, Int>().makeCache() // Cache<String, Int>
+let cache = MemoryCache<String, Int>().asCache() // Cache<String, Int>
 ```
 
 Cache instances have `retrieve` and `set` methods, which are asynhronous and fallible:
@@ -109,7 +109,7 @@ The huge advantage of **Shallows** is that it doesn't try to hide the actual mec
 If you don't want to expose writing to your cache, you can make it a read-only cache:
 
 ```swift
-let readOnly = cache.makeReadOnly() // ReadOnlyCache<Key, Value>
+let readOnly = cache.asReadOnlyCache() // ReadOnlyCache<Key, Value>
 ```
 
 Read-only caches can also be mapped and composed:
@@ -117,10 +117,10 @@ Read-only caches can also be mapped and composed:
 ```swift
 let immutableFileCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-immutable")
     .mapString(withEncoding: .utf8)
-    .makeReadOnly()
+    .asReadOnlyCache()
 let cache = MemoryCache<String, String>()
     .combined(with: immutableFileCache)
-    .makeReadOnly() // ReadOnlyCache<String, String>
+    .asReadOnlyCache() // ReadOnlyCache<String, String>
 ```
 
 **NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
@@ -193,17 +193,17 @@ Where `Key` and `Value` are associated types.
 
 **NOTE:** Please be aware that you should care about thread-safety of your implementation. Very often `retrieve` and `set` will not be called from the main thread, so you should make sure that no race conditions will occur.
 
-To use it as `Cache<Key, Value>` instance, simply call `.makeCache()` on it:
+To use it as `Cache<Key, Value>` instance, simply call `.asCache()` on it:
 
 ```swift
-let cache = MyCache().makeCache()
+let cache = MyCache().asCache()
 ```
 
 You can also conform to a `ReadableCacheProtocol` only. That way, you only need to define a `retrieve(forKey:completion:)` method.
 
 ### Using Shallows with images in `UITableView`
 
-You shouldn't. Technically you can, but really **Shallows** is not the best option for this task. Instead, you should use [Avenues][avenues-github-url], which is designed exactly for this. Saying more, **Shallows** and **Avenues** complement each other very well - **Shallows** can be used to cache fetched images on disk (which **Avenues** doesn't do). You can check out the [Avenues+Shallows][avenues-shallows-github-url] repo for more details.
+Well, you shouldn't really do that. Technically you can, but really **Shallows** is not the best option for this task. Instead, you should use [Avenues][avenues-github-url], which is designed exactly for this. Saying more, **Shallows** and **Avenues** complement each other very well - **Shallows** can be used to cache fetched images on disk (which **Avenues** doesn't do). You can check out the [Avenues+Shallows][avenues-shallows-github-url] repo for more details.
 
 ## Installation
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
