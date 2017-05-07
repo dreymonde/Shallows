@@ -31,6 +31,10 @@ extension ReadOnlyCache {
         return ReadOnlyCache(cacheName: "", retrieve: { _, completion in completion(.failure(error)) })
     }
     
+    static func alwaysSucceeding(with value: Value) -> ReadOnlyCache<Key, Value> {
+        return ReadOnlyCache(cacheName: "", retrieve: { _, completion in completion(.success(value)) })
+    }
+    
 }
 
 class ShallowsTests: XCTestCase {
@@ -275,6 +279,17 @@ class ShallowsTests: XCTestCase {
             complete1!(.success(15))
         }
         waitForExpectations(timeout: 5.0)
+    }
+    
+    func testZipALot() throws {
+        let int = ReadOnlyCache<Void, Int>.alwaysSucceeding(with: 10)
+        let bool = ReadOnlyCache<Void, Bool>.alwaysSucceeding(with: true)
+        let string = ReadOnlyCache<Void, String>.alwaysSucceeding(with: "A lot")
+        let zipped = flat(zip(int, zip(bool, string))).makeSyncCache()
+        let (i, b, s) = try zipped.retrieve()
+        XCTAssertEqual(i, 10)
+        XCTAssertTrue(b)
+        XCTAssertEqual(s, "A lot")
     }
     
     static var allTests = [

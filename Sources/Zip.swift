@@ -162,3 +162,21 @@ public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _
         rhs.set(value.1, forKey: key, completion: { container.completeB(with: [$0]) })
     })
 }
+
+public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, (T, (U, V))>) -> Cache<Key, (T, U, V)> {
+    return notFlatCache.mapValues(transformIn: { ($0, $1.0, $1.1) },
+                                  transformOut: { ($0, ($1, $2)) })
+}
+
+public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, ((T, U), V)>) -> Cache<Key, (T, U, V)> {
+    return notFlatCache.mapValues(transformIn: { ($0.0, $0.1, $1) },
+                                  transformOut: { (($0, $1), $2) })
+}
+
+public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, (T, (U, V))>) -> ReadOnlyCache<Key, (T, U, V)> {
+    return notFlatCache.mapValues({ ($0, $1.0, $1.1) })
+}
+
+public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, ((T, U), V)>) -> ReadOnlyCache<Key, (T, U, V)> {
+    return notFlatCache.mapValues({ ($0.0, $0.1, $1) })
+}
