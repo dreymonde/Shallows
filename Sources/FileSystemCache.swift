@@ -25,10 +25,7 @@ public final class FileSystemCache : FileSystemCacheProtocol {
         guard let data = key.data(using: .utf8) else { return key }
         return data.base64EncodedString(options: [])
     }
-    
-    public typealias Key = String
-    public typealias Value = Data
-    
+        
     public var directoryURL: URL {
         return raw.directoryURL
     }

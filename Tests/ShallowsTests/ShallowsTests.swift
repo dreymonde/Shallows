@@ -152,19 +152,7 @@ class ShallowsTests: XCTestCase {
         }
         waitForExpectations(timeout: 5.0)
     }
-    
-    func testUpdateCreatingIfFail() {
-        let cache = MemoryCache<Int, Int>()
-        let expectation = self.expectation(description: "On update")
-        cache.update(forKey: 10, { $0 += 5 }, creatingIfFail: { _ in 15 }) { result in
-            XCTAssertEqual(result.asOptional, 20)
-            let check = try! cache.makeSyncCache().retrieve(forKey: 10)
-            XCTAssertEqual(check, 20)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5.0)
-    }
-    
+        
     func testMapKeysFailing() {
         let cache = MemoryCache<Int, Int>()
         let mapped: Cache<Int, Int> = cache.mapKeys({ _ in throw "Test failable keys mappings" })

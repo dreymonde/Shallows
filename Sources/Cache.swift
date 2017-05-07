@@ -85,35 +85,6 @@ extension CacheProtocol {
         }
     }
     
-    public func update(forKey key: Key,
-                       _ modify: @escaping (inout Value) -> (),
-                       creatingIfFail: @escaping (Error) throws -> Value,
-                       completion: @escaping (Result<Value>) -> () = { _ in }) {
-        retrieve(forKey: key) { (result) in
-            do {
-                var finalValue: Value = try {
-                    switch result {
-                    case .success(let value):
-                        return value
-                    case .failure(let error):
-                        return try creatingIfFail(error)
-                    }
-                }()
-                modify(&finalValue)
-                self.set(finalValue, forKey: key, completion: { (setResult) in
-                    switch setResult {
-                    case .success:
-                        completion(.success(finalValue))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                })
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-    
     internal func set<CacheType : WritableCacheProtocol>(_ value: Value,
                       forKey key: Key,
                       pushingTo cache: CacheType,

@@ -86,6 +86,8 @@ let imageCache = fileSystemCache.mapValues(transformIn: { try UIImage(data: $0).
 
 Now you have an instance of type `Cache<String, UIImage>` which can be used to store images without much fuss.
 
+**NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
+
 #### Caches composition
 
 Another core concept of **Shallows** is composition. Hitting a disk every time you request an image can be slow and inefficient. Instead, you can compose `MemoryCache` and `FileSystemCache`:
@@ -122,8 +124,6 @@ let cache = MemoryCache<String, String>()
     .combined(with: immutableFileCache)
     .asReadOnlyCache() // ReadOnlyCache<String, String>
 ```
-
-**NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
 
 #### Single element cache
 
@@ -162,6 +162,33 @@ arrays.update(forKey: "some-key", { $0.append(10) }) { (result) in
     // ...
 }
 ```
+
+#### Zipping caches
+
+Zipping is a very powerful feature of **Shallows**. It allows you to compose your caches in a way that you get result only when both of them completes for your request. For example:
+
+```swift
+let jsons = FileSystemCache.inDirectory(.cachesDirectory, appending: "jsons-cache")
+    .mapJSONDictionary()
+let metadata = FileSystemCache.inDirectory(.cachesDirectory, appending: "meta")
+    .mapString()
+let zipped = zip(jsons, metadata) // Cache<String, ([String : Any], String)>
+zipped.retrieve(forKey: "morshyn") { (result) in
+    if let (json, meta) = result.asOptional {
+        print(json)
+        print(meta)
+    }
+}
+let newJSON = ["water": 15]
+let meta = "Berezivska"
+zipped.set((newJSON, meta), forKey: "berezovka") { (result) in
+    if result.isSuccess {
+        print("Yay!")
+    }
+}
+```
+
+Isn't it nice?
 
 #### Different ways of composition
 
@@ -209,7 +236,7 @@ Well, you shouldn't really do that. Technically you can, but really **Shallows**
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.1.1
+github "dreymonde/Shallows" ~> 0.2.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
