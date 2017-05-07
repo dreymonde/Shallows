@@ -1,6 +1,6 @@
 import Dispatch
 
-enum MemCacheError : Error {
+enum MemoryCacheError : Error {
     case noValue
 }
 
@@ -39,7 +39,7 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
             if let value = _storage[key] {
                 return .success(value)
             } else {
-                return .failure(MemCacheError.noValue)
+                return .failure(MemoryCacheError.noValue)
             }
         }
         completion(result)

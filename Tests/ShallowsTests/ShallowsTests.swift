@@ -14,10 +14,21 @@ extension String : Error { }
 
 extension FileSystemCache {
     
-    static func test(number: Int) -> FileSystemCache {
-        let cache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-\(number)")
+    private static var counter = 0
+    
+    static func test() -> FileSystemCache {
+        counter += 1
+        let cache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-\(counter)")
         cache.pruneOnDeinit = true
         return cache
+    }
+    
+}
+
+extension ReadOnlyCache {
+    
+    static func alwaysFailing(with error: Error) -> ReadOnlyCache<Key, Value> {
+        return ReadOnlyCache(cacheName: "", retrieve: { _, completion in completion(.failure(error)) })
     }
     
 }
@@ -188,6 +199,45 @@ class ShallowsTests: XCTestCase {
         let back = MemoryCache<String, String>(storage: ["A": "Alba"], cacheName: "Back")
         front.retrieve(forKey: "A", backedBy: back, shouldPullFromBack: false, completion: { print($0) })
         print(front.storage["A"] as Any)
+    }
+    
+    func testZipReadOnly() throws {
+        let memory1 = MemoryCache<String, Int>(storage: ["avenues": 2], cacheName: "avenues").asReadOnlyCache()
+        let file1 = FileSystemCache.test()
+            .mapString()
+        try file1.makeSyncCache().set("Out To Sea", forKey: "avenues")
+        let zipped = zip(memory1, file1.asReadOnlyCache()).makeSyncCache()
+        let (number, firstSong) = try zipped.retrieve(forKey: "avenues")
+        XCTAssertEqual(number, 2)
+        XCTAssertEqual(firstSong, "Out To Sea")
+    }
+    
+    func testZipReadOnlyFail() throws {
+        enum Err : Error {
+            case a, b
+        }
+        let failure1 = ReadOnlyCache<Int, Int>.alwaysFailing(with: Err.a)
+        let failure2 = ReadOnlyCache<Int, String>.alwaysFailing(with: Err.b)
+        let zipped = zip(failure1.asReadOnlyCache(), failure2.asReadOnlyCache()).makeSyncCache()
+        XCTAssertThrowsError(try zipped.retrieve(forKey: 1)) { error in
+            let zerror = error as! ZippedResultError
+            switch (zerror.left!, zerror.right!) {
+            case (Err.a, Err.b):
+                break
+            default:
+                XCTFail("Not expected error")
+            }
+        }
+    }
+    
+    func testZip() throws {
+        let memory1 = MemoryCache<String, Int>(storage: [:], cacheName: "batman")
+        let file1 = FileSystemCache.test().mapString()
+        let zipped = zip(memory1, file1).singleKey("arkham-knight").makeSyncCache()
+        try zipped.set((3, "Scarecrow"))
+        let (number, mainVillain) = try zipped.retrieve()
+        XCTAssertEqual(number, 3)
+        XCTAssertEqual(mainVillain, "Scarecrow")
     }
     
     static var allTests = [
