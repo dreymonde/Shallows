@@ -1,6 +1,25 @@
 import Foundation
 
-public final class FileSystemCache : CacheProtocol {
+internal protocol FileSystemCacheProtocol : CacheProtocol {
+    
+    init(directoryURL: URL, name: String?)
+    
+}
+
+extension FileSystemCacheProtocol {
+    
+    public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
+                                   appending pathComponent: String,
+                                   domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
+                                   cacheName: String? = nil) -> Self {
+        let urls = FileManager.default.urls(for: directory, in: domainMask)
+        let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
+        return Self(directoryURL: url, name: cacheName)
+    }
+    
+}
+
+public final class FileSystemCache : FileSystemCacheProtocol {
     
     public static func fileName(for key: String) -> String {
         guard let data = key.data(using: .utf8) else { return key }
@@ -31,15 +50,6 @@ public final class FileSystemCache : CacheProtocol {
         self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
     }
     
-    public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
-                                   appending pathComponent: String,
-                                   domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
-                                   cacheName: String? = nil) -> FileSystemCache {
-        let urls = FileManager.default.urls(for: directory, in: domainMask)
-        let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return FileSystemCache(directoryURL: url, name: cacheName)
-    }
-    
     public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
         rawMapped.retrieve(forKey: key, completion: completion)
     }
@@ -50,7 +60,7 @@ public final class FileSystemCache : CacheProtocol {
     
 }
 
-public final class RawFileSystemCache : CacheProtocol {
+public final class RawFileSystemCache : FileSystemCacheProtocol {
     
     public struct FileName {
         public let fileName: String
