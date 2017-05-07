@@ -2,7 +2,7 @@ import Foundation
 
 internal protocol FileSystemCacheProtocol : CacheProtocol {
     
-    init(directoryURL: URL, name: String?)
+    init(directoryURL: URL, cacheName: String?)
     
 }
 
@@ -14,7 +14,7 @@ extension FileSystemCacheProtocol {
                                    cacheName: String? = nil) -> Self {
         let urls = FileManager.default.urls(for: directory, in: domainMask)
         let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return Self(directoryURL: url, name: cacheName)
+        return Self(directoryURL: url, cacheName: cacheName)
     }
     
 }
@@ -33,8 +33,8 @@ public final class FileSystemCache : FileSystemCacheProtocol {
         return raw.directoryURL
     }
     
-    public var name: String {
-        return raw.name
+    public var cacheName: String {
+        return raw.cacheName
     }
     
     internal var pruneOnDeinit: Bool {
@@ -45,8 +45,8 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     public let raw: RawFileSystemCache
     private let rawMapped: Cache<String, Data>
     
-    init(directoryURL: URL, name: String? = nil) {
-        self.raw = RawFileSystemCache(directoryURL: directoryURL, name: name)
+    init(directoryURL: URL, cacheName: String? = nil) {
+        self.raw = RawFileSystemCache(directoryURL: directoryURL, cacheName: cacheName)
         self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
     }
     
@@ -69,7 +69,7 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
         }
     }
         
-    public let name: String
+    public let cacheName: String
     public let directoryURL: URL
     
     internal var pruneOnDeinit: Bool = false
@@ -77,10 +77,10 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
-    public init(directoryURL: URL, name: String? = nil) {
+    public init(directoryURL: URL, cacheName: String? = nil) {
         self.directoryURL = directoryURL
-        self.name = name ?? "file-system-cache"
-        self.queue = DispatchQueue(label: "\(self.name)-file-system-cache-queue")
+        self.cacheName = cacheName ?? "file-system-cache"
+        self.queue = DispatchQueue(label: "\(self.cacheName)-file-system-cache-queue")
     }
     
     deinit {

@@ -6,7 +6,7 @@ enum MemCacheError : Error {
 
 public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
     
-    public let name: String
+    public let cacheName: String
     
     private let queue = DispatchQueue(label: "com.shallows.memory-cache-queue")
     private var _storage: [Key : Value]
@@ -22,9 +22,9 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
         }
     }
     
-    public init(storage: [Key : Value] = [:], name: String = "memory-cache-\(Key.self):\(Value.self)") {
+    public init(storage: [Key : Value] = [:], cacheName: String = "memory-cache-\(Key.self):\(Value.self)") {
         self._storage = storage
-        self.name = name
+        self.cacheName = cacheName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {

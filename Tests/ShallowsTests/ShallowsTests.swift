@@ -29,7 +29,7 @@ class ShallowsTests: XCTestCase {
     }
     
     func testSome() {
-        let mmcch = MemoryCache<String, Int>(storage: [:], name: "mmcch")
+        let mmcch = MemoryCache<String, Int>(storage: [:], cacheName: "mmcch")
         mmcch.set(10, forKey: "AAA", completion: { _ in })
         mmcch.retrieve(forKey: "Something") { (result) in
             print(result)
@@ -37,9 +37,9 @@ class ShallowsTests: XCTestCase {
         
         print("City of stars")
         
-        let memeMain = MemoryCache<String, Int>(storage: [:], name: "Main")
-        let meme1 = MemoryCache<String, Int>(storage: ["Some" : 15], name: "First-Back")
-        let meme2 = MemoryCache<String, Int>(storage: ["Other" : 20], name: "Second-Back")//.makeReadOnly()
+        let memeMain = MemoryCache<String, Int>(storage: [:], cacheName: "Main")
+        let meme1 = MemoryCache<String, Int>(storage: ["Some" : 15], cacheName: "First-Back")
+        let meme2 = MemoryCache<String, Int>(storage: ["Other" : 20], cacheName: "Second-Back")//.makeReadOnly()
         
         let combined1 = meme1.combined(with: meme2)
         let full = memeMain.backed(by: combined1)
@@ -58,8 +58,8 @@ class ShallowsTests: XCTestCase {
         let expectation = self.expectation(description: "On retrieve")
         let diskCache = diskCache_raw
             .mapString(withEncoding: .utf8)
-        let memCache = MemoryCache<String, String>(storage: [:], name: "mem")
-        let nscache = NSCacheCache<NSString, NSString>(cache: .init(), name: "nscache")
+        let memCache = MemoryCache<String, String>(storage: [:], cacheName: "mem")
+        let nscache = NSCacheCache<NSString, NSString>(cache: .init(), cacheName: "nscache")
             .toNonObjCKeys()
             .toNonObjCValues()
         let main = memCache.combined(with: nscache.combined(with: diskCache))
@@ -126,7 +126,7 @@ class ShallowsTests: XCTestCase {
     }
     
     func testUpdate() {
-        let cache = MemoryCache<Int, Int>(name: "mem")
+        let cache = MemoryCache<Int, Int>(cacheName: "mem")
         cache.storage[10] = 15
         let expectation = self.expectation(description: "On update")
         cache.update(forKey: 10, { $0 += 5 }) { (result) in
@@ -170,7 +170,7 @@ class ShallowsTests: XCTestCase {
         let front = MemoryCache<Int, Int>()
         let back = MemoryCache<Int, Int>()
         let combined = front.combined(with: back, pullingFromBack: true, pushingToBack: false).makeSyncCache()
-        print(combined.name)
+        print(combined.cacheName)
         back.storage[1] = 1
         let firstCombined = try combined.retrieve(forKey: 1)
         XCTAssertEqual(firstCombined, 1)
@@ -184,13 +184,14 @@ class ShallowsTests: XCTestCase {
     }
     
     func testRetrievePullStrategy() {
-        let front = MemoryCache<String, String>(name: "Front")
-        let back = MemoryCache<String, String>(storage: ["A": "Alba"], name: "Back")
+        let front = MemoryCache<String, String>(cacheName: "Front")
+        let back = MemoryCache<String, String>(storage: ["A": "Alba"], cacheName: "Back")
         front.retrieve(forKey: "A", backedBy: back, shouldPullFromBack: false, completion: { print($0) })
         print(front.storage["A"] as Any)
     }
     
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
-        ]
+    ]
+    
 }

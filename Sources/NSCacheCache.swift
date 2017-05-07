@@ -7,11 +7,11 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     }
     
     public let cache: NSCache<Key, Value>
-    public let name: String
+    public let cacheName: String
     
-    public init(cache: NSCache<Key, Value> = NSCache(), name: String = "\(NSCache<Key, Value>.self)") {
+    public init(cache: NSCache<Key, Value> = NSCache(), cacheName: String = "\(NSCache<Key, Value>.self)") {
         self.cache = cache
-        self.name = name
+        self.cacheName = cacheName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {

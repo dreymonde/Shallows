@@ -9,7 +9,7 @@ internal func dispatched<In>(to queue: DispatchQueue, _ function: @escaping (In)
 extension CacheProtocol {
     
     public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-cache-thread-safety-queue")) -> Cache<Key, Value> {
-        return Cache<Key, Value>(name: self.name,
+        return Cache<Key, Value>(cacheName: self.cacheName,
                                  retrieve: dispatched(to: queue, self.retrieve(forKey:completion:)),
                                  set: dispatched(to: queue, self.set(_:forKey:completion:)))
     }
@@ -18,13 +18,13 @@ extension CacheProtocol {
 
 public struct SyncCache<Key, Value> {
     
-    public let name: String
+    public let cacheName: String
     
     private let _retrieve: (Key) throws -> Value
     private let _set: (Value, Key) throws -> ()
     
-    public init(name: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> ()) {
-        self.name = name
+    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> ()) {
+        self.cacheName = cacheName
         self._retrieve = retrieve
         self._set = set
     }
@@ -41,12 +41,12 @@ public struct SyncCache<Key, Value> {
 
 public struct ReadOnlySyncCache<Key, Value> {
     
-    public let name: String
+    public let cacheName: String
     
     private let _retrieve: (Key) throws -> Value
 
-    public init(name: String, retrieve: @escaping (Key) throws -> Value) {
-        self.name = name
+    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value) {
+        self.cacheName = cacheName
         self._retrieve = retrieve
     }
     
@@ -72,7 +72,7 @@ internal extension Result {
 extension ReadOnlyCache {
     
     public func makeSyncCache() -> ReadOnlySyncCache<Key, Value> {
-        return ReadOnlySyncCache(name: "\(self.name)-sync", retrieve: { (key) throws -> Value in
+        return ReadOnlySyncCache(cacheName: "\(self.cacheName)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
@@ -89,7 +89,7 @@ extension ReadOnlyCache {
 extension CacheProtocol {
     
     public func makeSyncCache() -> SyncCache<Key, Value> {
-        return SyncCache(name: "\(self.name)-sync", retrieve: { (key) throws -> Value in
+        return SyncCache(cacheName: "\(self.cacheName)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
