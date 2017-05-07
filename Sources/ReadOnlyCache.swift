@@ -13,7 +13,7 @@ public struct ReadOnlyCache<Key, Value> : ReadableCacheProtocol {
     
     private let _retrieve: (Key, @escaping (Result<Value>) -> ()) -> ()
     
-    public init(cacheName: String/* = "Unnamed read-only cache \(Key.self) : \(Value.self)"*/, retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> ()) {
+    public init(cacheName: String, retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> ()) {
         self._retrieve = retrieve
         self.cacheName = cacheName
     }
@@ -35,6 +35,10 @@ extension ReadableCacheProtocol {
         return ReadOnlyCache(self)
     }
     
+}
+
+extension ReadOnlyCache {
+    
     public func backed<CacheType : ReadableCacheProtocol>(by cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return ReadOnlyCache(cacheName: "\(self.cacheName)-\(cache.cacheName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
@@ -47,10 +51,6 @@ extension ReadableCacheProtocol {
             })
         })
     }
-    
-}
-
-extension ReadOnlyCache {
     
     public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> ReadOnlyCache<OtherKey, Value> {
         return ReadOnlyCache<OtherKey, Value>(cacheName: cacheName, retrieve: { key, completion in
