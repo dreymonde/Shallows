@@ -2,7 +2,7 @@ import Foundation
 
 public protocol FileSystemCacheProtocol : CacheProtocol {
     
-    init(directoryURL: URL, cacheName: String?)
+    init(directoryURL: URL, qos: DispatchQoS, cacheName: String?)
     
 }
 
@@ -11,10 +11,11 @@ extension FileSystemCacheProtocol {
     public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
                                    appending pathComponent: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
+                                   qos: DispatchQoS = .default,
                                    cacheName: String? = nil) -> Self {
         let urls = FileManager.default.urls(for: directory, in: domainMask)
         let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return Self(directoryURL: url, cacheName: cacheName)
+        return Self(directoryURL: url, qos: qos, cacheName: cacheName)
     }
     
 }
@@ -25,7 +26,7 @@ public final class FileSystemCache : FileSystemCacheProtocol {
         guard let data = key.data(using: .utf8) else { return key }
         return data.base64EncodedString(options: [])
     }
-        
+    
     public var directoryURL: URL {
         return raw.directoryURL
     }
@@ -42,8 +43,8 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     public let raw: RawFileSystemCache
     private let rawMapped: Cache<String, Data>
     
-    public init(directoryURL: URL, cacheName: String? = nil) {
-        self.raw = RawFileSystemCache(directoryURL: directoryURL, cacheName: cacheName)
+    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
+        self.raw = RawFileSystemCache(directoryURL: directoryURL, qos: qos, cacheName: cacheName)
         self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
     }
     
@@ -65,7 +66,7 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
             self.fileName = fileName
         }
     }
-        
+    
     public let cacheName: String
     public let directoryURL: URL
     
@@ -74,10 +75,10 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
-    public init(directoryURL: URL, cacheName: String? = nil) {
+    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
         self.directoryURL = directoryURL
         self.cacheName = cacheName ?? "file-system-cache"
-        self.queue = DispatchQueue(label: "\(self.cacheName)-file-system-cache-queue")
+        self.queue = DispatchQueue(label: "\(self.cacheName)-file-system-cache-queue", qos: qos)
     }
     
     deinit {
