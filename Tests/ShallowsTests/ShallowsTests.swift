@@ -25,6 +25,7 @@ extension FileSystemCache {
     
 }
 
+
 extension ReadOnlyCache {
     
     static func alwaysFailing(with error: Error) -> ReadOnlyCache<Key, Value> {
@@ -278,6 +279,36 @@ class ShallowsTests: XCTestCase {
         XCTAssertEqual(i, 10)
         XCTAssertTrue(b)
         XCTAssertEqual(s, "A lot")
+    }
+    
+    func testSetStrategyFrontFirst() {
+        var frontSet: Bool = false
+        let front = Cache<Void, Int>(cacheName: "front",
+                                     retrieve: { _ in },
+                                     set: { (_, _, completion) in frontSet = true; completion(.success()) })
+        let expectation = self.expectation(description: "On back called")
+        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
+            XCTAssertTrue(frontSet)
+            expectation.fulfill()
+        }
+        let combined = front.combined(with: back, pullingFromBack: true, setStrategy: .frontFirst)
+        combined.set(10)
+        waitForExpectations(timeout: 5.0)
+    }
+    
+    func testStrategyFrontOnly() {
+        let front = Cache<Void, Int>(cacheName: "front",
+                                     retrieve: { _ in },
+                                     set: { (_, _, completion) in completion(.success()) })
+        let expectation = self.expectation(description: "On back called")
+        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
+            XCTFail()
+        }
+        let combined = front.combined(with: back, pullingFromBack: true, setStrategy: .frontOnly)
+        combined.set(10) { _ in
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5.0)
     }
     
     static var allTests = [

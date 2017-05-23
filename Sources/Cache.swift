@@ -206,6 +206,12 @@ extension CacheProtocol {
     
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                          pullingFromBack: Bool = true,
+                         pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+        return self.combined(with: cache, pullingFromBack: pullingFromBack, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
+    }
+    
+    public func combined<CacheType : CacheProtocol>(with cache: CacheType,
+                         pullingFromBack: Bool = true,
                          setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullingFromBack, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
