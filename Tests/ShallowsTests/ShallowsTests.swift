@@ -185,7 +185,7 @@ class ShallowsTests: XCTestCase {
     func testCombinedSetFront() throws {
         let front = MemoryCache<Int, Int>()
         let back = MemoryCache<Int, Int>()
-        let combined = front.combined(with: back, pullingFromBack: true, setStrategy: .frontOnly).makeSyncCache()
+        let combined = front.combined(with: back, pullStrategy: .pullFromBack, setStrategy: .frontOnly).makeSyncCache()
         print(combined.cacheName)
         back.storage[1] = 1
         let firstCombined = try combined.retrieve(forKey: 1)
@@ -291,7 +291,7 @@ class ShallowsTests: XCTestCase {
             XCTAssertTrue(frontSet)
             expectation.fulfill()
         }
-        let combined = front.combined(with: back, pullingFromBack: true, setStrategy: .frontFirst)
+        let combined = front.combined(with: back, pullStrategy: .pullFromBack, setStrategy: .frontFirst)
         combined.set(10)
         waitForExpectations(timeout: 5.0)
     }
@@ -304,7 +304,7 @@ class ShallowsTests: XCTestCase {
         let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
             XCTFail()
         }
-        let combined = front.combined(with: back, pullingFromBack: true, setStrategy: .frontOnly)
+        let combined = front.combined(with: back, pullStrategy: .pullFromBack, setStrategy: .frontOnly)
         combined.set(10) { _ in
             expectation.fulfill()
         }

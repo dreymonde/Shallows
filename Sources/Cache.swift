@@ -107,6 +107,11 @@ extension Cache {
     
 }
 
+public enum CacheCombinationPullStrategy {
+    case pullFromBack
+    case neverPull
+}
+
 public enum CacheCombinationSetStrategy {
     case backFirst
     case frontFirst
@@ -204,17 +209,18 @@ extension CacheProtocol {
         })
     }
     
+    @available(*, deprecated, message: "Use combined(with:retrieveStrategy:setStrategy:) instead")
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                          pullingFromBack: Bool = true,
                          pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return self.combined(with: cache, pullingFromBack: pullingFromBack, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
+        return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullFromBack : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
     }
     
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
-                         pullingFromBack: Bool = true,
+                         pullStrategy: CacheCombinationPullStrategy = .pullFromBack,
                          setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullingFromBack, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
+        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy == .pullFromBack, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullStrategy == .pullFromBack, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: cache, strategy: setStrategy, completion: completion)
         })
