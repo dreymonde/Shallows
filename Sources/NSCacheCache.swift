@@ -162,3 +162,9 @@ extension ReadOnlyCache where Value == NSDate {
     
 }
 
+func readme() {
+let nscache = NSCacheCache<NSURL, NSData>()
+    .toNonObjCKeys()
+    .toNonObjCValues() // Cache<URL, Data>
+}
+
