@@ -21,7 +21,7 @@ let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallo
     .mapJSONDictionary()
 let combinedCache = memoryJSONCache.combined(with: diskCache)
 combinedCache.retrieve(forKey: "Higgins") { (result) in
-    if let json = result.asOptional {
+    if let json = result.value {
         print(json)
     }
 }
@@ -168,20 +168,16 @@ arrays.update(forKey: "some-key", { $0.append(10) }) { (result) in
 Zipping is a very powerful feature of **Shallows**. It allows you to compose your caches in a way that you get result only when both of them completes for your request. For example:
 
 ```swift
-let jsons = FileSystemCache.inDirectory(.cachesDirectory, appending: "jsons-cache")
-    .mapJSONDictionary()
-let metadata = FileSystemCache.inDirectory(.cachesDirectory, appending: "meta")
-    .mapString()
-let zipped = zip(jsons, metadata) // Cache<String, ([String : Any], String)>
-zipped.retrieve(forKey: "morshyn") { (result) in
-    if let (json, meta) = result.asOptional {
-        print(json)
-        print(meta)
+let strings = MemoryCache<String, String>()
+let numbers = MemoryCache<String, Int>()
+let zipped = zip(strings, numbers) // Cache<String, (String, Int)>
+zipped.retrieve(forKey: "some-key") { (result) in
+    if let (string, number) = result.value {
+        print(string)
+        print(number)
     }
 }
-let newJSON = ["water": 15]
-let meta = "Berezivska"
-zipped.set((newJSON, meta), forKey: "berezovka") { (result) in
+zipped.set(("shallows", 3), forKey: "another-key") { (result) in
     if result.isSuccess {
         print("Yay!")
     }

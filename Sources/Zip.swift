@@ -85,17 +85,6 @@ fileprivate final class CompletionContainer<A, B> {
     
 }
 
-fileprivate extension Result {
-    
-    var error: Error? {
-        if case .failure(let er) = self {
-            return er
-        }
-        return nil
-    }
-    
-}
-
 public struct ZippedResultError : Error {
     
     public let left: Error?

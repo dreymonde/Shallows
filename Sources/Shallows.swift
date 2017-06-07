@@ -22,6 +22,21 @@ public enum Result<Value> {
         return !isFailure
     }
     
+    public var value: Value? {
+        if case .success(let value) = self {
+            return value
+        }
+        return nil
+    }
+    
+    public var error: Error? {
+        if case .failure(let error) = self {
+            return error
+        }
+        return nil
+    }
+    
+    @available(*, deprecated, renamed: "value")
     public var asOptional: Value? {
         switch self {
         case .success(let value):
