@@ -211,7 +211,7 @@ extension CacheProtocol {
     
     @available(*, deprecated, message: "Use combined(with:retrieveStrategy:setStrategy:) instead")
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
-                         pullingFromBack: Bool = true,
+                         pullingFromBack: Bool,
                          pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullFromBack : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
     }
