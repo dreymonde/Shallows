@@ -127,3 +127,38 @@ extension ReadOnlyCache where Value == NSIndexPath {
     }
     
 }
+
+extension CacheProtocol where Value == NSData {
+    
+    public func toNonObjCValues() -> Cache<Key, Data> {
+        return mapValues(transformIn: { $0 as Data },
+                         transformOut: { $0 as NSData })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSData {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, Data> {
+        return mapValues({ $0 as Data })
+    }
+    
+}
+
+extension CacheProtocol where Value == NSDate {
+    
+    public func toNonObjCValues() -> Cache<Key, Date> {
+        return mapValues(transformIn: { $0 as Date },
+                         transformOut: { $0 as NSDate })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSDate {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, Date> {
+        return mapValues({ $0 as Date })
+    }
+    
+}
+
