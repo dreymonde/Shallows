@@ -100,7 +100,7 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
-                    completion(.success())
+                    completion(.success)
                 } else {
                     completion(.failure(Error.cantCreateFile))
                 }

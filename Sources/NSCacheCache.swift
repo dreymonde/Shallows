@@ -16,7 +16,7 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
         cache.setObject(value, forKey: key)
-        completion(.success())
+        completion(.success)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {

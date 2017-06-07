@@ -33,6 +33,14 @@ public enum Result<Value> {
     
 }
 
+extension Result where Value == Void {
+    
+    public static var success: Result<Void> {
+        return .success(())
+    }
+    
+}
+
 extension Optional {
     
     public struct UnwrapError : Error {

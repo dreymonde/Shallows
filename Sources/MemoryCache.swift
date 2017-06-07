@@ -56,7 +56,7 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
         queue.sync {
             _storage.write({ (dict: inout [Key : Value]) in dict[key] = value })
         }
-        completion(.success())
+        completion(.success)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {

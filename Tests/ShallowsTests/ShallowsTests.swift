@@ -285,7 +285,7 @@ class ShallowsTests: XCTestCase {
         var frontSet: Bool = false
         let front = Cache<Void, Int>(cacheName: "front",
                                      retrieve: { _ in },
-                                     set: { (_, _, completion) in frontSet = true; completion(.success()) })
+                                     set: { (_, _, completion) in frontSet = true; completion(.success) })
         let expectation = self.expectation(description: "On back called")
         let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
             XCTAssertTrue(frontSet)
@@ -299,7 +299,7 @@ class ShallowsTests: XCTestCase {
     func testStrategyFrontOnly() {
         let front = Cache<Void, Int>(cacheName: "front",
                                      retrieve: { _ in },
-                                     set: { (_, _, completion) in completion(.success()) })
+                                     set: { (_, _, completion) in completion(.success) })
         let expectation = self.expectation(description: "On back called")
         let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
             XCTFail()
