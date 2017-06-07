@@ -324,6 +324,32 @@ extension CacheProtocol {
     
 }
 
+extension ReadOnlyCache {
+    
+    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyCache<Key, Value> {
+        return ReadOnlyCache(cacheName: self.cacheName, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: { (result) in
+                switch result {
+                case .failure(let error):
+                    do {
+                        let fallbackValue = try produceValue(error)
+                        completion(.success(fallbackValue))
+                    } catch let fallbackError {
+                        completion(.failure(fallbackError))
+                    }
+                case .success(let value):
+                    completion(.success(value))
+                }
+            })
+        })
+    }
+    
+    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> ReadOnlyCache<Key, Value> {
+        return fallback(with: { _ in defaultValue() })
+    }
+    
+}
+
 extension CacheProtocol {
     
     public func singleKey(_ key: Key) -> Cache<Void, Value> {
