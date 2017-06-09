@@ -102,3 +102,18 @@ extension ReadOnlyCache {
     }
     
 }
+
+public enum UnsupportedTransformationReadOnlyCacheError : Error {
+    case cacheIsReadOnly
+}
+
+extension ReadOnlyCache {
+    
+    public func usingUnsupportedTransformation<OtherKey, OtherValue>(_ transformation: (Cache<Key, Value>) -> Cache<OtherKey, OtherValue>) -> ReadOnlyCache<OtherKey, OtherValue> {
+        let fullCache = Cache<Key, Value>(cacheName: self.cacheName, retrieve: self.retrieve) { (_, _, completion) in
+            completion(fail(with: UnsupportedTransformationReadOnlyCacheError.cacheIsReadOnly))
+        }
+        return transformation(fullCache).asReadOnlyCache()
+    }
+    
+}

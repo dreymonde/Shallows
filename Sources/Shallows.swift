@@ -48,6 +48,14 @@ public enum Result<Value> {
     
 }
 
+internal func fail<Value>(with error: Error) -> Result<Value> {
+    return .failure(error)
+}
+
+internal func succeed<Value>(with value: Value) -> Result<Value> {
+    return .success(value)
+}
+
 extension Result where Value == Void {
     
     public static var success: Result<Void> {

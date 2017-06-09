@@ -311,6 +311,13 @@ class ShallowsTests: XCTestCase {
         waitForExpectations(timeout: 5.0)
     }
     
+    func testUnsupportedTransformation() throws {
+        let back = MemoryCache<String, Data>(storage: ["single-key": "Alba".data(using: .utf8)!]).singleKey("single-key").asReadOnlyCache()
+        let stringCache = back.usingUnsupportedTransformation({ $0.mapString() }).makeSyncCache()
+        let alba = try stringCache.retrieve()
+        XCTAssertEqual(alba, "Alba")
+    }
+    
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
     ]
