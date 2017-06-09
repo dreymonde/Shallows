@@ -311,6 +311,43 @@ class ShallowsTests: XCTestCase {
         waitForExpectations(timeout: 5.0)
     }
     
+    func testCodableJSON() throws {
+        let cache = MemoryCache<String, Data>().singleKey("single")
+        
+        struct Meta : Codable {
+            let a: String
+            let b: Int
+            let c: Bool
+        }
+        
+        let metacache = cache.mapJSONObject(Meta.self).makeSyncCache()
+        let meta1 = Meta(a: "a", b: 1, c: true)
+        try metacache.set(meta1)
+        
+        let meta2 = try metacache.retrieve()
+        XCTAssertEqual(meta1.a, meta2.a)
+        XCTAssertEqual(meta1.b, meta2.b)
+        XCTAssertEqual(meta1.c, meta2.c)
+    }
+    
+    func testCodablePlist() throws {
+        let cache = MemoryCache<String, Data>().singleKey("single")
+        
+        struct Meta : Codable {
+            let a: String
+            let b: Int
+            let c: Bool
+        }
+        
+        let metacache = cache.mapPlistObject(Meta.self).makeSyncCache()
+        let meta1 = Meta(a: "a", b: 1, c: true)
+        try metacache.set(meta1)
+        let meta2 = try metacache.retrieve()
+        XCTAssertEqual(meta1.a, meta2.a)
+        XCTAssertEqual(meta1.b, meta2.b)
+        XCTAssertEqual(meta1.c, meta2.c)
+    }
+    
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
     ]

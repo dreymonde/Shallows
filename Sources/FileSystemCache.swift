@@ -153,6 +153,13 @@ extension CacheProtocol where Value == Data {
                                    transformOut: { $0 })
     }
     
+    public func mapJSONObject<JSONObject : Codable>(_ objectType: JSONObject.Type,
+                                                    decoder: JSONDecoder = JSONDecoder(),
+                                                    encoder: JSONEncoder = JSONEncoder()) -> Cache<Key, JSONObject> {
+        return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
+                         transformOut: { try encoder.encode($0) })
+    }
+    
     public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, Any> {
         return mapValues(transformIn: { data in
             var formatRef = format
@@ -165,6 +172,13 @@ extension CacheProtocol where Value == Data {
     public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, [String : Any]> {
         return mapPlist(format: format).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                                   transformOut: { $0 })
+    }
+    
+    public func mapPlistObject<PlistObject : Codable>(_ objectType: PlistObject.Type,
+                                                    decoder: PropertyListDecoder = PropertyListDecoder(),
+                                                    encoder: PropertyListEncoder = PropertyListEncoder()) -> Cache<Key, PlistObject> {
+        return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
+                         transformOut: { try encoder.encode($0) })
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Cache<Key, String> {
@@ -184,6 +198,11 @@ extension ReadOnlyCache where Value == Data {
         return mapJSON().mapValues(throwing({ $0 as? [String : Any] }))
     }
     
+    public func mapJSONObject<JSONObject : Codable>(_ objectType: JSONObject.Type,
+                                                    decoder: JSONDecoder = JSONDecoder()) -> ReadOnlyCache<Key, JSONObject> {
+        return mapValues({ try decoder.decode(objectType, from: $0) })
+    }
+    
     public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, Any> {
         return mapValues({ data in
             var formatRef = format
@@ -193,6 +212,11 @@ extension ReadOnlyCache where Value == Data {
     
     public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, [String : Any]> {
         return mapPlist(format: format).mapValues(throwing({ $0 as? [String : Any] }))
+    }
+    
+    public func mapPlistObject<PlistObject : Codable>(_ objectType: PlistObject.Type,
+                                                    decoder: PropertyListDecoder = PropertyListDecoder()) -> ReadOnlyCache<Key, PlistObject> {
+        return mapValues({ try decoder.decode(objectType, from: $0) })
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyCache<Key, String> {
