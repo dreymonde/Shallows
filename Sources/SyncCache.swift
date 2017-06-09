@@ -62,6 +62,19 @@ public struct ReadOnlySyncCache<Key, Value> {
 
 }
 
+extension Result {
+    
+    func getValue() throws -> Value {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            throw error
+        }
+    }
+    
+}
+
 extension ReadOnlyCache {
     
     public func makeSyncCache() -> ReadOnlySyncCache<Key, Value> {
@@ -74,7 +87,7 @@ extension ReadOnlyCache {
                 semaphore.signal()
             })
             semaphore.wait()
-            return try r_result!.value.unwrap()
+            return try r_result!.getValue()
         })
     }
     
@@ -91,7 +104,7 @@ extension CacheProtocol {
                 semaphore.signal()
             })
             semaphore.wait()
-            return try r_result!.value.unwrap()
+            return try r_result!.getValue()
         }, set: { (value, key) in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Void>?
@@ -100,7 +113,7 @@ extension CacheProtocol {
                 semaphore.signal()
             })
             semaphore.wait()
-            return try r_result!.value.unwrap()
+            return try r_result!.getValue()
         })
     }
     
