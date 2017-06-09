@@ -83,7 +83,6 @@ extension ReadOnlyCache {
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
                 r_result = result
-                print(r_result)
                 semaphore.signal()
             })
             semaphore.wait()
