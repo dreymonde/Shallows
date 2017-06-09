@@ -9,9 +9,15 @@ internal func dispatched<In>(to queue: DispatchQueue, _ function: @escaping (In)
 extension CacheProtocol {
     
     public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-cache-thread-safety-queue")) -> Cache<Key, Value> {
-        return Cache<Key, Value>(cacheName: self.cacheName,
-                                 retrieve: dispatched(to: queue, self.retrieve(forKey:completion:)),
-                                 set: dispatched(to: queue, self.set(_:forKey:completion:)))
+        return Cache<Key, Value>(cacheName: self.cacheName, retrieve: { (key, completion) in
+            queue.async {
+                self.retrieve(forKey: key, completion: completion)
+            }
+        }, set: { (value, key, completion) in
+            queue.async {
+                self.set(value, forKey: key, completion: completion)
+            }
+        })
     }
     
 }
@@ -64,6 +70,7 @@ extension ReadOnlyCache {
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
                 r_result = result
+                print(r_result)
                 semaphore.signal()
             })
             semaphore.wait()

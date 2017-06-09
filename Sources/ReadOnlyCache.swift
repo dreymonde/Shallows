@@ -98,7 +98,7 @@ extension ReadOnlyCache {
 extension ReadOnlyCache {
     
     public func singleKey(_ key: Key) -> ReadOnlyCache<Void, Value> {
-        return mapKeys({ key })
+        return mapKeys({ _ in key })
     }
     
 }

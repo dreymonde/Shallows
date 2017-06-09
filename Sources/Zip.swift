@@ -153,19 +153,19 @@ public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _
 }
 
 public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, (T, (U, V))>) -> Cache<Key, (T, U, V)> {
-    return notFlatCache.mapValues(transformIn: { ($0, $1.0, $1.1) },
-                                  transformOut: { ($0, ($1, $2)) })
+    return notFlatCache.mapValues(transformIn: { ($0.0, $0.1.0, $0.1.1) },
+                                  transformOut: { ($0.0, ($0.1, $0.2)) })
 }
 
 public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, ((T, U), V)>) -> Cache<Key, (T, U, V)> {
-    return notFlatCache.mapValues(transformIn: { ($0.0, $0.1, $1) },
-                                  transformOut: { (($0, $1), $2) })
+    return notFlatCache.mapValues(transformIn: { ($0.0.0, $0.0.1, $0.1) },
+                                  transformOut: { (($0.0, $0.1), $0.2) })
 }
 
 public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, (T, (U, V))>) -> ReadOnlyCache<Key, (T, U, V)> {
-    return notFlatCache.mapValues({ ($0, $1.0, $1.1) })
+    return notFlatCache.mapValues({ ($0.0, $0.1.0, $0.1.1) })
 }
 
 public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, ((T, U), V)>) -> ReadOnlyCache<Key, (T, U, V)> {
-    return notFlatCache.mapValues({ ($0.0, $0.1, $1) })
+    return notFlatCache.mapValues({ ($0.0.0, $0.0.1, $0.1) })
 }

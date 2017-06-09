@@ -81,7 +81,7 @@ class ShallowsTests: XCTestCase {
         let main = memCache.combined(with: nscache.combined(with: diskCache))
         diskCache.set("I was just a little boy", forKey: "my-life", completion: { print($0) })
         main.retrieve(forKey: "my-life", completion: {
-            XCTAssertEqual($0.asOptional, "I was just a little boy")
+            XCTAssertEqual($0.value, "I was just a little boy")
             expectation.fulfill()
         })
         waitForExpectations(timeout: 5.0)
@@ -93,8 +93,8 @@ class ShallowsTests: XCTestCase {
         }
         let memCache = MemoryCache<String, Int>(storage: [:]).mapKeys() as Cache<Keys, Int>
         memCache.set(10, forKey: .a)
-        memCache.retrieve(forKey: .a, completion: { XCTAssertEqual($0.asOptional, 10) })
-        memCache.retrieve(forKey: .b, completion: { XCTAssertNil($0.asOptional) })
+        memCache.retrieve(forKey: .a, completion: { XCTAssertEqual($0.value, 10) })
+        memCache.retrieve(forKey: .b, completion: { XCTAssertNil($0.value) })
     }
     
     func testJSONMapping() {
@@ -103,7 +103,7 @@ class ShallowsTests: XCTestCase {
         memCache.set(dict, forKey: 10)
         memCache.retrieve(forKey: 10) { (result) in
             print(result)
-            XCTAssertEqual(result.asOptional! as NSDictionary, dict as NSDictionary)
+            XCTAssertEqual(result.value! as NSDictionary, dict as NSDictionary)
         }
     }
     
@@ -113,7 +113,7 @@ class ShallowsTests: XCTestCase {
         memCache.set(dict, forKey: 10)
         memCache.retrieve(forKey: 10) { (result) in
             print(result)
-            XCTAssertEqual(result.asOptional! as NSDictionary, dict as NSDictionary)
+            XCTAssertEqual(result.value! as NSDictionary, dict as NSDictionary)
         }
     }
     
@@ -121,14 +121,14 @@ class ShallowsTests: XCTestCase {
         let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-2")
         diskCache.pruneOnDeinit = true
         print(diskCache.directoryURL)
-        let singleElementCache = MemoryCache<String, String>().mapKeys({ "only_key" }) as Cache<Void, String>
+        let singleElementCache = MemoryCache<String, String>().singleKey("only_key")
         let finalCache = singleElementCache.combined(with: diskCache
             .singleKey("only_key")
             .mapString(withEncoding: .utf8)
         )
         finalCache.set("Five-Four")
         finalCache.retrieve { (result) in
-            XCTAssertEqual(result.asOptional, "Five-Four")
+            XCTAssertEqual(result.value, "Five-Four")
         }
     }
     
@@ -146,7 +146,7 @@ class ShallowsTests: XCTestCase {
         cache.storage[10] = 15
         let expectation = self.expectation(description: "On update")
         cache.update(forKey: 10, { $0 += 5 }) { (result) in
-            XCTAssertEqual(result.asOptional, 20)
+            XCTAssertEqual(result.value, 20)
             let check = try! cache.makeSyncCache().retrieve(forKey: 10)
             XCTAssertEqual(check, 20)
             expectation.fulfill()
@@ -253,7 +253,7 @@ class ShallowsTests: XCTestCase {
         let cache2 = ReadOnlyCache<Void, Bool>(cacheName: "", retrieve: { _, completion in completion(.success(true)) })
         let zipped = zip(cache1, cache2, withStrategy: .latest)
         zipped.retrieve { (res) in
-            let (num, bool) = res.asOptional!
+            let (num, bool) = res.value!
             if num == 10, bool {
                 expectation10.fulfill()
             }
@@ -284,10 +284,10 @@ class ShallowsTests: XCTestCase {
     func testSetStrategyFrontFirst() {
         var frontSet: Bool = false
         let front = Cache<Void, Int>(cacheName: "front",
-                                     retrieve: { _ in },
+                                     retrieve: { _, _ in },
                                      set: { (_, _, completion) in frontSet = true; completion(.success) })
         let expectation = self.expectation(description: "On back called")
-        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
+        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _, _ in }) { (_, _, _) in
             XCTAssertTrue(frontSet)
             expectation.fulfill()
         }
@@ -298,10 +298,10 @@ class ShallowsTests: XCTestCase {
     
     func testStrategyFrontOnly() {
         let front = Cache<Void, Int>(cacheName: "front",
-                                     retrieve: { _ in },
+                                     retrieve: { _, _ in },
                                      set: { (_, _, completion) in completion(.success) })
         let expectation = self.expectation(description: "On back called")
-        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _ in }) { (_, _, _) in
+        let back = Cache<Void, Int>(cacheName: "back", retrieve: { _, _ in }) { (_, _, _) in
             XCTFail()
         }
         let combined = front.combined(with: back, pullStrategy: .pullFromBack, setStrategy: .frontOnly)

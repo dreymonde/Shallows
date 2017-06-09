@@ -353,7 +353,7 @@ extension ReadOnlyCache {
 extension CacheProtocol {
     
     public func singleKey(_ key: Key) -> Cache<Void, Value> {
-        return mapKeys({ key })
+        return mapKeys({ _ in key })
     }
     
 }
