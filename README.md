@@ -3,6 +3,8 @@
 [![Swift][swift-badge]][swift-url]
 [![Platform][platform-badge]][platform-url]
 
+### This is a preview version for Swift 4.
+
 **Shallows** is a generic abstraction layer over lightweight data storage and persistence. It provides a `Cache<Key, Value>` type, instances of which can be easily transformed and composed with each other. It gives you an ability to create highly sophisticated, effective and reliable caching/persistence solutions.
 
 **Shallows** is deeply inspired by [Carlos][carlos-github-url] and [this amazing talk][composable-caches-in-swift-url] by [Brandon Kase][brandon-kase-twitter-url].
@@ -256,6 +258,22 @@ let nscache = NSCacheCache<NSURL, NSData>()
     .toNonObjCValues() // Cache<URL, Data>
 ```
 
+#### Using `Codable`
+
+**Shallows** in Swift 4 works seamlessly with new `Codable` protocol:
+
+```swift
+struct Guitar : Codable {
+    let name: String
+    let numberOfStrings: Int
+}
+
+let guitarJSONCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "guitars-json")
+    .mapJSONObject(Guitar.self) // Cache<String, Guitar>
+let guitarPlistCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "guitars-plist")
+    .mapPlistObject(Guitar.self) // Cache<String, Guitar>
+```
+
 ### Making your own cache
 
 To create your own caching layer, you should conform to `CacheProtocol`. That means that you should define these two methods:
@@ -289,7 +307,7 @@ github "dreymonde/Shallows" ~> 0.3.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
-[swift-badge]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
+[swift-badge]: https://img.shields.io/badge/Swift-4.0-orange.svg?style=flat
 [swift-url]: https://swift.org
 [platform-badge]: https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg
 [platform-url]: https://developer.apple.com/swift/
