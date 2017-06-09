@@ -21,7 +21,7 @@ let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallo
     .mapJSONDictionary()
 let combinedCache = memoryJSONCache.combined(with: diskCache)
 combinedCache.retrieve(forKey: "Higgins") { (result) in
-    if let json = result.asOptional {
+    if let json = result.value {
         print(json)
     }
 }
@@ -168,20 +168,16 @@ arrays.update(forKey: "some-key", { $0.append(10) }) { (result) in
 Zipping is a very powerful feature of **Shallows**. It allows you to compose your caches in a way that you get result only when both of them completes for your request. For example:
 
 ```swift
-let jsons = FileSystemCache.inDirectory(.cachesDirectory, appending: "jsons-cache")
-    .mapJSONDictionary()
-let metadata = FileSystemCache.inDirectory(.cachesDirectory, appending: "meta")
-    .mapString()
-let zipped = zip(jsons, metadata) // Cache<String, ([String : Any], String)>
-zipped.retrieve(forKey: "morshyn") { (result) in
-    if let (json, meta) = result.asOptional {
-        print(json)
-        print(meta)
+let strings = MemoryCache<String, String>()
+let numbers = MemoryCache<String, Int>()
+let zipped = zip(strings, numbers) // Cache<String, (String, Int)>
+zipped.retrieve(forKey: "some-key") { (result) in
+    if let (string, number) = result.value {
+        print(string)
+        print(number)
     }
 }
-let newJSON = ["water": 15]
-let meta = "Berezivska"
-zipped.set((newJSON, meta), forKey: "berezovka") { (result) in
+zipped.set(("shallows", 3), forKey: "another-key") { (result) in
     if result.isSuccess {
         print("Yay!")
     }
@@ -196,16 +192,69 @@ Caches can be composed in different ways. If you look at the `combined` method, 
 
 ```swift
 public func combined<CacheType : CacheProtocol>(with cache: CacheType,
-                     pullingFromBack: Bool,
-                     pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value
+                     pullStrategy: CacheCombinationPullStrategy,
+                     setStrategy: CacheCombinationSetStrategy) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value
 ```
 
-And `pullingFromBack` and `pushingToBack` are both `true` by default.
+Where `pullStrategy` defaults to `.pullFromBack` and `setStrategy` defaults to `.frontFirst`. Available options are:
 
-- "Pulling from back" means that when "back" cache will be hit and success, the retrieved value will be set to the "front" cache also.
-- "Pushing to back" means that when the value is set to the "front" cache, it will also be set to the "back" cache.
+```swift
+public enum CacheCombinationPullStrategy {
+    case pullFromBack
+    case neverPull
+}
 
-You can change these flags to accomplish a behavior you want.           
+public enum CacheCombinationSetStrategy {
+    case backFirst
+    case frontFirst
+    case frontOnly
+    case backOnly
+}
+```
+
+- `.pullFromBack` means that when "back" cache will be hit and success, the retrieved value will be set to the "front" cache also.
+
+You can change these parameters to accomplish a behavior you want.
+
+#### Recovering from errors
+
+You can protect your cache instance from failures using `fallback(with:)` or `defaulting(to:)` methods:
+
+```swift
+let cache = MemoryCache<String, Int>()
+let protected = cache.fallback(with: { error in
+    switch error {
+    case MemoryCacheError.noValue:
+        return 15
+    default:
+        return -1
+    }
+})
+```
+
+```swift
+let cache = MemoryCache<String, Int>()
+let defaulted = cache.defaulting(to: -1)
+```
+
+This is _especially_ useful when using `update` method:
+
+```swift
+let cache = MemoryCache<String, [Int]>()
+cache.defaulting(to: []).update(forKey: "first", { $0.append(10) })
+```
+
+That means that in case of failure retrieving existing value, `update` will use default value of `[]` instead of just failing the whole update.
+
+#### Using `NSCacheCache`
+
+`NSCache` is a tricky class: it supports only reference types, so you're forced to use, for example, `NSData` instead of `Data` and so on. To help you out, **Shallows** provides a set of convenience extensions for legacy Foundation types:
+
+```swift
+let nscache = NSCacheCache<NSURL, NSData>()
+    .toNonObjCKeys()
+    .toNonObjCValues() // Cache<URL, Data>
+```
 
 ### Making your own cache
 
@@ -236,7 +285,7 @@ Well, you shouldn't really do that. Technically you can, but really **Shallows**
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.2.0
+github "dreymonde/Shallows" ~> 0.3.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage

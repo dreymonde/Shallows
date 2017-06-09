@@ -45,7 +45,7 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     
     public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
         self.raw = RawFileSystemCache(directoryURL: directoryURL, qos: qos, cacheName: cacheName)
-        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(FileSystemCache.fileName(for: $0)) })
+        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(validFileName: FileSystemCache.fileName(for: $0)) })
     }
     
     public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
@@ -62,6 +62,11 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     
     public struct FileName {
         public let fileName: String
+        public init(validFileName: String) {
+            self.fileName = validFileName
+        }
+        
+        @available(*, unavailable, renamed: "init(validFileName:)")
         public init(_ fileName: String) {
             self.fileName = fileName
         }
@@ -100,7 +105,7 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
-                    completion(.success())
+                    completion(.success)
                 } else {
                     completion(.failure(Error.cantCreateFile))
                 }

@@ -65,6 +65,81 @@ internal func cacheConnectionSignFromOptions(pullingFromBack: Bool, pushingToBac
 
 extension CacheProtocol {
     
+    public var dev: Cache<Key, Value>.Dev {
+        return Cache<Key, Value>.Dev(self.asCache())
+    }
+    
+}
+
+extension Cache {
+    
+    public struct Dev {
+        
+        fileprivate let frontCache: Cache
+        
+        fileprivate init(_ cache: Cache) {
+            self.frontCache = cache
+        }
+        
+        public func set<CacheType : WritableCacheProtocol>(_ value: Value,
+                        forKey key: Key,
+                        pushingTo backCache: CacheType,
+                        completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+            frontCache.set(value, forKey: key, pushingTo: backCache, completion: completion)
+        }
+        
+        public func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
+                             backedBy backCache: CacheType,
+                             shouldPullFromBack: Bool,
+                             completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value{
+            frontCache.retrieve(forKey: key, backedBy: backCache, shouldPullFromBack: shouldPullFromBack, completion: completion)
+        }
+        
+        public func set<CacheType : CacheProtocol>(_ value: Value,
+                        forKey key: Key,
+                        pushingTo cache: CacheType,
+                        strategy: CacheCombinationSetStrategy,
+                        completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value{
+            frontCache.set(value, forKey: key, pushingTo: cache, strategy: strategy, completion: completion)
+        }
+        
+    }
+    
+}
+
+public enum CacheCombinationPullStrategy {
+    case pullFromBack
+    case neverPull
+}
+
+public enum CacheCombinationSetStrategy {
+    case backFirst
+    case frontFirst
+    case frontOnly
+    case backOnly
+}
+
+extension WritableCacheProtocol {
+    
+    fileprivate func set<CacheType : WritableCacheProtocol>(_ value: Value,
+                         forKey key: Key,
+                         pushingTo cache: CacheType,
+                         completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+        self.set(value, forKey: key, completion: { (result) in
+            if result.isFailure {
+                shallows_print("Failed setting \(key) to \(self.cacheName). Aborting")
+                completion(result)
+            } else {
+                shallows_print("Succesfull set of \(key). Pushing to \(cache.cacheName)")
+                cache.set(value, forKey: key, completion: completion)
+            }
+        })
+    }
+    
+}
+
+extension CacheProtocol {
+    
     public func asCache() -> Cache<Key, Value> {
         return Cache(self)
     }
@@ -90,25 +165,27 @@ extension CacheProtocol {
         }
     }
     
-    internal func set<CacheType : WritableCacheProtocol>(_ value: Value,
-                      forKey key: Key,
-                      pushingTo cache: CacheType,
-                      completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
-        self.set(value, forKey: key, completion: { (result) in
-            if result.isFailure {
-                shallows_print("Failed setting \(key) to \(self.cacheName). Aborting")
-                completion(result)
-            } else {
-                shallows_print("Succesfull set of \(key). Pushing to \(cache.cacheName)")
-                cache.set(value, forKey: key, completion: completion)
-            }
-        })
+    fileprivate func set<CacheType : CacheProtocol>(_ value: Value,
+                         forKey key: Key,
+                         pushingTo cache: CacheType,
+                         strategy: CacheCombinationSetStrategy,
+                         completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+        switch strategy {
+        case .frontFirst:
+            self.set(value, forKey: key, pushingTo: cache, completion: completion)
+        case .backFirst:
+            cache.set(value, forKey: key, pushingTo: self, completion: completion)
+        case .frontOnly:
+            self.set(value, forKey: key, completion: completion)
+        case .backOnly:
+            cache.set(value, forKey: key, completion: completion)
+        }
     }
     
-    internal func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
-                           backedBy cache: CacheType,
-                           shouldPullFromBack: Bool,
-                           completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+    fileprivate func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
+                              backedBy cache: CacheType,
+                              shouldPullFromBack: Bool,
+                              completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
                 shallows_print("Cache (\(self.cacheName)) miss for key: \(key). Attempting to retrieve from \(cache.cacheName)")
@@ -132,22 +209,25 @@ extension CacheProtocol {
         })
     }
     
+    @available(*, deprecated, message: "Use combined(with:retrieveStrategy:setStrategy:) instead")
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
-                         pullingFromBack: Bool = true,
-                         pushingToBack: Bool = true) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullingFromBack, pushingToBack: pushingToBack))(\(cache.cacheName))", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
+                         pullingFromBack: Bool,
+                         pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+        return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullFromBack : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
+    }
+    
+    public func combined<CacheType : CacheProtocol>(with cache: CacheType,
+                         pullStrategy: CacheCombinationPullStrategy = .pullFromBack,
+                         setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy == .pullFromBack, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullStrategy == .pullFromBack, completion: completion)
         }, set: { (value, key, completion) in
-            if pushingToBack {
-                self.set(value, forKey: key, pushingTo: cache, completion: completion)
-            } else {
-                self.set(value, forKey: key, completion: completion)
-            }
+            self.set(value, forKey: key, pushingTo: cache, strategy: setStrategy, completion: completion)
         })
     }
     
     public func backed<ReadableCacheType : ReadableCacheProtocol>(by cache: ReadableCacheType,
-                         pullingFromBack: Bool = true) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
+                       pullingFromBack: Bool = true) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
         return Cache<Key, Value>(cacheName: "\(self.cacheName)+\(cache.cacheName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
         }, set: { value, key, completion in
@@ -214,6 +294,58 @@ extension CacheProtocol {
     
     public func mapKeys<OtherKey : RawRepresentable>() -> Cache<OtherKey, Value> where OtherKey.RawValue == Key {
         return mapKeys({ $0.rawValue })
+    }
+    
+}
+
+extension CacheProtocol {
+    
+    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> Cache<Key, Value> {
+        return Cache(cacheName: self.cacheName, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: { (result) in
+                switch result {
+                case .failure(let error):
+                    do {
+                        let fallbackValue = try produceValue(error)
+                        completion(.success(fallbackValue))
+                    } catch let fallbackError {
+                        completion(.failure(fallbackError))
+                    }
+                case .success(let value):
+                    completion(.success(value))
+                }
+            })
+        }, set: self.set)
+    }
+    
+    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> Cache<Key, Value> {
+        return fallback(with: { _ in defaultValue() })
+    }
+    
+}
+
+extension ReadOnlyCache {
+    
+    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyCache<Key, Value> {
+        return ReadOnlyCache(cacheName: self.cacheName, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: { (result) in
+                switch result {
+                case .failure(let error):
+                    do {
+                        let fallbackValue = try produceValue(error)
+                        completion(.success(fallbackValue))
+                    } catch let fallbackError {
+                        completion(.failure(fallbackError))
+                    }
+                case .success(let value):
+                    completion(.success(value))
+                }
+            })
+        })
+    }
+    
+    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> ReadOnlyCache<Key, Value> {
+        return fallback(with: { _ in defaultValue() })
     }
     
 }

@@ -16,7 +16,7 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
         cache.setObject(value, forKey: key)
-        completion(.success())
+        completion(.success)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
@@ -124,6 +124,40 @@ extension ReadOnlyCache where Value == NSIndexPath {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, IndexPath> {
         return mapValues({ $0 as IndexPath })
+    }
+    
+}
+
+extension CacheProtocol where Value == NSData {
+    
+    public func toNonObjCValues() -> Cache<Key, Data> {
+        return mapValues(transformIn: { $0 as Data },
+                         transformOut: { $0 as NSData })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSData {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, Data> {
+        return mapValues({ $0 as Data })
+    }
+    
+}
+
+extension CacheProtocol where Value == NSDate {
+    
+    public func toNonObjCValues() -> Cache<Key, Date> {
+        return mapValues(transformIn: { $0 as Date },
+                         transformOut: { $0 as NSDate })
+    }
+    
+}
+
+extension ReadOnlyCache where Value == NSDate {
+    
+    public func toNonObjCValues() -> ReadOnlyCache<Key, Date> {
+        return mapValues({ $0 as Date })
     }
     
 }

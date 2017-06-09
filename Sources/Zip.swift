@@ -85,17 +85,6 @@ fileprivate final class CompletionContainer<Left, Right> {
     
 }
 
-fileprivate extension Result {
-    
-    var error: Error? {
-        if case .failure(let er) = self {
-            return er
-        }
-        return nil
-    }
-    
-}
-
 public struct ZippedResultError : Error {
     
     public let left: Error?
@@ -153,7 +142,7 @@ public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _
             let zipped = zip(left, right)
             switch zipped {
             case .success:
-                completion(.success())
+                completion(.success)
             case .failure(let error):
                 completion(.failure(error))
             }
