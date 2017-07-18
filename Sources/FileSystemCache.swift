@@ -92,9 +92,18 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
         }
     }
     
-    public enum Error : Swift.Error {
+    public enum Error : ShallowsError {
         case cantCreateDirectory(Swift.Error)
         case cantCreateFile
+        
+        public var isTransient: Bool {
+            switch self {
+            case .cantCreateFile:
+                return false
+            case .cantCreateDirectory:
+                return false
+            }
+        }
     }
     
     public func set(_ value: Data, forKey key: FileName, completion: @escaping (Result<Void>) -> ()) {

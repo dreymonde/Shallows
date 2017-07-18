@@ -1,7 +1,14 @@
 import Dispatch
 
-enum MemoryCacheError : Error {
+enum MemoryCacheError : ShallowsError {
     case noValue
+    
+    var isTransient: Bool {
+        switch self {
+        case .noValue:
+            return false
+        }
+    }
 }
 
 public struct ThreadSafe<Value> {

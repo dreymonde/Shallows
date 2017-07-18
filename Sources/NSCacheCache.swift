@@ -2,8 +2,15 @@ import Foundation
 
 public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtocol {
     
-    public enum Error : Swift.Error {
+    public enum Error : ShallowsError {
         case noValue(Key)
+        
+        public var isTransient: Bool {
+            switch self {
+            case .noValue:
+                return false
+            }
+        }
     }
     
     public let cache: NSCache<Key, Value>
