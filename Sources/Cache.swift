@@ -136,6 +136,23 @@ extension WritableCacheProtocol {
         })
     }
     
+    fileprivate func set<CacheType : WritableCacheProtocol>(_ value: Value,
+                         forKey key: Key,
+                         pushingTo cache: CacheType,
+                         strategy: CacheCombinationSetStrategy,
+                         completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
+        switch strategy {
+        case .frontFirst:
+            self.set(value, forKey: key, pushingTo: cache, completion: completion)
+        case .backFirst:
+            cache.set(value, forKey: key, pushingTo: self, completion: completion)
+        case .frontOnly:
+            self.set(value, forKey: key, completion: completion)
+        case .backOnly:
+            cache.set(value, forKey: key, completion: completion)
+        }
+    }
+    
 }
 
 extension CacheProtocol {
@@ -162,23 +179,6 @@ extension CacheProtocol {
             case .failure(let error):
                 completion(.failure(error))
             }
-        }
-    }
-    
-    fileprivate func set<CacheType : CacheProtocol>(_ value: Value,
-                         forKey key: Key,
-                         pushingTo cache: CacheType,
-                         strategy: CacheCombinationSetStrategy,
-                         completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
-        switch strategy {
-        case .frontFirst:
-            self.set(value, forKey: key, pushingTo: cache, completion: completion)
-        case .backFirst:
-            cache.set(value, forKey: key, pushingTo: self, completion: completion)
-        case .frontOnly:
-            self.set(value, forKey: key, completion: completion)
-        case .backOnly:
-            cache.set(value, forKey: key, completion: completion)
         }
     }
     
@@ -223,6 +223,15 @@ extension CacheProtocol {
             self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullStrategy == .pullFromBack, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: cache, strategy: setStrategy, completion: completion)
+        })
+    }
+    
+    public func pushing<WritableCacheType : WritableCacheProtocol>(to backCache: WritableCacheType,
+                        strategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where WritableCacheType.Key == Key, WritableCacheType.Value == Value {
+        return Cache<Key, Value>(cacheName: "\(self.cacheName)>\(backCache.cacheName)", retrieve: { (key, completion) in
+            self.retrieve(forKey: key, completion: completion)
+        }, set: { (value, key, completion) in
+            self.set(value, forKey: key, pushingTo: backCache, strategy: strategy, completion: completion)
         })
     }
     
