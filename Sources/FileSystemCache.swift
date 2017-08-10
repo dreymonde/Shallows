@@ -174,13 +174,13 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
 
 extension CacheProtocol where Value == Data {
     
-    public func mapJSON() -> Cache<Key, Any> {
-        return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: []) },
-                         transformOut: { try JSONSerialization.data(withJSONObject: $0, options: []) })
+    public func mapJSON(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Cache<Key, Any> {
+        return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: readingOptions) },
+                         transformOut: { try JSONSerialization.data(withJSONObject: $0, options: writingOptions) })
     }
     
-    public func mapJSONDictionary() -> Cache<Key, [String : Any]> {
-        return mapJSON().mapValues(transformIn: throwing({ $0 as? [String : Any] }),
+    public func mapJSONDictionary(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Cache<Key, [String : Any]> {
+        return mapJSON(readingOptions: readingOptions, writingOptions: writingOptions).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                    transformOut: { $0 })
     }
     
@@ -211,7 +211,7 @@ extension ReadOnlyCache where Value == Data {
         return mapValues({ try JSONSerialization.jsonObject(with: $0, options: options) })
     }
     
-    public func mapJSONDictionary(options: JSONSerialization.ReadingOptions) -> ReadOnlyCache<Key, [String : Any]> {
+    public func mapJSONDictionary(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyCache<Key, [String : Any]> {
         return mapJSON(options: options).mapValues(throwing({ $0 as? [String : Any] }))
     }
     
