@@ -90,9 +90,9 @@ extension Cache {
         
         public func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
                              backedBy backCache: CacheType,
-                             shouldPullFromBack: Bool,
+                             strategy: CacheCombinationPullStrategy,
                              completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value{
-            frontCache.retrieve(forKey: key, backedBy: backCache, shouldPullFromBack: shouldPullFromBack, completion: completion)
+            frontCache.retrieve(forKey: key, backedBy: backCache, strategy: strategy, completion: completion)
         }
         
         public func set<CacheType : CacheProtocol>(_ value: Value,
@@ -108,7 +108,8 @@ extension Cache {
 }
 
 public enum CacheCombinationPullStrategy {
-    case pullFromBack
+    case pullThenComplete
+    case completeThenPull
     case neverPull
 }
 
@@ -184,17 +185,22 @@ extension CacheProtocol {
     
     fileprivate func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
                               backedBy cache: CacheType,
-                              shouldPullFromBack: Bool,
+                              strategy: CacheCombinationPullStrategy,
                               completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
                 shallows_print("Cache (\(self.cacheName)) miss for key: \(key). Attempting to retrieve from \(cache.cacheName)")
                 cache.retrieve(forKey: key, completion: { (secondResult) in
                     if case .success(let value) = secondResult {
-                        if shouldPullFromBack {
+                        switch strategy {
+                        case .pullThenComplete:
                             shallows_print("Success retrieving \(key) from \(cache.cacheName). Setting value back to \(self.cacheName)")
                             self.set(value, forKey: key, completion: { _ in completion(secondResult) })
-                        } else {
+                        case .completeThenPull:
+                            shallows_print("Success retrieving \(key) from \(cache.cacheName). Completing, then value back to \(self.cacheName)")
+                            completion(secondResult)
+                            self.set(value, forKey: key, completion: { _ in })
+                        case .neverPull:
                             shallows_print("Success retrieving \(key) from \(cache.cacheName). Not pulling.")
                             completion(secondResult)
                         }
@@ -213,14 +219,14 @@ extension CacheProtocol {
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                          pullingFromBack: Bool,
                          pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullFromBack : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
+        return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullThenComplete : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
     }
     
     public func combined<CacheType : CacheProtocol>(with cache: CacheType,
-                         pullStrategy: CacheCombinationPullStrategy = .pullFromBack,
+                         pullStrategy: CacheCombinationPullStrategy = .pullThenComplete,
                          setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy == .pullFromBack, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullStrategy == .pullFromBack, completion: completion)
+        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy != .neverPull, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: cache, strategy: pullStrategy, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: cache, strategy: setStrategy, completion: completion)
         })
@@ -236,9 +242,9 @@ extension CacheProtocol {
     }
     
     public func backed<ReadableCacheType : ReadableCacheProtocol>(by cache: ReadableCacheType,
-                       pullingFromBack: Bool = true) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
+                       strategy: CacheCombinationPullStrategy = .pullThenComplete) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
         return Cache<Key, Value>(cacheName: "\(self.cacheName)+\(cache.cacheName)", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: cache, shouldPullFromBack: pullingFromBack, completion: completion)
+            self.retrieve(forKey: key, backedBy: cache, strategy: strategy, completion: completion)
         }, set: { value, key, completion in
             self.set(value, forKey: key, completion: completion)
         })
