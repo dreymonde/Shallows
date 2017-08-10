@@ -20,11 +20,33 @@ extension FileSystemCacheProtocol {
     
 }
 
+public struct Filename : RawRepresentable, ExpressibleByStringLiteral {
+    
+    public var rawValue: String
+    
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+    
+    public init(stringLiteral value: String) {
+        self.init(rawValue: value)
+    }
+    
+    public init(unicodeScalarLiteral value: String) {
+        self.init(rawValue: value)
+    }
+    
+    public init(extendedGraphemeClusterLiteral value: String) {
+        self.init(rawValue: value)
+    }
+    
+}
+
 public final class FileSystemCache : FileSystemCacheProtocol {
     
-    public static func fileName(for key: String) -> String {
-        guard let data = key.data(using: .utf8) else { return key }
-        return data.base64EncodedString(options: [])
+    public static func validFilename(for key: Filename) -> Filename {
+        guard let data = key.rawValue.data(using: .utf8) else { return key }
+        return Filename(rawValue: data.base64EncodedString(options: []))
     }
     
     public var directoryURL: URL {
@@ -41,18 +63,18 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     }
     
     public let raw: RawFileSystemCache
-    private let rawMapped: Cache<String, Data>
+    private let rawMapped: Cache<Filename, Data>
     
     public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
         self.raw = RawFileSystemCache(directoryURL: directoryURL, qos: qos, cacheName: cacheName)
-        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(validFileName: FileSystemCache.fileName(for: $0)) })
+        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(validFileName: FileSystemCache.validFilename(for: $0)) })
     }
     
-    public func retrieve(forKey key: String, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey key: Filename, completion: @escaping (Result<Data>) -> ()) {
         rawMapped.retrieve(forKey: key, completion: completion)
     }
     
-    public func set(_ value: Data, forKey key: String, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Data, forKey key: Filename, completion: @escaping (Result<Void>) -> ()) {
         rawMapped.set(value, forKey: key, completion: completion)
     }
     
@@ -62,8 +84,8 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     
     public struct FileName {
         public let fileName: String
-        public init(validFileName: String) {
-            self.fileName = validFileName
+        public init(validFileName: Filename) {
+            self.fileName = validFileName.rawValue
         }
         
         @available(*, unavailable, renamed: "init(validFileName:)")
@@ -230,6 +252,30 @@ extension WriteOnlyCache where Value == Data {
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> WriteOnlyCache<Key, String> {
         return mapValues(throwing({ $0.data(using: encoding) }))
+    }
+    
+}
+
+extension CacheProtocol where Key == Filename {
+    
+    public func usingStringKeys() -> Cache<String, Value> {
+        return mapKeys(Filename.init(rawValue:))
+    }
+    
+}
+
+extension ReadOnlyCache where Key == Filename {
+    
+    public func usingStringKeys() -> ReadOnlyCache<String, Value> {
+        return mapKeys(Filename.init(rawValue:))
+    }
+    
+}
+
+extension WriteOnlyCache where Key == Filename {
+    
+    public func usingStringKeys() -> WriteOnlyCache<String, Value> {
+        return mapKeys(Filename.init(rawValue:))
     }
     
 }
