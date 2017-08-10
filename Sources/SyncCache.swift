@@ -16,14 +16,27 @@ extension CacheProtocol {
     
 }
 
+extension Result {
+    
+    func getValue() throws -> Value {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            throw error
+        }
+    }
+    
+}
+
 public struct SyncCache<Key, Value> {
     
     public let cacheName: String
     
     private let _retrieve: (Key) throws -> Value
-    private let _set: (Value, Key) throws -> ()
+    private let _set: (Value, Key) throws -> Void
     
-    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> ()) {
+    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> Void) {
         self.cacheName = cacheName
         self._retrieve = retrieve
         self._set = set
@@ -56,15 +69,19 @@ public struct ReadOnlySyncCache<Key, Value> {
 
 }
 
-extension Result {
+public struct WriteOnlySyncCache<Key, Value> {
     
-    func getValue() throws -> Value {
-        switch self {
-        case .success(let value):
-            return value
-        case .failure(let error):
-            throw error
-        }
+    public let cacheName: String
+    
+    private let _set: (Value, Key) throws -> Void
+    
+    public init(cacheName: String, set: @escaping (Value, Key) throws -> Void) {
+        self.cacheName = cacheName
+        self._set = set
+    }
+    
+    public func set(_ value: Value, forKey key: Key) throws {
+        try _set(value, key)
     }
     
 }
@@ -76,6 +93,23 @@ extension ReadOnlyCache {
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
+                r_result = result
+                semaphore.signal()
+            })
+            semaphore.wait()
+            return try r_result!.getValue()
+        })
+    }
+    
+}
+
+extension WriteOnlyCache {
+    
+    public func makeSyncCache() -> WriteOnlySyncCache<Key, Value> {
+        return WriteOnlySyncCache(cacheName: self.cacheName + "-sync", set: { (value, key) in
+            let semaphore = DispatchSemaphore(value: 0)
+            var r_result: Result<Void>?
+            self.set(value, forKey: key, completion: { (result) in
                 r_result = result
                 semaphore.signal()
             })
@@ -128,6 +162,14 @@ extension ReadOnlySyncCache where Key == Void {
     
     public func retrieve() throws -> Value {
         return try retrieve(forKey: ())
+    }
+    
+}
+
+extension WriteOnlySyncCache where Key == Void {
+    
+    public func set(_ value: Value) throws {
+        try set(value, forKey: ())
     }
     
 }

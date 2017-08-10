@@ -185,27 +185,51 @@ extension CacheProtocol where Value == Data {
 
 extension ReadOnlyCache where Value == Data {
     
-    public func mapJSON() -> ReadOnlyCache<Key, Any> {
-        return mapValues({ try JSONSerialization.jsonObject(with: $0, options: []) })
+    public func mapJSON(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyCache<Key, Any> {
+        return mapValues({ try JSONSerialization.jsonObject(with: $0, options: options) })
     }
     
-    public func mapJSONDictionary() -> ReadOnlyCache<Key, [String : Any]> {
-        return mapJSON().mapValues(throwing({ $0 as? [String : Any] }))
+    public func mapJSONDictionary(options: JSONSerialization.ReadingOptions) -> ReadOnlyCache<Key, [String : Any]> {
+        return mapJSON(options: options).mapValues(throwing({ $0 as? [String : Any] }))
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, Any> {
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyCache<Key, Any> {
         return mapValues({ data in
             var formatRef = format
-            return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
+            return try PropertyListSerialization.propertyList(from: data, options: options, format: &formatRef)
         })
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> ReadOnlyCache<Key, [String : Any]> {
-        return mapPlist(format: format).mapValues(throwing({ $0 as? [String : Any] }))
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyCache<Key, [String : Any]> {
+        return mapPlist(format: format, options: options).mapValues(throwing({ $0 as? [String : Any] }))
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyCache<Key, String> {
         return mapValues(throwing({ String(data: $0, encoding: encoding) }))
+    }
+    
+}
+
+extension WriteOnlyCache where Value == Data {
+    
+    public func mapJSON(options: JSONSerialization.WritingOptions = []) -> WriteOnlyCache<Key, Any> {
+        return mapValues({ try JSONSerialization.data(withJSONObject: $0, options: options) })
+    }
+    
+    public func mapJSONDictionary(options: JSONSerialization.WritingOptions = []) -> WriteOnlyCache<Key, [String : Any]> {
+        return mapJSON(options: options).mapValues({ $0 as Any })
+    }
+    
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyCache<Key, Any> {
+        return mapValues({ try PropertyListSerialization.data(fromPropertyList: $0, format: format, options: options) })
+    }
+    
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyCache<Key, [String : Any]> {
+        return mapPlist(format: format, options: options).mapValues({ $0 as Any })
+    }
+    
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> WriteOnlyCache<Key, String> {
+        return mapValues(throwing({ $0.data(using: encoding) }))
     }
     
 }
