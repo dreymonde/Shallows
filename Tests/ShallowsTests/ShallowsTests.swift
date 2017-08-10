@@ -74,6 +74,7 @@ class ShallowsTests: XCTestCase {
         let expectation = self.expectation(description: "On retrieve")
         let diskCache = diskCache_raw
             .mapString(withEncoding: .utf8)
+            .usingStringKeys()
         let memCache = MemoryCache<String, String>(storage: [:], cacheName: "mem")
         let nscache = NSCacheCache<NSString, NSString>(cache: .init(), cacheName: "nscache")
             .toNonObjCKeys()
@@ -210,6 +211,7 @@ class ShallowsTests: XCTestCase {
         let memory1 = MemoryCache<String, Int>(storage: ["avenues": 2], cacheName: "avenues").asReadOnlyCache()
         let file1 = FileSystemCache.test()
             .mapString()
+            .usingStringKeys()
         try file1.makeSyncCache().set("Out To Sea", forKey: "avenues")
         let zipped = zip(memory1, file1.asReadOnlyCache()).makeSyncCache()
         let (number, firstSong) = try zipped.retrieve(forKey: "avenues")
@@ -237,7 +239,7 @@ class ShallowsTests: XCTestCase {
     
     func testZip() throws {
         let memory1 = MemoryCache<String, Int>(storage: [:], cacheName: "batman")
-        let file1 = FileSystemCache.test().mapString()
+        let file1 = FileSystemCache.test().mapString().usingStringKeys()
         let zipped = zip(memory1, file1).singleKey("arkham-knight").makeSyncCache()
         try zipped.set((3, "Scarecrow"))
         let (number, mainVillain) = try zipped.retrieve()

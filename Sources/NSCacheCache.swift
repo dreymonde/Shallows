@@ -69,6 +69,24 @@ extension ReadOnlyCache where Value == NSString {
     
 }
 
+extension WriteOnlyCache where Key == NSString {
+    
+    public func toNonObjCKeys() -> WriteOnlyCache<String, Value> {
+        return mapKeys({ $0 as NSString })
+    }
+    
+}
+
+extension WriteOnlyCache where Value == NSString {
+    
+    public func toNonObjCValues() -> WriteOnlyCache<Key, String> {
+        return mapValues({ $0 as NSString })
+    }
+    
+}
+
+// TODO: Other WriteOnlyCache extensions
+
 extension CacheProtocol where Key == NSURL {
     
     public func toNonObjCKeys() -> Cache<URL, Value> {
