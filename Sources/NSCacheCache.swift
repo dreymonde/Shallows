@@ -69,7 +69,7 @@ extension ReadOnlyCacheProtocol where Value == NSString {
     
 }
 
-extension WriteOnlyCache where Key == NSString {
+extension WriteOnlyCacheProtocol where Key == NSString {
     
     public func toNonObjCKeys() -> WriteOnlyCache<String, Value> {
         return mapKeys({ $0 as NSString })
@@ -77,7 +77,7 @@ extension WriteOnlyCache where Key == NSString {
     
 }
 
-extension WriteOnlyCache where Value == NSString {
+extension WriteOnlyCacheProtocol where Value == NSString {
     
     public func toNonObjCValues() -> WriteOnlyCache<Key, String> {
         return mapValues({ $0 as NSString })

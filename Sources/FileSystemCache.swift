@@ -232,7 +232,7 @@ extension ReadOnlyCacheProtocol where Value == Data {
     
 }
 
-extension WriteOnlyCache where Value == Data {
+extension WriteOnlyCacheProtocol where Value == Data {
     
     public func mapJSON(options: JSONSerialization.WritingOptions = []) -> WriteOnlyCache<Key, Any> {
         return mapValues({ try JSONSerialization.data(withJSONObject: $0, options: options) })
@@ -272,7 +272,7 @@ extension ReadOnlyCacheProtocol where Key == Filename {
     
 }
 
-extension WriteOnlyCache where Key == Filename {
+extension WriteOnlyCacheProtocol where Key == Filename {
     
     public func usingStringKeys() -> WriteOnlyCache<String, Value> {
         return mapKeys(Filename.init(rawValue:))

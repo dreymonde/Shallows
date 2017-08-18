@@ -7,7 +7,9 @@ public protocol WritableCacheProtocol : CacheDesign {
     
 }
 
-public struct WriteOnlyCache<Key, Value> : WritableCacheProtocol {
+public protocol WriteOnlyCacheProtocol : WritableCacheProtocol {  }
+
+public struct WriteOnlyCache<Key, Value> : WriteOnlyCacheProtocol {
     
     public let cacheName: String
     
@@ -37,7 +39,7 @@ extension WritableCacheProtocol {
     
 }
 
-extension WriteOnlyCache {
+extension WriteOnlyCacheProtocol {
     
     public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> WriteOnlyCache<OtherKey, Value> {
         return WriteOnlyCache<OtherKey, Value>(cacheName: cacheName, set: { (value, key, completion) in
@@ -63,7 +65,7 @@ extension WriteOnlyCache {
     
 }
 
-extension WriteOnlyCache {
+extension WriteOnlyCacheProtocol {
     
     public func singleKey(_ key: Key) -> WriteOnlyCache<Void, Value> {
         return mapKeys({ key })

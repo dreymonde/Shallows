@@ -103,7 +103,7 @@ extension ReadOnlyCacheProtocol {
     
 }
 
-extension WriteOnlyCache {
+extension WriteOnlyCacheProtocol {
     
     public func makeSyncCache() -> WriteOnlySyncCache<Key, Value> {
         return WriteOnlySyncCache(cacheName: self.cacheName + "-sync", set: { (value, key) in
