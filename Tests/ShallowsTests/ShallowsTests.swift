@@ -26,7 +26,7 @@ extension FileSystemCache {
 }
 
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     static func alwaysFailing(with error: Error) -> ReadOnlyCache<Key, Value> {
         return ReadOnlyCache(cacheName: "", retrieve: { _, completion in completion(.failure(error)) })

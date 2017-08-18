@@ -7,7 +7,9 @@ public protocol ReadableCacheProtocol : CacheDesign {
     
 }
 
-public struct ReadOnlyCache<Key, Value> : ReadableCacheProtocol {
+public protocol ReadOnlyCacheProtocol : ReadableCacheProtocol {  }
+
+public struct ReadOnlyCache<Key, Value> : ReadOnlyCacheProtocol {
     
     public let cacheName: String
     
@@ -37,7 +39,7 @@ extension ReadableCacheProtocol {
     
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func backed<CacheType : ReadableCacheProtocol>(by cache: CacheType) -> ReadOnlyCache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return ReadOnlyCache(cacheName: "\(self.cacheName)-\(cache.cacheName)", retrieve: { (key, completion) in
@@ -83,7 +85,7 @@ extension ReadOnlyCache {
     
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func mapValues<OtherValue : RawRepresentable>() -> ReadOnlyCache<Key, OtherValue> where OtherValue.RawValue == Value {
         return mapValues(throwing(OtherValue.init(rawValue:)))
@@ -95,7 +97,7 @@ extension ReadOnlyCache {
     
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func singleKey(_ key: Key) -> ReadOnlyCache<Void, Value> {
         return mapKeys({ key })
@@ -107,7 +109,7 @@ public enum UnsupportedTransformationReadOnlyCacheError : Error {
     case cacheIsReadOnly
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func usingUnsupportedTransformation<OtherKey, OtherValue>(_ transformation: (Cache<Key, Value>) -> Cache<OtherKey, OtherValue>) -> ReadOnlyCache<OtherKey, OtherValue> {
         let fullCache = Cache<Key, Value>(cacheName: self.cacheName, retrieve: self.retrieve) { (_, _, completion) in

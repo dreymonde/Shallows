@@ -339,7 +339,7 @@ extension CacheProtocol {
     
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyCache<Key, Value> {
         return ReadOnlyCache(cacheName: self.cacheName, retrieve: { (key, completion) in

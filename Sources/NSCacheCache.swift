@@ -53,7 +53,7 @@ extension CacheProtocol where Value == NSString {
     
 }
 
-extension ReadOnlyCache where Key == NSString {
+extension ReadOnlyCacheProtocol where Key == NSString {
     
     public func toNonObjCKeys() -> ReadOnlyCache<String, Value> {
         return mapKeys({ $0 as NSString })
@@ -61,7 +61,7 @@ extension ReadOnlyCache where Key == NSString {
     
 }
 
-extension ReadOnlyCache where Value == NSString {
+extension ReadOnlyCacheProtocol where Value == NSString {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, String> {
         return mapValues({ $0 as String })
@@ -104,7 +104,7 @@ extension CacheProtocol where Value == NSURL {
     
 }
 
-extension ReadOnlyCache where Key == NSURL {
+extension ReadOnlyCacheProtocol where Key == NSURL {
     
     public func toNonObjCKeys() -> ReadOnlyCache<URL, Value> {
         return mapKeys({ $0 as NSURL })
@@ -112,7 +112,7 @@ extension ReadOnlyCache where Key == NSURL {
     
 }
 
-extension ReadOnlyCache where Value == NSURL {
+extension ReadOnlyCacheProtocol where Value == NSURL {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, URL> {
         return mapValues({ $0 as URL })
@@ -137,7 +137,7 @@ extension CacheProtocol where Value == NSIndexPath {
     
 }
 
-extension ReadOnlyCache where Key == NSIndexPath {
+extension ReadOnlyCacheProtocol where Key == NSIndexPath {
     
     public func toNonObjCKeys() -> ReadOnlyCache<IndexPath, Value> {
         return mapKeys({ $0 as NSIndexPath })
@@ -145,7 +145,7 @@ extension ReadOnlyCache where Key == NSIndexPath {
     
 }
 
-extension ReadOnlyCache where Value == NSIndexPath {
+extension ReadOnlyCacheProtocol where Value == NSIndexPath {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, IndexPath> {
         return mapValues({ $0 as IndexPath })
@@ -162,7 +162,7 @@ extension CacheProtocol where Value == NSData {
     
 }
 
-extension ReadOnlyCache where Value == NSData {
+extension ReadOnlyCacheProtocol where Value == NSData {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, Data> {
         return mapValues({ $0 as Data })
@@ -179,7 +179,7 @@ extension CacheProtocol where Value == NSDate {
     
 }
 
-extension ReadOnlyCache where Value == NSDate {
+extension ReadOnlyCacheProtocol where Value == NSDate {
     
     public func toNonObjCValues() -> ReadOnlyCache<Key, Date> {
         return mapValues({ $0 as Date })

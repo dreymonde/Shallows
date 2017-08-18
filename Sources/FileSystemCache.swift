@@ -205,7 +205,7 @@ extension CacheProtocol where Value == Data {
     
 }
 
-extension ReadOnlyCache where Value == Data {
+extension ReadOnlyCacheProtocol where Value == Data {
     
     public func mapJSON(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyCache<Key, Any> {
         return mapValues({ try JSONSerialization.jsonObject(with: $0, options: options) })
@@ -264,7 +264,7 @@ extension CacheProtocol where Key == Filename {
     
 }
 
-extension ReadOnlyCache where Key == Filename {
+extension ReadOnlyCacheProtocol where Key == Filename {
     
     public func usingStringKeys() -> ReadOnlyCache<String, Value> {
         return mapKeys(Filename.init(rawValue:))

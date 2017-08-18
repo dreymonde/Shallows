@@ -86,7 +86,7 @@ public struct WriteOnlySyncCache<Key, Value> {
     
 }
 
-extension ReadOnlyCache {
+extension ReadOnlyCacheProtocol {
     
     public func makeSyncCache() -> ReadOnlySyncCache<Key, Value> {
         return ReadOnlySyncCache(cacheName: "\(self.cacheName)-sync", retrieve: { (key) throws -> Value in
