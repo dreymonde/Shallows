@@ -320,6 +320,18 @@ class ShallowsTests: XCTestCase {
         XCTAssertEqual(alba, "Alba")
     }
     
+    func readme() {
+        
+        struct Player : Codable {
+            let name: String
+            let rating: Int
+        }
+        
+//        let memoryCache = MemoryCache<String, Player>()
+//        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-codable-cache")
+//            
+    }
+    
     static var allTests = [
         ("testFileSystemCache", testFileSystemCache),
     ]

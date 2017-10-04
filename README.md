@@ -196,11 +196,12 @@ public func combined<CacheType : CacheProtocol>(with cache: CacheType,
                      setStrategy: CacheCombinationSetStrategy) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value
 ```
 
-Where `pullStrategy` defaults to `.pullFromBack` and `setStrategy` defaults to `.frontFirst`. Available options are:
+Where `pullStrategy` defaults to `.pullThenComplete` and `setStrategy` defaults to `.frontFirst`. Available options are:
 
 ```swift
 public enum CacheCombinationPullStrategy {
-    case pullFromBack
+    case pullThenComplete
+    case completeThenPull
     case neverPull
 }
 
@@ -289,7 +290,7 @@ github "dreymonde/Shallows" ~> 0.3.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
-[swift-badge]: https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat
+[swift-badge]: https://img.shields.io/badge/Swift-4.0-orange.svg?style=flat
 [swift-url]: https://swift.org
 [platform-badge]: https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg
 [platform-url]: https://developer.apple.com/swift/
