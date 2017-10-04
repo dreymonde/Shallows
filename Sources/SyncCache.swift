@@ -6,6 +6,18 @@ internal func dispatched<In>(to queue: DispatchQueue, _ function: @escaping (In)
     }
 }
 
+internal func dispatched<In1, In2>(to queue: DispatchQueue, _ function: @escaping (In1, In2) -> ()) -> (In1, In2) -> () {
+    return { in1, in2 in
+        queue.async(execute: { function(in1, in2) })
+    }
+}
+
+internal func dispatched<In1, In2, In3>(to queue: DispatchQueue, _ function: @escaping (In1, In2, In3) -> ()) -> (In1, In2, In3) -> () {
+    return { in1, in2, in3 in
+        queue.async(execute: { function(in1, in2, in3) })
+    }
+}
+
 extension CacheProtocol {
     
     public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-cache-thread-safety-queue")) -> Cache<Key, Value> {
