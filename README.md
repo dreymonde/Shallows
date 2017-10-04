@@ -16,16 +16,22 @@
 Using **Shallows** for two-step JSON cache (memory and disk):
 
 ```swift
-let memoryJSONCache = MemoryCache<String, [String : Any]>()
-let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-json-cache")
-    .mapJSONDictionary()
-let combinedCache = memoryJSONCache.combined(with: diskCache)
+struct Player : Codable {
+    let name: String
+    let rating: Int
+}
+
+let memoryCache = MemoryCache<String, Player>()
+let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "cache")
+    .mapJSONObject(Player.self)
+    .usingStringKeys()
+let combinedCache = memoryCache.combined(with: diskCache)
 combinedCache.retrieve(forKey: "Higgins") { (result) in
-    if let json = result.value {
-        print(json)
+    if let player = result.value {
+        print(player.name)
     }
 }
-combinedCache.set(["name": "Mark", "rating": 1], forKey: "Selby") { (result) in
+combinedCache.set(Player(name: "Mark", rating: 1), forKey: "Selby") { (result) in
     if result.isSuccess {
         print("Success!")
     }
@@ -86,7 +92,7 @@ let imageCache = fileSystemCache.mapValues(transformIn: { try UIImage(data: $0).
 
 Now you have an instance of type `Cache<String, UIImage>` which can be used to store images without much fuss.
 
-**NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapPlist(format:)`, `.mapPlistDictionary(format:)`.
+**NOTE:** There are several convenience methods defined on `Cache` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapJSONObject(_:)` `.mapPlist(format:)`, `.mapPlistDictionary(format:)`, `.mapPlistObject(_:)`.
 
 #### Caches composition
 
@@ -123,6 +129,14 @@ let immutableFileCache = FileSystemCache.inDirectory(.cachesDirectory, appending
 let cache = MemoryCache<String, String>()
     .combined(with: immutableFileCache)
     .asReadOnlyCache() // ReadOnlyCache<String, String>
+```
+
+#### Write-only cache
+
+In similar way, write-only cache is also available:
+
+```swift
+let writeOnly = cache.asWriteOnlyCache() // WriteOnlyCache<Key, Value>
 ```
 
 #### Single element cache
@@ -213,8 +227,6 @@ public enum CacheCombinationSetStrategy {
 }
 ```
 
-- `.pullFromBack` means that when "back" cache will be hit and success, the retrieved value will be set to the "front" cache also.
-
 You can change these parameters to accomplish a behavior you want.
 
 #### Recovering from errors
@@ -286,7 +298,7 @@ Well, you shouldn't really do that. Technically you can, but really **Shallows**
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.3.0
+github "dreymonde/Shallows" ~> 0.5.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
