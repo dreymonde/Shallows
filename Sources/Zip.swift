@@ -130,6 +130,22 @@ public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyCache<Key, Value1>, _ rhs: R
     })
 }
 
+public func zip<Key, Value1, Value2>(_ lhs: WriteOnlyCache<Key, Value1>, _ rhs: WriteOnlyCache<Key, Value2>, withStrategy strategy: ZipCompletionStrategy = .latest) -> WriteOnlyCache<Key, (Value1, Value2)> {
+    return WriteOnlyCache(cacheName: lhs.cacheName + "+" + rhs.cacheName, set: { (value, key, completion) in
+        let container = CompletionContainer<Result<Void>, Result<Void>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
+            let zipped = zip(left, right)
+            switch zipped {
+            case .success:
+                completion(.success)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        })
+        lhs.set(value.0, forKey: key, completion: { container.completeLeft(with: [$0]) })
+        rhs.set(value.1, forKey: key, completion: { container.completeRight(with: [$0]) })
+    })
+}
+
 public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _ rhs: Cache2, withStrategy strategy: ZipCompletionStrategy = .latest) -> Cache<Cache1.Key, (Cache1.Value, Cache2.Value)> where Cache1.Key == Cache2.Key {
     return Cache(cacheName: lhs.cacheName + "+" + rhs.cacheName, retrieve: { (key, completion) in
         let container = CompletionContainer<Result<Cache1.Value>, Result<Cache2.Value>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
@@ -150,22 +166,4 @@ public func zip<Cache1 : CacheProtocol, Cache2 : CacheProtocol>(_ lhs: Cache1, _
         lhs.set(value.0, forKey: key, completion: { container.completeLeft(with: [$0]) })
         rhs.set(value.1, forKey: key, completion: { container.completeRight(with: [$0]) })
     })
-}
-
-public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, (T, (U, V))>) -> Cache<Key, (T, U, V)> {
-    return notFlatCache.mapValues(transformIn: { ($0, $1.0, $1.1) },
-                                  transformOut: { ($0, ($1, $2)) })
-}
-
-public func flat<Key, T, U, V>(_ notFlatCache: Cache<Key, ((T, U), V)>) -> Cache<Key, (T, U, V)> {
-    return notFlatCache.mapValues(transformIn: { ($0.0, $0.1, $1) },
-                                  transformOut: { (($0, $1), $2) })
-}
-
-public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, (T, (U, V))>) -> ReadOnlyCache<Key, (T, U, V)> {
-    return notFlatCache.mapValues({ ($0, $1.0, $1.1) })
-}
-
-public func flat<Key, T, U, V>(_ notFlatCache: ReadOnlyCache<Key, ((T, U), V)>) -> ReadOnlyCache<Key, (T, U, V)> {
-    return notFlatCache.mapValues({ ($0.0, $0.1, $1) })
 }

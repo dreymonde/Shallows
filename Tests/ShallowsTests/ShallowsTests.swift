@@ -327,9 +327,23 @@ class ShallowsTests: XCTestCase {
             let rating: Int
         }
         
-//        let memoryCache = MemoryCache<String, Player>()
-//        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "shallows-codable-cache")
-//            
+        let memoryCache = MemoryCache<String, Player>()
+        let diskCache = FileSystemCache.inDirectory(.cachesDirectory, appending: "cache")
+            .mapJSONObject(Player.self)
+            .usingStringKeys()
+        let combinedCache = memoryCache.combined(with: diskCache)
+        combinedCache.retrieve(forKey: "Higgins") { (result) in
+            if let player = result.value {
+                print(player.name)
+            }
+        }
+        combinedCache.set(Player(name: "Mark", rating: 1), forKey: "Selby") { (result) in
+            if result.isSuccess {
+                print("Success!")
+            }
+        }
+        
+//
     }
     
     static var allTests = [
