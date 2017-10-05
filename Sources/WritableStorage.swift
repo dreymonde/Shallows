@@ -15,14 +15,14 @@ public struct WriteOnlyStorage<Key, Value> : WriteOnlyStorageProtocol {
     
     private let _set: (Value, Key, @escaping (Result<Void>) -> ()) -> ()
     
-    public init(cacheName: String, set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
+    public init(storageName: String, set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
         self._set = set
-        self.storageName = cacheName
+        self.storageName = storageName
     }
     
-    public init<CacheType : WritableStorageProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
-        self._set = cache.set
-        self.storageName = cache.storageName
+    public init<StorageType : WritableStorageProtocol>(_ storage: StorageType) where StorageType.Key == Key, StorageType.Value == Value {
+        self._set = storage.set
+        self.storageName = storage.storageName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
@@ -42,7 +42,7 @@ extension WritableStorageProtocol {
 extension WriteOnlyStorageProtocol {
     
     public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> WriteOnlyStorage<OtherKey, Value> {
-        return WriteOnlyStorage<OtherKey, Value>(cacheName: storageName, set: { (value, key, completion) in
+        return WriteOnlyStorage<OtherKey, Value>(storageName: storageName, set: { (value, key, completion) in
             do {
                 let newKey = try transform(key)
                 self.set(value, forKey: newKey, completion: completion)
@@ -53,7 +53,7 @@ extension WriteOnlyStorageProtocol {
     }
     
     public func mapValues<OtherValue>(_ transform: @escaping (OtherValue) throws -> Value) -> WriteOnlyStorage<Key, OtherValue> {
-        return WriteOnlyStorage<Key, OtherValue>(cacheName: storageName, set: { (value, key, completion) in
+        return WriteOnlyStorage<Key, OtherValue>(storageName: storageName, set: { (value, key, completion) in
             do {
                 let newValue = try transform(value)
                 self.set(newValue, forKey: key, completion: completion)

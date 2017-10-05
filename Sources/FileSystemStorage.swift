@@ -2,7 +2,7 @@ import Foundation
 
 public protocol FileSystemStorageProtocol : StorageProtocol {
     
-    init(directoryURL: URL, qos: DispatchQoS, cacheName: String?)
+    init(directoryURL: URL, qos: DispatchQoS, storageName: String?)
     
 }
 
@@ -12,10 +12,10 @@ extension FileSystemStorageProtocol {
                                    appending pathComponent: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
                                    qos: DispatchQoS = .default,
-                                   cacheName: String? = nil) -> Self {
+                                   storageName: String? = nil) -> Self {
         let urls = FileManager.default.urls(for: directory, in: domainMask)
         let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return Self(directoryURL: url, qos: qos, cacheName: cacheName)
+        return Self(directoryURL: url, qos: qos, storageName: storageName)
     }
     
 }
@@ -65,8 +65,8 @@ public final class FileSystemStorage : FileSystemStorageProtocol {
     public let raw: RawFileSystemStorage
     private let rawMapped: Storage<Filename, Data>
     
-    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
-        self.raw = RawFileSystemStorage(directoryURL: directoryURL, qos: qos, cacheName: cacheName)
+    public init(directoryURL: URL, qos: DispatchQoS = .default, storageName: String? = nil) {
+        self.raw = RawFileSystemStorage(directoryURL: directoryURL, qos: qos, storageName: storageName)
         self.rawMapped = raw.mapKeys({ RawFileSystemStorage.FileName(validFileName: FileSystemStorage.validFilename(for: $0)) })
     }
     
@@ -102,10 +102,10 @@ public final class RawFileSystemStorage : FileSystemStorageProtocol {
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
-    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
+    public init(directoryURL: URL, qos: DispatchQoS = .default, storageName: String? = nil) {
         self.directoryURL = directoryURL
-        self.storageName = cacheName ?? "file-system-cache"
-        self.queue = DispatchQueue(label: "\(self.storageName)-file-system-cache-queue", qos: qos)
+        self.storageName = storageName ?? "file-system-storage"
+        self.queue = DispatchQueue(label: "\(self.storageName)-file-system-storage-queue", qos: qos)
     }
     
     deinit {

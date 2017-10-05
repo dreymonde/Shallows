@@ -20,8 +20,8 @@ internal func dispatched<In1, In2, In3>(to queue: DispatchQueue, _ function: @es
 
 extension StorageProtocol {
     
-    public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-cache-thread-safety-queue")) -> Storage<Key, Value> {
-        return Storage<Key, Value>(cacheName: self.storageName,
+    public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-storage-thread-safety-queue")) -> Storage<Key, Value> {
+        return Storage<Key, Value>(storageName: self.storageName,
                                  retrieve: dispatched(to: queue, self.retrieve(forKey:completion:)),
                                  set: dispatched(to: queue, self.set(_:forKey:completion:)))
     }
@@ -48,8 +48,8 @@ public struct SyncStorage<Key, Value> {
     private let _retrieve: (Key) throws -> Value
     private let _set: (Value, Key) throws -> Void
     
-    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> Void) {
-        self.storageName = cacheName
+    public init(storageName: String, retrieve: @escaping (Key) throws -> Value, set: @escaping (Value, Key) throws -> Void) {
+        self.storageName = storageName
         self._retrieve = retrieve
         self._set = set
     }
@@ -70,8 +70,8 @@ public struct ReadOnlySyncStorage<Key, Value> {
     
     private let _retrieve: (Key) throws -> Value
 
-    public init(cacheName: String, retrieve: @escaping (Key) throws -> Value) {
-        self.storageName = cacheName
+    public init(storageName: String, retrieve: @escaping (Key) throws -> Value) {
+        self.storageName = storageName
         self._retrieve = retrieve
     }
     
@@ -87,8 +87,8 @@ public struct WriteOnlySyncStorage<Key, Value> {
     
     private let _set: (Value, Key) throws -> Void
     
-    public init(cacheName: String, set: @escaping (Value, Key) throws -> Void) {
-        self.storageName = cacheName
+    public init(storageName: String, set: @escaping (Value, Key) throws -> Void) {
+        self.storageName = storageName
         self._set = set
     }
     
@@ -101,7 +101,7 @@ public struct WriteOnlySyncStorage<Key, Value> {
 extension ReadOnlyStorageProtocol {
     
     public func makeSyncStorage() -> ReadOnlySyncStorage<Key, Value> {
-        return ReadOnlySyncStorage(cacheName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
+        return ReadOnlySyncStorage(storageName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in
@@ -118,7 +118,7 @@ extension ReadOnlyStorageProtocol {
 extension WriteOnlyStorageProtocol {
     
     public func makeSyncStorage() -> WriteOnlySyncStorage<Key, Value> {
-        return WriteOnlySyncStorage(cacheName: self.storageName + "-sync", set: { (value, key) in
+        return WriteOnlySyncStorage(storageName: self.storageName + "-sync", set: { (value, key) in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Void>?
             self.set(value, forKey: key, completion: { (result) in
@@ -135,7 +135,7 @@ extension WriteOnlyStorageProtocol {
 extension StorageProtocol {
     
     public func makeSyncStorage() -> SyncStorage<Key, Value> {
-        return SyncStorage(cacheName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
+        return SyncStorage(storageName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
             var r_result: Result<Value>?
             self.retrieve(forKey: key, completion: { (result) in

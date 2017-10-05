@@ -42,7 +42,7 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
     
     public let storageName: String
     
-    private let queue = DispatchQueue(label: "com.shallows.memory-cache-queue")
+    private let queue = DispatchQueue(label: "com.shallows.memory-storage-queue")
     private var _storage: ThreadSafe<[Key : Value]>
     
     public var storage: [Key : Value] {
@@ -54,9 +54,9 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
         }
     }
     
-    public init(storage: [Key : Value] = [:], cacheName: String = "memory-cache-\(Key.self):\(Value.self)") {
+    public init(storage: [Key : Value] = [:], storageName: String = "memory-storage-\(Key.self):\(Value.self)") {
         self._storage = ThreadSafe(storage)
-        self.storageName = cacheName
+        self.storageName = storageName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {

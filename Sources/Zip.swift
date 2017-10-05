@@ -131,7 +131,7 @@ public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyStorage<Key, Value1>, _ rhs:
 }
 
 public func zip<Key, Value1, Value2>(_ lhs: WriteOnlyStorage<Key, Value1>, _ rhs: WriteOnlyStorage<Key, Value2>, withStrategy strategy: ZipCompletionStrategy = .latest) -> WriteOnlyStorage<Key, (Value1, Value2)> {
-    return WriteOnlyStorage(cacheName: lhs.storageName + "+" + rhs.storageName, set: { (value, key, completion) in
+    return WriteOnlyStorage(storageName: lhs.storageName + "+" + rhs.storageName, set: { (value, key, completion) in
         let container = CompletionContainer<Result<Void>, Result<Void>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
             let zipped = zip(left, right)
             switch zipped {
@@ -146,9 +146,9 @@ public func zip<Key, Value1, Value2>(_ lhs: WriteOnlyStorage<Key, Value1>, _ rhs
     })
 }
 
-public func zip<Cache1 : StorageProtocol, Cache2 : StorageProtocol>(_ lhs: Cache1, _ rhs: Cache2, withStrategy strategy: ZipCompletionStrategy = .latest) -> Storage<Cache1.Key, (Cache1.Value, Cache2.Value)> where Cache1.Key == Cache2.Key {
-    return Storage(cacheName: lhs.storageName + "+" + rhs.storageName, retrieve: { (key, completion) in
-        let container = CompletionContainer<Result<Cache1.Value>, Result<Cache2.Value>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
+public func zip<Storage1 : StorageProtocol, Storage2 : StorageProtocol>(_ lhs: Storage1, _ rhs: Storage2, withStrategy strategy: ZipCompletionStrategy = .latest) -> Storage<Storage1.Key, (Storage1.Value, Storage2.Value)> where Storage1.Key == Storage2.Key {
+    return Storage(storageName: lhs.storageName + "+" + rhs.storageName, retrieve: { (key, completion) in
+        let container = CompletionContainer<Result<Storage1.Value>, Result<Storage2.Value>>(strategy: strategy.containerStrategy(), completion: { (left, right) in
             completion(zip(left, right))
         })
         lhs.retrieve(forKey: key, completion: { container.completeLeft(with: [$0]) })

@@ -23,9 +23,9 @@ public struct ReadOnlyStorage<Key, Value> : ReadOnlyStorageProtocol {
         self.storageName = storageName
     }
     
-    public init<CacheType : ReadableStorageProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
-        self._retrieve = cache.retrieve
-        self.storageName = cache.storageName
+    public init<StorageType : ReadableStorageProtocol>(_ storage: StorageType) where StorageType.Key == Key, StorageType.Value == Value {
+        self._retrieve = storage.retrieve
+        self.storageName = storage.storageName
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
@@ -44,12 +44,12 @@ extension ReadableStorageProtocol {
 
 extension ReadOnlyStorageProtocol {
     
-    public func backed<CacheType : ReadableStorageProtocol>(by cache: CacheType) -> ReadOnlyStorage<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return ReadOnlyStorage(storageName: "\(self.storageName)-\(cache.storageName)", retrieve: { (key, completion) in
+    public func backed<StorageType : ReadableStorageProtocol>(by storage: StorageType) -> ReadOnlyStorage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
+        return ReadOnlyStorage(storageName: "\(self.storageName)-\(storage.storageName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
                 if firstResult.isFailure {
-                    shallows_print("Cache (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(cache.storageName)")
-                    cache.retrieve(forKey: key, completion: completion)
+                    shallows_print("Storage (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(storage.storageName)")
+                    storage.retrieve(forKey: key, completion: completion)
                 } else {
                     completion(firstResult)
                 }
@@ -108,17 +108,17 @@ extension ReadOnlyStorageProtocol {
     
 }
 
-public enum UnsupportedTransformationReadOnlyCacheError : Error {
-    case cacheIsReadOnly
+public enum UnsupportedTransformationReadOnlyStorageError : Error {
+    case storageIsReadOnly
 }
 
 extension ReadOnlyStorageProtocol {
     
     public func usingUnsupportedTransformation<OtherKey, OtherValue>(_ transformation: (Storage<Key, Value>) -> Storage<OtherKey, OtherValue>) -> ReadOnlyStorage<OtherKey, OtherValue> {
-        let fullCache = Storage<Key, Value>(cacheName: self.storageName, retrieve: self.retrieve) { (_, _, completion) in
-            completion(fail(with: UnsupportedTransformationReadOnlyCacheError.cacheIsReadOnly))
+        let fullStorage = Storage<Key, Value>(storageName: self.storageName, retrieve: self.retrieve) { (_, _, completion) in
+            completion(fail(with: UnsupportedTransformationReadOnlyStorageError.storageIsReadOnly))
         }
-        return transformation(fullCache).asReadOnlyStorage()
+        return transformation(fullStorage).asReadOnlyStorage()
     }
     
 }

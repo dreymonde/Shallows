@@ -13,21 +13,21 @@ public final class NSCacheStorage<Key : NSObject, Value : AnyObject> : StoragePr
         }
     }
     
-    public let cache: NSCache<Key, Value>
+    public let storage: NSCache<Key, Value>
     public let storageName: String
     
-    public init(cache: NSCache<Key, Value> = NSCache(), cacheName: String = "\(NSCache<Key, Value>.self)") {
-        self.cache = cache
-        self.storageName = cacheName
+    public init(storage: NSCache<Key, Value> = NSCache(), storageName: String = "\(NSCache<Key, Value>.self)") {
+        self.storage = storage
+        self.storageName = storageName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
-        cache.setObject(value, forKey: key)
+        storage.setObject(value, forKey: key)
         completion(.success)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
-        if let object = cache.object(forKey: key) {
+        if let object = storage.object(forKey: key) {
             completion(.success(object))
         } else {
             completion(.failure(Error.noValue(key)))
@@ -85,7 +85,7 @@ extension WriteOnlyStorageProtocol where Value == NSString {
     
 }
 
-// TODO: Other WriteOnlyCache extensions
+// TODO: Other WriteOnlyStorage extensions
 
 extension StorageProtocol where Key == NSURL {
     
