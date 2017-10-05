@@ -1,27 +1,27 @@
-public protocol CacheDesign {
+public protocol StorageDesign {
     
-    var cacheName: String { get }
+    var storageName: String { get }
     
 }
 
-extension CacheDesign {
+extension StorageDesign {
     
     @available(*, deprecated, renamed: "cacheName")
     public var name: String {
-        return cacheName
+        return storageName
     }
     
-    public var cacheName: String {
+    public var storageName: String {
         return String(describing: Self.self)
     }
     
 }
 
-public protocol CacheProtocol : ReadableCacheProtocol, WritableCacheProtocol { }
+public protocol StorageProtocol : ReadableStorageProtocol, WritableStorageProtocol { }
 
-public struct Cache<Key, Value> : CacheProtocol {
+public struct Storage<Key, Value> : StorageProtocol {
     
-    public let cacheName: String
+    public let storageName: String
     
     private let _retrieve: (Key, @escaping (Result<Value>) -> ()) -> ()
     private let _set: (Value, Key, @escaping (Result<Void>) -> ()) -> ()
@@ -31,13 +31,13 @@ public struct Cache<Key, Value> : CacheProtocol {
                 set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
         self._retrieve = retrieve
         self._set = set
-        self.cacheName = cacheName
+        self.storageName = cacheName
     }
     
-    public init<CacheType : CacheProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
+    public init<CacheType : StorageProtocol>(_ cache: CacheType) where CacheType.Key == Key, CacheType.Value == Value {
         self._retrieve = cache.retrieve
         self._set = cache.set
-        self.cacheName = cache.cacheName
+        self.storageName = cache.storageName
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
@@ -63,39 +63,39 @@ internal func cacheConnectionSignFromOptions(pullingFromBack: Bool, pushingToBac
     }
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public var dev: Cache<Key, Value>.Dev {
-        return Cache<Key, Value>.Dev(self.asCache())
+    public var dev: Storage<Key, Value>.Dev {
+        return Storage<Key, Value>.Dev(self.asStorage())
     }
     
 }
 
-extension Cache {
+extension Storage {
     
     public struct Dev {
         
-        fileprivate let frontCache: Cache
+        fileprivate let frontCache: Storage
         
-        fileprivate init(_ cache: Cache) {
+        fileprivate init(_ cache: Storage) {
             self.frontCache = cache
         }
         
-        public func set<CacheType : WritableCacheProtocol>(_ value: Value,
+        public func set<CacheType : WritableStorageProtocol>(_ value: Value,
                         forKey key: Key,
                         pushingTo backCache: CacheType,
                         completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
             frontCache.set(value, forKey: key, pushingTo: backCache, completion: completion)
         }
         
-        public func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
+        public func retrieve<CacheType : ReadableStorageProtocol>(forKey key: Key,
                              backedBy backCache: CacheType,
                              strategy: CacheCombinationPullStrategy,
                              completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value{
             frontCache.retrieve(forKey: key, backedBy: backCache, strategy: strategy, completion: completion)
         }
         
-        public func set<CacheType : CacheProtocol>(_ value: Value,
+        public func set<CacheType : StorageProtocol>(_ value: Value,
                         forKey key: Key,
                         pushingTo cache: CacheType,
                         strategy: CacheCombinationSetStrategy,
@@ -120,24 +120,24 @@ public enum CacheCombinationSetStrategy {
     case backOnly
 }
 
-extension WritableCacheProtocol {
+extension WritableStorageProtocol {
     
-    fileprivate func set<CacheType : WritableCacheProtocol>(_ value: Value,
+    fileprivate func set<CacheType : WritableStorageProtocol>(_ value: Value,
                          forKey key: Key,
                          pushingTo cache: CacheType,
                          completion: @escaping (Result<Void>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
         self.set(value, forKey: key, completion: { (result) in
             if result.isFailure {
-                shallows_print("Failed setting \(key) to \(self.cacheName). Aborting")
+                shallows_print("Failed setting \(key) to \(self.storageName). Aborting")
                 completion(result)
             } else {
-                shallows_print("Succesfull set of \(key). Pushing to \(cache.cacheName)")
+                shallows_print("Succesfull set of \(key). Pushing to \(cache.storageName)")
                 cache.set(value, forKey: key, completion: completion)
             }
         })
     }
     
-    fileprivate func set<CacheType : WritableCacheProtocol>(_ value: Value,
+    fileprivate func set<CacheType : WritableStorageProtocol>(_ value: Value,
                          forKey key: Key,
                          pushingTo cache: CacheType,
                          strategy: CacheCombinationSetStrategy,
@@ -156,10 +156,10 @@ extension WritableCacheProtocol {
     
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public func asCache() -> Cache<Key, Value> {
-        return Cache(self)
+    public func asStorage() -> Storage<Key, Value> {
+        return Storage(self)
     }
     
     public func update(forKey key: Key,
@@ -183,29 +183,29 @@ extension CacheProtocol {
         }
     }
     
-    fileprivate func retrieve<CacheType : ReadableCacheProtocol>(forKey key: Key,
+    fileprivate func retrieve<CacheType : ReadableStorageProtocol>(forKey key: Key,
                               backedBy cache: CacheType,
                               strategy: CacheCombinationPullStrategy,
                               completion: @escaping (Result<Value>) -> ()) where CacheType.Key == Key, CacheType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
-                shallows_print("Cache (\(self.cacheName)) miss for key: \(key). Attempting to retrieve from \(cache.cacheName)")
+                shallows_print("Cache (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(cache.storageName)")
                 cache.retrieve(forKey: key, completion: { (secondResult) in
                     if case .success(let value) = secondResult {
                         switch strategy {
                         case .pullThenComplete:
-                            shallows_print("Success retrieving \(key) from \(cache.cacheName). Setting value back to \(self.cacheName)")
+                            shallows_print("Success retrieving \(key) from \(cache.storageName). Setting value back to \(self.storageName)")
                             self.set(value, forKey: key, completion: { _ in completion(secondResult) })
                         case .completeThenPull:
-                            shallows_print("Success retrieving \(key) from \(cache.cacheName). Completing, then value back to \(self.cacheName)")
+                            shallows_print("Success retrieving \(key) from \(cache.storageName). Completing, then value back to \(self.storageName)")
                             completion(secondResult)
                             self.set(value, forKey: key, completion: { _ in })
                         case .neverPull:
-                            shallows_print("Success retrieving \(key) from \(cache.cacheName). Not pulling.")
+                            shallows_print("Success retrieving \(key) from \(cache.storageName). Not pulling.")
                             completion(secondResult)
                         }
                     } else {
-                        shallows_print("Cache miss for final destination (\(cache.cacheName)). Completing with failure result")
+                        shallows_print("Cache miss for final destination (\(cache.storageName)). Completing with failure result")
                         completion(secondResult)
                     }
                 })
@@ -216,34 +216,34 @@ extension CacheProtocol {
     }
     
     @available(*, deprecated, message: "Use combined(with:retrieveStrategy:setStrategy:) instead")
-    public func combined<CacheType : CacheProtocol>(with cache: CacheType,
+    public func combined<CacheType : StorageProtocol>(with cache: CacheType,
                          pullingFromBack: Bool,
-                         pushingToBack: Bool) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+                         pushingToBack: Bool) -> Storage<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
         return self.combined(with: cache, pullStrategy: pullingFromBack ? .pullThenComplete : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
     }
     
-    public func combined<CacheType : CacheProtocol>(with cache: CacheType,
+    public func combined<CacheType : StorageProtocol>(with cache: CacheType,
                          pullStrategy: CacheCombinationPullStrategy = .pullThenComplete,
-                         setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "(\(self.cacheName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy != .neverPull, pushingToBack: setStrategy != .frontOnly))(\(cache.cacheName))", retrieve: { (key, completion) in
+                         setStrategy: CacheCombinationSetStrategy = .frontFirst) -> Storage<Key, Value> where CacheType.Key == Key, CacheType.Value == Value {
+        return Storage<Key, Value>(cacheName: "(\(self.storageName))\(cacheConnectionSignFromOptions(pullingFromBack: pullStrategy != .neverPull, pushingToBack: setStrategy != .frontOnly))(\(cache.storageName))", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, strategy: pullStrategy, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: cache, strategy: setStrategy, completion: completion)
         })
     }
     
-    public func pushing<WritableCacheType : WritableCacheProtocol>(to backCache: WritableCacheType,
-                        strategy: CacheCombinationSetStrategy = .frontFirst) -> Cache<Key, Value> where WritableCacheType.Key == Key, WritableCacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "\(self.cacheName)>\(backCache.cacheName)", retrieve: { (key, completion) in
+    public func pushing<WritableCacheType : WritableStorageProtocol>(to backCache: WritableCacheType,
+                        strategy: CacheCombinationSetStrategy = .frontFirst) -> Storage<Key, Value> where WritableCacheType.Key == Key, WritableCacheType.Value == Value {
+        return Storage<Key, Value>(cacheName: "\(self.storageName)>\(backCache.storageName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: completion)
         }, set: { (value, key, completion) in
             self.set(value, forKey: key, pushingTo: backCache, strategy: strategy, completion: completion)
         })
     }
     
-    public func backed<ReadableCacheType : ReadableCacheProtocol>(by cache: ReadableCacheType,
-                       strategy: CacheCombinationPullStrategy = .pullThenComplete) -> Cache<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
-        return Cache<Key, Value>(cacheName: "\(self.cacheName)+\(cache.cacheName)", retrieve: { (key, completion) in
+    public func backed<ReadableCacheType : ReadableStorageProtocol>(by cache: ReadableCacheType,
+                       strategy: CacheCombinationPullStrategy = .pullThenComplete) -> Storage<Key, Value> where ReadableCacheType.Key == Key, ReadableCacheType.Value == Value {
+        return Storage<Key, Value>(cacheName: "\(self.storageName)+\(cache.storageName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, backedBy: cache, strategy: strategy, completion: completion)
         }, set: { value, key, completion in
             self.set(value, forKey: key, completion: completion)
@@ -252,10 +252,10 @@ extension CacheProtocol {
     
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> Cache<OtherKey, Value> {
-        return Cache<OtherKey, Value>(cacheName: cacheName, retrieve: { key, completion in
+    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> Storage<OtherKey, Value> {
+        return Storage<OtherKey, Value>(cacheName: storageName, retrieve: { key, completion in
             do {
                 let newKey = try transform(key)
                 self.retrieve(forKey: newKey, completion: completion)
@@ -273,8 +273,8 @@ extension CacheProtocol {
     }
     
     public func mapValues<OtherValue>(transformIn: @escaping (Value) throws -> OtherValue,
-                          transformOut: @escaping (OtherValue) throws -> Value) -> Cache<Key, OtherValue> {
-        return Cache<Key, OtherValue>(cacheName: cacheName, retrieve: { (key, completion) in
+                          transformOut: @escaping (OtherValue) throws -> Value) -> Storage<Key, OtherValue> {
+        return Storage<Key, OtherValue>(cacheName: storageName, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {
                 case .success(let value):
@@ -300,23 +300,23 @@ extension CacheProtocol {
     
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public func mapValues<OtherValue : RawRepresentable>() -> Cache<Key, OtherValue> where OtherValue.RawValue == Value {
+    public func mapValues<OtherValue : RawRepresentable>() -> Storage<Key, OtherValue> where OtherValue.RawValue == Value {
         return mapValues(transformIn: throwing(OtherValue.init(rawValue:)),
                          transformOut: { $0.rawValue })
     }
     
-    public func mapKeys<OtherKey : RawRepresentable>() -> Cache<OtherKey, Value> where OtherKey.RawValue == Key {
+    public func mapKeys<OtherKey : RawRepresentable>() -> Storage<OtherKey, Value> where OtherKey.RawValue == Key {
         return mapKeys({ $0.rawValue })
     }
     
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> Cache<Key, Value> {
-        return Cache(cacheName: self.cacheName, retrieve: { (key, completion) in
+    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> Storage<Key, Value> {
+        return Storage(cacheName: self.storageName, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {
                 case .failure(let error):
@@ -333,16 +333,16 @@ extension CacheProtocol {
         }, set: self.set)
     }
     
-    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> Cache<Key, Value> {
+    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> Storage<Key, Value> {
         return fallback(with: { _ in defaultValue() })
     }
     
 }
 
-extension ReadOnlyCacheProtocol {
+extension ReadOnlyStorageProtocol {
     
-    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyCache<Key, Value> {
-        return ReadOnlyCache(cacheName: self.cacheName, retrieve: { (key, completion) in
+    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyStorage<Key, Value> {
+        return ReadOnlyStorage(storageName: self.storageName, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {
                 case .failure(let error):
@@ -359,21 +359,21 @@ extension ReadOnlyCacheProtocol {
         })
     }
     
-    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> ReadOnlyCache<Key, Value> {
+    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> ReadOnlyStorage<Key, Value> {
         return fallback(with: { _ in defaultValue() })
     }
     
 }
 
-extension CacheProtocol {
+extension StorageProtocol {
     
-    public func singleKey(_ key: Key) -> Cache<Void, Value> {
+    public func singleKey(_ key: Key) -> Storage<Void, Value> {
         return mapKeys({ key })
     }
     
 }
 
-extension ReadableCacheProtocol where Key == Void {
+extension ReadableStorageProtocol where Key == Void {
     
     public func retrieve(completion: @escaping (Result<Value>) -> ()) {
         retrieve(forKey: (), completion: completion)
@@ -381,7 +381,7 @@ extension ReadableCacheProtocol where Key == Void {
     
 }
 
-extension WritableCacheProtocol where Key == Void {
+extension WritableStorageProtocol where Key == Void {
     
     public func set(_ value: Value, completion: @escaping (Result<Void>) -> () = { _ in }) {
         set(value, forKey: (), completion: completion)
@@ -389,7 +389,7 @@ extension WritableCacheProtocol where Key == Void {
     
 }
 
-extension CacheProtocol where Key == Void {
+extension StorageProtocol where Key == Void {
     
     public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (Result<Value>) -> () = {_ in }) {
         self.update(forKey: (), modify, completion: completion)

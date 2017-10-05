@@ -1,6 +1,6 @@
 import Foundation
 
-public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtocol {
+public final class NSCacheStorage<Key : NSObject, Value : AnyObject> : StorageProtocol {
     
     public enum Error : ShallowsError {
         case noValue(Key)
@@ -14,11 +14,11 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     }
     
     public let cache: NSCache<Key, Value>
-    public let cacheName: String
+    public let storageName: String
     
     public init(cache: NSCache<Key, Value> = NSCache(), cacheName: String = "\(NSCache<Key, Value>.self)") {
         self.cache = cache
-        self.cacheName = cacheName
+        self.storageName = cacheName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
@@ -36,50 +36,50 @@ public final class NSCacheCache<Key : NSObject, Value : AnyObject> : CacheProtoc
     
 }
 
-extension CacheProtocol where Key == NSString {
+extension StorageProtocol where Key == NSString {
     
-    public func toNonObjCKeys() -> Cache<String, Value> {
+    public func toNonObjCKeys() -> Storage<String, Value> {
         return mapKeys({ $0 as NSString })
     }
     
 }
 
-extension CacheProtocol where Value == NSString {
+extension StorageProtocol where Value == NSString {
     
-    public func toNonObjCValues() -> Cache<Key, String> {
+    public func toNonObjCValues() -> Storage<Key, String> {
         return mapValues(transformIn: { $0 as String },
                          transformOut: { $0 as NSString })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Key == NSString {
+extension ReadOnlyStorageProtocol where Key == NSString {
     
-    public func toNonObjCKeys() -> ReadOnlyCache<String, Value> {
+    public func toNonObjCKeys() -> ReadOnlyStorage<String, Value> {
         return mapKeys({ $0 as NSString })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == NSString {
+extension ReadOnlyStorageProtocol where Value == NSString {
     
-    public func toNonObjCValues() -> ReadOnlyCache<Key, String> {
+    public func toNonObjCValues() -> ReadOnlyStorage<Key, String> {
         return mapValues({ $0 as String })
     }
     
 }
 
-extension WriteOnlyCacheProtocol where Key == NSString {
+extension WriteOnlyStorageProtocol where Key == NSString {
     
-    public func toNonObjCKeys() -> WriteOnlyCache<String, Value> {
+    public func toNonObjCKeys() -> WriteOnlyStorage<String, Value> {
         return mapKeys({ $0 as NSString })
     }
     
 }
 
-extension WriteOnlyCacheProtocol where Value == NSString {
+extension WriteOnlyStorageProtocol where Value == NSString {
     
-    public func toNonObjCValues() -> WriteOnlyCache<Key, String> {
+    public func toNonObjCValues() -> WriteOnlyStorage<Key, String> {
         return mapValues({ $0 as NSString })
     }
     
@@ -87,101 +87,101 @@ extension WriteOnlyCacheProtocol where Value == NSString {
 
 // TODO: Other WriteOnlyCache extensions
 
-extension CacheProtocol where Key == NSURL {
+extension StorageProtocol where Key == NSURL {
     
-    public func toNonObjCKeys() -> Cache<URL, Value> {
+    public func toNonObjCKeys() -> Storage<URL, Value> {
         return mapKeys({ $0 as NSURL })
     }
     
 }
 
-extension CacheProtocol where Value == NSURL {
+extension StorageProtocol where Value == NSURL {
     
-    public func toNonObjCValues() -> Cache<Key, URL> {
+    public func toNonObjCValues() -> Storage<Key, URL> {
         return mapValues(transformIn: { $0 as URL },
                          transformOut: { $0 as NSURL })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Key == NSURL {
+extension ReadOnlyStorageProtocol where Key == NSURL {
     
-    public func toNonObjCKeys() -> ReadOnlyCache<URL, Value> {
+    public func toNonObjCKeys() -> ReadOnlyStorage<URL, Value> {
         return mapKeys({ $0 as NSURL })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == NSURL {
+extension ReadOnlyStorageProtocol where Value == NSURL {
     
-    public func toNonObjCValues() -> ReadOnlyCache<Key, URL> {
+    public func toNonObjCValues() -> ReadOnlyStorage<Key, URL> {
         return mapValues({ $0 as URL })
     }
     
 }
 
-extension CacheProtocol where Key == NSIndexPath {
+extension StorageProtocol where Key == NSIndexPath {
     
-    public func toNonObjCKeys() -> Cache<IndexPath, Value> {
+    public func toNonObjCKeys() -> Storage<IndexPath, Value> {
         return mapKeys({ $0 as NSIndexPath })
     }
     
 }
 
-extension CacheProtocol where Value == NSIndexPath {
+extension StorageProtocol where Value == NSIndexPath {
     
-    public func toNonObjCValues() -> Cache<Key, IndexPath> {
+    public func toNonObjCValues() -> Storage<Key, IndexPath> {
         return mapValues(transformIn: { $0 as IndexPath },
                          transformOut: { $0 as NSIndexPath })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Key == NSIndexPath {
+extension ReadOnlyStorageProtocol where Key == NSIndexPath {
     
-    public func toNonObjCKeys() -> ReadOnlyCache<IndexPath, Value> {
+    public func toNonObjCKeys() -> ReadOnlyStorage<IndexPath, Value> {
         return mapKeys({ $0 as NSIndexPath })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == NSIndexPath {
+extension ReadOnlyStorageProtocol where Value == NSIndexPath {
     
-    public func toNonObjCValues() -> ReadOnlyCache<Key, IndexPath> {
+    public func toNonObjCValues() -> ReadOnlyStorage<Key, IndexPath> {
         return mapValues({ $0 as IndexPath })
     }
     
 }
 
-extension CacheProtocol where Value == NSData {
+extension StorageProtocol where Value == NSData {
     
-    public func toNonObjCValues() -> Cache<Key, Data> {
+    public func toNonObjCValues() -> Storage<Key, Data> {
         return mapValues(transformIn: { $0 as Data },
                          transformOut: { $0 as NSData })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == NSData {
+extension ReadOnlyStorageProtocol where Value == NSData {
     
-    public func toNonObjCValues() -> ReadOnlyCache<Key, Data> {
+    public func toNonObjCValues() -> ReadOnlyStorage<Key, Data> {
         return mapValues({ $0 as Data })
     }
     
 }
 
-extension CacheProtocol where Value == NSDate {
+extension StorageProtocol where Value == NSDate {
     
-    public func toNonObjCValues() -> Cache<Key, Date> {
+    public func toNonObjCValues() -> Storage<Key, Date> {
         return mapValues(transformIn: { $0 as Date },
                          transformOut: { $0 as NSDate })
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == NSDate {
+extension ReadOnlyStorageProtocol where Value == NSDate {
     
-    public func toNonObjCValues() -> ReadOnlyCache<Key, Date> {
+    public func toNonObjCValues() -> ReadOnlyStorage<Key, Date> {
         return mapValues({ $0 as Date })
     }
     
