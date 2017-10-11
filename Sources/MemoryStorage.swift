@@ -1,6 +1,6 @@
 import Dispatch
 
-enum MemoryCacheError : ShallowsError {
+enum MemoryStorageError : ShallowsError {
     case noValue
     
     var isTransient: Bool {
@@ -38,11 +38,11 @@ public struct ThreadSafe<Value> {
     
 }
 
-public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
+public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
     
-    public let cacheName: String
+    public let storageName: String
     
-    private let queue = DispatchQueue(label: "com.shallows.memory-cache-queue")
+    private let queue = DispatchQueue(label: "com.shallows.memory-storage-queue")
     private var _storage: ThreadSafe<[Key : Value]>
     
     public var storage: [Key : Value] {
@@ -54,9 +54,9 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
         }
     }
     
-    public init(storage: [Key : Value] = [:], cacheName: String = "memory-cache-\(Key.self):\(Value.self)") {
+    public init(storage: [Key : Value] = [:], storageName: String = "memory-storage-\(Key.self):\(Value.self)") {
         self._storage = ThreadSafe(storage)
-        self.cacheName = cacheName
+        self.storageName = storageName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
@@ -71,7 +71,7 @@ public final class MemoryCache<Key : Hashable, Value> : CacheProtocol {
             if let value = _storage.read()[key] {
                 return .success(value)
             } else {
-                return .failure(MemoryCacheError.noValue)
+                return .failure(MemoryStorageError.noValue)
             }
         }
         completion(result)

@@ -1,21 +1,21 @@
 import Foundation
 
-public protocol FileSystemCacheProtocol : CacheProtocol {
+public protocol FileSystemStorageProtocol : StorageProtocol {
     
-    init(directoryURL: URL, qos: DispatchQoS, cacheName: String?)
+    init(directoryURL: URL, qos: DispatchQoS, storageName: String?)
     
 }
 
-extension FileSystemCacheProtocol {
+extension FileSystemStorageProtocol {
     
     public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
                                    appending pathComponent: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
                                    qos: DispatchQoS = .default,
-                                   cacheName: String? = nil) -> Self {
+                                   storageName: String? = nil) -> Self {
         let urls = FileManager.default.urls(for: directory, in: domainMask)
         let url = urls.first!.appendingPathComponent(pathComponent, isDirectory: true)
-        return Self(directoryURL: url, qos: qos, cacheName: cacheName)
+        return Self(directoryURL: url, qos: qos, storageName: storageName)
     }
     
 }
@@ -42,7 +42,7 @@ public struct Filename : RawRepresentable, ExpressibleByStringLiteral {
     
 }
 
-public final class FileSystemCache : FileSystemCacheProtocol {
+public final class FileSystemStorage : FileSystemStorageProtocol {
     
     public static func validFilename(for key: Filename) -> Filename {
         guard let data = key.rawValue.data(using: .utf8) else { return key }
@@ -53,8 +53,8 @@ public final class FileSystemCache : FileSystemCacheProtocol {
         return raw.directoryURL
     }
     
-    public var cacheName: String {
-        return raw.cacheName
+    public var storageName: String {
+        return raw.storageName
     }
     
     internal var pruneOnDeinit: Bool {
@@ -62,12 +62,12 @@ public final class FileSystemCache : FileSystemCacheProtocol {
         set { raw.pruneOnDeinit = newValue }
     }
     
-    public let raw: RawFileSystemCache
-    private let rawMapped: Cache<Filename, Data>
+    public let raw: RawFileSystemStorage
+    private let rawMapped: Storage<Filename, Data>
     
-    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
-        self.raw = RawFileSystemCache(directoryURL: directoryURL, qos: qos, cacheName: cacheName)
-        self.rawMapped = raw.mapKeys({ RawFileSystemCache.FileName(validFileName: FileSystemCache.validFilename(for: $0)) })
+    public init(directoryURL: URL, qos: DispatchQoS = .default, storageName: String? = nil) {
+        self.raw = RawFileSystemStorage(directoryURL: directoryURL, qos: qos, storageName: storageName)
+        self.rawMapped = raw.mapKeys({ RawFileSystemStorage.FileName(validFileName: FileSystemStorage.validFilename(for: $0)) })
     }
     
     public func retrieve(forKey key: Filename, completion: @escaping (Result<Data>) -> ()) {
@@ -80,7 +80,7 @@ public final class FileSystemCache : FileSystemCacheProtocol {
     
 }
 
-public final class RawFileSystemCache : FileSystemCacheProtocol {
+public final class RawFileSystemStorage : FileSystemStorageProtocol {
     
     public struct FileName {
         public let fileName: String
@@ -94,7 +94,7 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
         }
     }
     
-    public let cacheName: String
+    public let storageName: String
     public let directoryURL: URL
     
     internal var pruneOnDeinit: Bool = false
@@ -102,10 +102,10 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     fileprivate let fileManager = FileManager.default
     fileprivate let queue: DispatchQueue
     
-    public init(directoryURL: URL, qos: DispatchQoS = .default, cacheName: String? = nil) {
+    public init(directoryURL: URL, qos: DispatchQoS = .default, storageName: String? = nil) {
         self.directoryURL = directoryURL
-        self.cacheName = cacheName ?? "file-system-cache"
-        self.queue = DispatchQueue(label: "\(self.cacheName)-file-system-cache-queue", qos: qos)
+        self.storageName = storageName ?? "file-system-storage"
+        self.queue = DispatchQueue(label: "\(self.storageName)-file-system-storage-queue", qos: qos)
     }
     
     deinit {
@@ -172,26 +172,26 @@ public final class RawFileSystemCache : FileSystemCacheProtocol {
     
 }
 
-extension CacheProtocol where Value == Data {
+extension StorageProtocol where Value == Data {
     
-    public func mapJSON(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Cache<Key, Any> {
+    public func mapJSON(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, Any> {
         return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: readingOptions) },
                          transformOut: { try JSONSerialization.data(withJSONObject: $0, options: writingOptions) })
     }
     
-    public func mapJSONDictionary(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Cache<Key, [String : Any]> {
+    public func mapJSONDictionary(readingOptions: JSONSerialization.ReadingOptions = [], writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, [String : Any]> {
         return mapJSON(readingOptions: readingOptions, writingOptions: writingOptions).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
-                                   transformOut: { $0 })
+                                                                                                 transformOut: { $0 })
     }
     
     public func mapJSONObject<JSONObject : Codable>(_ objectType: JSONObject.Type,
                                                     decoder: JSONDecoder = JSONDecoder(),
-                                                    encoder: JSONEncoder = JSONEncoder()) -> Cache<Key, JSONObject> {
+                                                    encoder: JSONEncoder = JSONEncoder()) -> Storage<Key, JSONObject> {
         return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
                          transformOut: { try encoder.encode($0) })
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, Any> {
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> Storage<Key, Any> {
         return mapValues(transformIn: { data in
             var formatRef = format
             return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
@@ -200,115 +200,115 @@ extension CacheProtocol where Value == Data {
         })
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Cache<Key, [String : Any]> {
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Storage<Key, [String : Any]> {
         return mapPlist(format: format).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
                                                   transformOut: { $0 })
     }
     
     public func mapPlistObject<PlistObject : Codable>(_ objectType: PlistObject.Type,
                                                       decoder: PropertyListDecoder = PropertyListDecoder(),
-                                                      encoder: PropertyListEncoder = PropertyListEncoder()) -> Cache<Key, PlistObject> {
+                                                      encoder: PropertyListEncoder = PropertyListEncoder()) -> Storage<Key, PlistObject> {
         return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
                          transformOut: { try encoder.encode($0) })
     }
     
-    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Cache<Key, String> {
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Storage<Key, String> {
         return mapValues(transformIn: throwing({ String(data: $0, encoding: encoding) }),
                          transformOut: throwing({ $0.data(using: encoding) }))
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Value == Data {
+extension ReadOnlyStorageProtocol where Value == Data {
     
-    public func mapJSON(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyCache<Key, Any> {
+    public func mapJSON(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyStorage<Key, Any> {
         return mapValues({ try JSONSerialization.jsonObject(with: $0, options: options) })
     }
     
-    public func mapJSONDictionary(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyCache<Key, [String : Any]> {
+    public func mapJSONDictionary(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyStorage<Key, [String : Any]> {
         return mapJSON(options: options).mapValues(throwing({ $0 as? [String : Any] }))
     }
     
     public func mapJSONObject<JSONObject : Decodable>(_ objectType: JSONObject.Type,
-                                                    decoder: JSONDecoder = JSONDecoder()) -> ReadOnlyCache<Key, JSONObject> {
+                                                      decoder: JSONDecoder = JSONDecoder()) -> ReadOnlyStorage<Key, JSONObject> {
         return mapValues({ try decoder.decode(objectType, from: $0) })
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyCache<Key, Any> {
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyStorage<Key, Any> {
         return mapValues({ data in
             var formatRef = format
             return try PropertyListSerialization.propertyList(from: data, options: options, format: &formatRef)
         })
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyCache<Key, [String : Any]> {
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyStorage<Key, [String : Any]> {
         return mapPlist(format: format, options: options).mapValues(throwing({ $0 as? [String : Any] }))
     }
     
     public func mapPlistObject<PlistObject : Decodable>(_ objectType: PlistObject.Type,
-                                                      decoder: PropertyListDecoder = PropertyListDecoder()) -> ReadOnlyCache<Key, PlistObject> {
+                                                        decoder: PropertyListDecoder = PropertyListDecoder()) -> ReadOnlyStorage<Key, PlistObject> {
         return mapValues({ try decoder.decode(objectType, from: $0) })
     }
     
-    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyCache<Key, String> {
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyStorage<Key, String> {
         return mapValues(throwing({ String(data: $0, encoding: encoding) }))
     }
     
 }
 
-extension WriteOnlyCacheProtocol where Value == Data {
+extension WriteOnlyStorageProtocol where Value == Data {
     
-    public func mapJSON(options: JSONSerialization.WritingOptions = []) -> WriteOnlyCache<Key, Any> {
+    public func mapJSON(options: JSONSerialization.WritingOptions = []) -> WriteOnlyStorage<Key, Any> {
         return mapValues({ try JSONSerialization.data(withJSONObject: $0, options: options) })
     }
     
-    public func mapJSONDictionary(options: JSONSerialization.WritingOptions = []) -> WriteOnlyCache<Key, [String : Any]> {
+    public func mapJSONDictionary(options: JSONSerialization.WritingOptions = []) -> WriteOnlyStorage<Key, [String : Any]> {
         return mapJSON(options: options).mapValues({ $0 as Any })
     }
     
     public func mapJSONObject<JSONObject : Encodable>(_ objectType: JSONObject.Type,
-                                                      encoder: JSONEncoder = JSONEncoder()) -> WriteOnlyCache<Key, JSONObject> {
+                                                      encoder: JSONEncoder = JSONEncoder()) -> WriteOnlyStorage<Key, JSONObject> {
         return mapValues({ try encoder.encode($0) })
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyCache<Key, Any> {
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyStorage<Key, Any> {
         return mapValues({ try PropertyListSerialization.data(fromPropertyList: $0, format: format, options: options) })
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyCache<Key, [String : Any]> {
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml, options: PropertyListSerialization.WriteOptions = 0) -> WriteOnlyStorage<Key, [String : Any]> {
         return mapPlist(format: format, options: options).mapValues({ $0 as Any })
     }
     
     public func mapPlistObject<PlistObject : Encodable>(_ objectType: PlistObject.Type,
-                                                        encoder: PropertyListEncoder = PropertyListEncoder()) -> WriteOnlyCache<Key, PlistObject> {
+                                                        encoder: PropertyListEncoder = PropertyListEncoder()) -> WriteOnlyStorage<Key, PlistObject> {
         return mapValues({ try encoder.encode($0) })
     }
     
-    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> WriteOnlyCache<Key, String> {
+    public func mapString(withEncoding encoding: String.Encoding = .utf8) -> WriteOnlyStorage<Key, String> {
         return mapValues(throwing({ $0.data(using: encoding) }))
     }
     
 }
 
-extension CacheProtocol where Key == Filename {
+extension StorageProtocol where Key == Filename {
     
-    public func usingStringKeys() -> Cache<String, Value> {
+    public func usingStringKeys() -> Storage<String, Value> {
         return mapKeys(Filename.init(rawValue:))
     }
     
 }
 
-extension ReadOnlyCacheProtocol where Key == Filename {
+extension ReadOnlyStorageProtocol where Key == Filename {
     
-    public func usingStringKeys() -> ReadOnlyCache<String, Value> {
+    public func usingStringKeys() -> ReadOnlyStorage<String, Value> {
         return mapKeys(Filename.init(rawValue:))
     }
     
 }
 
-extension WriteOnlyCacheProtocol where Key == Filename {
+extension WriteOnlyStorageProtocol where Key == Filename {
     
-    public func usingStringKeys() -> WriteOnlyCache<String, Value> {
+    public func usingStringKeys() -> WriteOnlyStorage<String, Value> {
         return mapKeys(Filename.init(rawValue:))
     }
     
