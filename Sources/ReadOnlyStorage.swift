@@ -9,9 +9,6 @@ public protocol ReadableStorageProtocol : StorageDesign {
 
 public protocol ReadOnlyStorageProtocol : ReadableStorageProtocol {  }
 
-//@available(*, deprecated, renamed: "ReadOnlyStorage")
-//public typealias ReadOnlyStorage<Key, Value> = ReadOnlyStorage<Key, Value>
-
 public struct ReadOnlyStorage<Key, Value> : ReadOnlyStorageProtocol {
     
     public let storageName: String
@@ -57,7 +54,8 @@ extension ReadOnlyStorageProtocol {
         })
     }
     
-    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> ReadOnlyStorage<OtherKey, Value> {
+    public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
+                                  _ transform: @escaping (OtherKey) throws -> Key) -> ReadOnlyStorage<OtherKey, Value> {
         return ReadOnlyStorage<OtherKey, Value>(storageName: storageName, retrieve: { key, completion in
             do {
                 let newKey = try transform(key)
@@ -68,7 +66,8 @@ extension ReadOnlyStorageProtocol {
         })
     }
     
-    public func mapValues<OtherValue>(_ transform: @escaping (Value) throws -> OtherValue) -> ReadOnlyStorage<Key, OtherValue> {
+    public func mapValues<OtherValue>(to type: OtherValue.Type = OtherValue.self,
+                                      _ transform: @escaping (Value) throws -> OtherValue) -> ReadOnlyStorage<Key, OtherValue> {
         return ReadOnlyStorage<Key, OtherValue>(storageName: storageName, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {
@@ -90,11 +89,11 @@ extension ReadOnlyStorageProtocol {
 
 extension ReadOnlyStorageProtocol {
     
-    public func mapValues<OtherValue : RawRepresentable>() -> ReadOnlyStorage<Key, OtherValue> where OtherValue.RawValue == Value {
+    public func mapValues<OtherValue : RawRepresentable>(toRawRepresentableType type: OtherValue.Type) -> ReadOnlyStorage<Key, OtherValue> where OtherValue.RawValue == Value {
         return mapValues(throwing(OtherValue.init(rawValue:)))
     }
     
-    public func mapKeys<OtherKey : RawRepresentable>() -> ReadOnlyStorage<OtherKey, Value> where OtherKey.RawValue == Key {
+    public func mapKeys<OtherKey : RawRepresentable>(toRawRepresentableType type: OtherKey.Type) -> ReadOnlyStorage<OtherKey, Value> where OtherKey.RawValue == Key {
         return mapKeys({ $0.rawValue })
     }
     
@@ -108,15 +107,16 @@ extension ReadOnlyStorageProtocol {
     
 }
 
-public enum UnsupportedTransformationReadOnlyStorageError : Error {
+public enum UnsupportedTransformationStorageError : Error {
     case storageIsReadOnly
+    case storageIsWriteOnly
 }
 
 extension ReadOnlyStorageProtocol {
     
     public func usingUnsupportedTransformation<OtherKey, OtherValue>(_ transformation: (Storage<Key, Value>) -> Storage<OtherKey, OtherValue>) -> ReadOnlyStorage<OtherKey, OtherValue> {
         let fullStorage = Storage<Key, Value>(storageName: self.storageName, retrieve: self.retrieve) { (_, _, completion) in
-            completion(fail(with: UnsupportedTransformationReadOnlyStorageError.storageIsReadOnly))
+            completion(fail(with: UnsupportedTransformationStorageError.storageIsReadOnly))
         }
         return transformation(fullStorage).asReadOnlyStorage()
     }

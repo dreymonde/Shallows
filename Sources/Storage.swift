@@ -254,7 +254,8 @@ extension StorageProtocol {
 
 extension StorageProtocol {
     
-    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> Storage<OtherKey, Value> {
+    public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
+                                  _ transform: @escaping (OtherKey) throws -> Key) -> Storage<OtherKey, Value> {
         return Storage<OtherKey, Value>(storageName: storageName, retrieve: { key, completion in
             do {
                 let newKey = try transform(key)
@@ -272,8 +273,9 @@ extension StorageProtocol {
         })
     }
     
-    public func mapValues<OtherValue>(transformIn: @escaping (Value) throws -> OtherValue,
-                          transformOut: @escaping (OtherValue) throws -> Value) -> Storage<Key, OtherValue> {
+    public func mapValues<OtherValue>(to type: OtherValue.Type = OtherValue.self,
+                                      transformIn: @escaping (Value) throws -> OtherValue,
+                                      transformOut: @escaping (OtherValue) throws -> Value) -> Storage<Key, OtherValue> {
         return Storage<Key, OtherValue>(storageName: storageName, retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (result) in
                 switch result {
@@ -302,12 +304,12 @@ extension StorageProtocol {
 
 extension StorageProtocol {
     
-    public func mapValues<OtherValue : RawRepresentable>() -> Storage<Key, OtherValue> where OtherValue.RawValue == Value {
+    public func mapValues<OtherValue : RawRepresentable>(toRawRepresentableType type: OtherValue.Type) -> Storage<Key, OtherValue> where OtherValue.RawValue == Value {
         return mapValues(transformIn: throwing(OtherValue.init(rawValue:)),
                          transformOut: { $0.rawValue })
     }
     
-    public func mapKeys<OtherKey : RawRepresentable>() -> Storage<OtherKey, Value> where OtherKey.RawValue == Key {
+    public func mapKeys<OtherKey : RawRepresentable>(toRawRepresentableType type: OtherKey.Type) -> Storage<OtherKey, Value> where OtherKey.RawValue == Key {
         return mapKeys({ $0.rawValue })
     }
     

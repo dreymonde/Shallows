@@ -41,7 +41,8 @@ extension WritableStorageProtocol {
 
 extension WriteOnlyStorageProtocol {
     
-    public func mapKeys<OtherKey>(_ transform: @escaping (OtherKey) throws -> Key) -> WriteOnlyStorage<OtherKey, Value> {
+    public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
+                                  _ transform: @escaping (OtherKey) throws -> Key) -> WriteOnlyStorage<OtherKey, Value> {
         return WriteOnlyStorage<OtherKey, Value>(storageName: storageName, set: { (value, key, completion) in
             do {
                 let newKey = try transform(key)
@@ -52,7 +53,8 @@ extension WriteOnlyStorageProtocol {
         })
     }
     
-    public func mapValues<OtherValue>(_ transform: @escaping (OtherValue) throws -> Value) -> WriteOnlyStorage<Key, OtherValue> {
+    public func mapValues<OtherValue>(to type: OtherValue.Type = OtherValue.self,
+                                      _ transform: @escaping (OtherValue) throws -> Value) -> WriteOnlyStorage<Key, OtherValue> {
         return WriteOnlyStorage<Key, OtherValue>(storageName: storageName, set: { (value, key, completion) in
             do {
                 let newValue = try transform(value)
@@ -69,6 +71,29 @@ extension WriteOnlyStorageProtocol {
     
     public func singleKey(_ key: Key) -> WriteOnlyStorage<Void, Value> {
         return mapKeys({ key })
+    }
+    
+}
+
+extension WriteOnlyStorageProtocol {
+    
+    public func mapValues<OtherValue : RawRepresentable>(toRawRepresentableType type: OtherValue.Type) -> WriteOnlyStorage<Key, OtherValue> where OtherValue.RawValue == Value {
+        return mapValues({ $0.rawValue })
+    }
+    
+    public func mapKeys<OtherKey : RawRepresentable>(toRawRepresentableType type: OtherKey.Type) -> WriteOnlyStorage<OtherKey, Value> where OtherKey.RawValue == Key {
+        return mapKeys({ $0.rawValue })
+    }
+    
+}
+
+extension WriteOnlyStorageProtocol {
+    
+    public func usingUnsupportedTransformation<OtherKey, OtherValue>(_ transformation: (Storage<Key, Value>) -> Storage<OtherKey, OtherValue>) -> WriteOnlyStorage<OtherKey, OtherValue> {
+        let fullStorage = Storage<Key, Value>(storageName: self.storageName, retrieve: { (_, completion) in
+            completion(fail(with: UnsupportedTransformationStorageError.storageIsWriteOnly))
+        }, set: self.set)
+        return transformation(fullStorage).asWriteOnlyStorage()
     }
     
 }

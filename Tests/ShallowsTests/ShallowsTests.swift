@@ -18,7 +18,7 @@ extension FileSystemStorage {
     
     static func test() -> FileSystemStorage {
         counter += 1
-        let storage = FileSystemStorage.inDirectory(.storagesDirectory, appending: "shallows-tests-tmp-\(counter)")
+        let storage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-\(counter)")
         storage.pruneOnDeinit = true
         return storage
     }
@@ -69,14 +69,14 @@ class ShallowsTests: XCTestCase {
     }
     
     func testFileSystemStorage() {
-        let diskStorage_raw = FileSystemStorage.inDirectory(.storagesDirectory, appending: "shallows-tests-tmp-1")
+        let diskStorage_raw = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-1")
         diskStorage_raw.pruneOnDeinit = true
         let expectation = self.expectation(description: "On retrieve")
         let diskStorage = diskStorage_raw
             .mapString(withEncoding: .utf8)
             .usingStringKeys()
         let memStorage = MemoryStorage<String, String>(storage: [:], storageName: "mem")
-        let nsstorage = NSStorageStorage<NSString, NSString>(storage: .init(), storageName: "nsstorage")
+        let nsstorage = NSCacheStorage<NSString, NSString>(storage: .init(), storageName: "nsstorage")
             .toNonObjCKeys()
             .toNonObjCValues()
         let main = memStorage.combined(with: nsstorage.combined(with: diskStorage))
@@ -92,7 +92,7 @@ class ShallowsTests: XCTestCase {
         enum Keys : String {
             case a, b, c
         }
-        let memStorage = MemoryStorage<String, Int>(storage: [:]).mapKeys() as Storage<Keys, Int>
+        let memStorage = MemoryStorage<String, Int>(storage: [:]).mapKeys(toRawRepresentableType: Keys.self)
         memStorage.set(10, forKey: .a)
         memStorage.retrieve(forKey: .a, completion: { XCTAssertEqual($0.value, 10) })
         memStorage.retrieve(forKey: .b, completion: { XCTAssertNil($0.value) })
@@ -119,7 +119,7 @@ class ShallowsTests: XCTestCase {
     }
     
     func testSingleElementStorage() {
-        let diskStorage = FileSystemStorage.inDirectory(.storagesDirectory, appending: "shallows-tests-tmp-2")
+        let diskStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-2")
         diskStorage.pruneOnDeinit = true
         print(diskStorage.directoryURL)
         let singleElementStorage = MemoryStorage<String, String>().mapKeys({ "only_key" }) as Storage<Void, String>
@@ -134,7 +134,7 @@ class ShallowsTests: XCTestCase {
     }
     
     func testSync() throws {
-        let diskStorage = FileSystemStorage.inDirectory(.storagesDirectory, appending: "shallows-tests-tmp-3")
+        let diskStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         diskStorage.pruneOnDeinit = true
         let stringStorage = diskStorage.mapString().makeSyncStorage()
         try stringStorage.set("Sofar", forKey: "kha")
@@ -169,13 +169,13 @@ class ShallowsTests: XCTestCase {
             case some, other, another
         }
         
-        let fileStorage = FileSystemStorage.inDirectory(.storagesDirectory, appending: "shallows-tests-tmp-3")
+        let fileStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-tests-tmp-3")
         fileStorage.pruneOnDeinit = true
         
         let finalStorage = fileStorage
             .mapString(withEncoding: .utf8)
             .singleKey("single")
-            .mapValues() as Storage<Void, Values>
+            .mapValues(toRawRepresentableType: Values.self)
         let sync = finalStorage.makeSyncStorage()
         try sync.set(.some)
         XCTAssertEqual(try sync.retrieve(), .some)
@@ -328,7 +328,7 @@ class ShallowsTests: XCTestCase {
         }
         
         let memoryStorage = MemoryStorage<String, Player>()
-        let diskStorage = FileSystemStorage.inDirectory(.storagesDirectory, appending: "storage")
+        let diskStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "storage")
             .mapJSONObject(Player.self)
             .usingStringKeys()
         let combinedStorage = memoryStorage.combined(with: diskStorage)
