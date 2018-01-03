@@ -290,15 +290,11 @@ let storage = MyStorage().asStorage()
 
 You can also conform to a `ReadableStorageProtocol` only. That way, you only need to define a `retrieve(forKey:completion:)` method.
 
-### Using Shallows with images in `UITableView`
-
-Well, you shouldn't really do that. Technically you can, but really **Shallows** is not the best option for this task. Instead, you should use [Avenues][avenues-github-url], which is designed exactly for this. Saying more, **Shallows** and **Avenues** complement each other very well - **Shallows** can be used to cache fetched images on disk (which **Avenues** doesn't do). You can check out the [Avenues+Shallows][avenues-shallows-github-url] repo for more details.
-
 ## Installation
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.5.0
+github "dreymonde/Shallows" ~> 0.7.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
