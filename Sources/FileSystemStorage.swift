@@ -20,7 +20,11 @@ extension FileSystemStorageProtocol {
     
 }
 
-public struct Filename : RawRepresentable, ExpressibleByStringLiteral {
+public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral {
+    
+    public var hashValue: Int {
+        return rawValue.hashValue
+    }
     
     public var rawValue: String
     
