@@ -40,10 +40,10 @@
 		7C4B83FB2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
 		7C4B83FC2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
 		7C4B83FD2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
-		7C4B83FE2010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
-		7C4B83FF2010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
-		7C4B84002010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
-		7C4B84012010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
+		7C4B83FE2010D48400502FB0 /* Legacy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* Legacy.swift */; };
+		7C4B83FF2010D48400502FB0 /* Legacy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* Legacy.swift */; };
+		7C4B84002010D48400502FB0 /* Legacy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* Legacy.swift */; };
+		7C4B84012010D48400502FB0 /* Legacy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* Legacy.swift */; };
 		7C4B84022010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
 		7C4B84032010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
 		7C4B84042010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
@@ -131,7 +131,7 @@
 		7C4B83D92010D48300502FB0 /* Shallows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shallows.swift; sourceTree = "<group>"; };
 		7C4B83DA2010D48300502FB0 /* SyncStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
 		7C4B83DB2010D48400502FB0 /* WritableStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritableStorage.swift; sourceTree = "<group>"; };
-		7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileSystemStorage.swift; sourceTree = "<group>"; };
+		7C4B83DC2010D48400502FB0 /* Legacy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Legacy.swift; sourceTree = "<group>"; };
 		7C4B83DD2010D48400502FB0 /* DiskStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorage.swift; sourceTree = "<group>"; };
 		7C4B84062010D4D600502FB0 /* DiskStorageSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorageSpec.swift; sourceTree = "<group>"; };
 		7C4B84072010D4D700502FB0 /* ShallowsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShallowsTests.swift; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				7CD789C32010F2FD0057F6E8 /* DiskStorage */,
-				7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */,
+				7C4B83DC2010D48400502FB0 /* Legacy.swift */,
 				7C4B83D52010D48300502FB0 /* MemoryStorage.swift */,
 				7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */,
 				7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */,
@@ -602,7 +602,7 @@
 			files = (
 				7C4B83E22010D48400502FB0 /* MemoryStorage.swift in Sources */,
 				7C4B83E62010D48400502FB0 /* Storage.swift in Sources */,
-				7C4B83FE2010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83FE2010D48400502FB0 /* Legacy.swift in Sources */,
 				7C4B83F22010D48400502FB0 /* Shallows.swift in Sources */,
 				7C4B83DE2010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EA2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
@@ -639,7 +639,7 @@
 			files = (
 				7C4B83E42010D48400502FB0 /* MemoryStorage.swift in Sources */,
 				7C4B83E82010D48400502FB0 /* Storage.swift in Sources */,
-				7C4B84002010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B84002010D48400502FB0 /* Legacy.swift in Sources */,
 				7C4B83F42010D48400502FB0 /* Shallows.swift in Sources */,
 				7C4B83E02010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EC2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
@@ -657,7 +657,7 @@
 			files = (
 				7C4B83E52010D48400502FB0 /* MemoryStorage.swift in Sources */,
 				7C4B83E92010D48400502FB0 /* Storage.swift in Sources */,
-				7C4B84012010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B84012010D48400502FB0 /* Legacy.swift in Sources */,
 				7C4B83F52010D48400502FB0 /* Shallows.swift in Sources */,
 				7C4B83E12010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83ED2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
@@ -675,7 +675,7 @@
 			files = (
 				7C4B83E32010D48400502FB0 /* MemoryStorage.swift in Sources */,
 				7C4B83E72010D48400502FB0 /* Storage.swift in Sources */,
-				7C4B83FF2010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83FF2010D48400502FB0 /* Legacy.swift in Sources */,
 				7C4B83F32010D48400502FB0 /* Shallows.swift in Sources */,
 				7C4B83DF2010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EB2010D48400502FB0 /* NSCacheStorage.swift in Sources */,

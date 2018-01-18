@@ -74,6 +74,8 @@ public final class DiskFolderStorage : StorageProtocol {
     
     public let filenameEncoder: Filename.Encoder
     
+    public var clearsOnDeinit = false
+    
     public init(folderURL: URL,
                 diskStorage: Storage<URL, Data> = DiskStorage.main.asStorage(),
                 filenameEncoder: Filename.Encoder = .base64) {
@@ -81,6 +83,18 @@ public final class DiskFolderStorage : StorageProtocol {
         self.folderURL = folderURL
         self.filenameEncoder = filenameEncoder
         self.storageName = "disk-\(folderURL.lastPathComponent)"
+    }
+    
+    deinit {
+        if clearsOnDeinit {
+            clear()
+        }
+    }
+    
+    public func clear() {
+        do {
+            try FileManager.default.removeItem(at: folderURL)
+        } catch { }
     }
     
     public func fileURL(forFilename filename: Filename) -> URL {

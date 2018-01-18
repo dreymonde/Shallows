@@ -160,6 +160,20 @@ func testDiskStorage() {
             let back = try folder.retrieve()
             try expect(back) == "Wigan-ManUTD"
         }
+        $0.it("can clear its folder") {
+            let folder = DiskFolderStorage(folderURL: currentDirURL.appendingPathComponent("_should_be_cleared", isDirectory: true))
+            let folderURL = folder.folderURL
+            try folder
+                .mapString()
+                .makeSyncStorage()
+                .set("Scholes", forKey: "some-key")
+            let exists: () -> Bool = {
+                return FileManager.default.fileExists(atPath: folderURL.path)
+            }
+            try expect(exists()).to.beTrue()
+            folder.clear()
+            try expect(exists()).to.beFalse()
+        }
     }
     
 }
