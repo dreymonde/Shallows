@@ -207,6 +207,13 @@ extension DiskStorage {
     
     public static let main = DiskStorage(creatingDirectories: true)
     
+    public static func folder(_ folderName: String,
+                              in directory: FileManager.SearchPathDirectory,
+                              domainMask: FileManager.SearchPathDomainMask,
+                              filenameEncoder: Filename.Encoder) -> DiskFolderStorage {
+        return DiskStorage.main.folder(folderName, in: directory, domainMask: domainMask, filenameEncoder: filenameEncoder)
+    }
+    
     public func folder(_ folderName: String,
                        in directory: FileManager.SearchPathDirectory,
                        domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
