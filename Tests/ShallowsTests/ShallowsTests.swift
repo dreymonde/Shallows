@@ -25,6 +25,17 @@ extension FileSystemStorage {
     
 }
 
+extension Storage {
+    
+    static func alwaysSucceeding(with value: Value) -> Storage<Key, Value> {
+        return Storage(storageName: "", retrieve: { (_, completion) in
+            completion(succeed(with: value))
+        }, set: { (_, _, completion) in
+            completion(.success)
+        })
+    }
+    
+}
 
 extension ReadOnlyStorageProtocol {
     

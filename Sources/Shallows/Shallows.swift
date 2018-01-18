@@ -89,6 +89,42 @@ extension Optional {
     
 }
 
+public enum EmptyCacheError : Error {
+    case cacheIsAlwaysEmpty
+}
+
+extension Storage {
+ 
+    public static func empty() -> Storage<Key, Value> {
+        return Storage(storageName: "empty", retrieve: { (_, completion) in
+            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        }, set: { (_, _, completion) in
+            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        })
+    }
+    
+}
+
+extension ReadOnlyStorage {
+    
+    public static func empty() -> ReadOnlyStorage<Key, Value> {
+        return ReadOnlyStorage(storageName: "empty", retrieve: { (_, completion) in
+            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        })
+    }
+    
+}
+
+extension WriteOnlyStorage {
+    
+    public static func empty() -> WriteOnlyStorage<Key, Value> {
+        return WriteOnlyStorage(storageName: "empty", set: { (_, _, completion) in
+            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        })
+    }
+    
+}
+
 public func throwing<In, Out>(_ block: @escaping (In) -> Out?) -> (In) throws -> Out {
     return { input in
         try block(input).unwrap()

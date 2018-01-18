@@ -54,9 +54,15 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
         }
     }
     
-    public init(storage: [Key : Value] = [:], storageName: String = "memory-storage-\(Key.self):\(Value.self)") {
+    @available(*, deprecated, message: "`storageName` in inits no longer allowed")
+    public init(storage: [Key : Value] = [:], storageName: String) {
         self._storage = ThreadSafe(storage)
         self.storageName = storageName
+    }
+    
+    public init(storage: [Key : Value] = [:]) {
+        self._storage = ThreadSafe(storage)
+        self.storageName = "memory-storage-\(Key.self):\(Value.self)"
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {

@@ -8,20 +8,6 @@
 
 import Foundation
 
-public struct FileURL {
-    
-    public let url: URL
-    
-    public init(_ url: URL) {
-        self.url = url
-    }
-    
-    public init(_ path: String) {
-        self.init(URL.init(fileURLWithPath: path))
-    }
-    
-}
-
 public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral {
     
     public var hashValue: Int {
@@ -48,27 +34,28 @@ public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral 
     
     public func base64Encoded() -> String {
         guard let data = rawValue.data(using: .utf8) else {
+            print("Something is very, very wrong: string \(rawValue) cannot be encoded with utf8")
             return rawValue
         }
         return data.base64EncodedString()
     }
     
-    public struct Transform {
+    public struct Encoder {
         
-        private let transform: (Filename) -> String
+        private let encode: (Filename) -> String
         
-        private init(transform: @escaping (Filename) -> String) {
-            self.transform = transform
+        private init(encode: @escaping (Filename) -> String) {
+            self.encode = encode
         }
         
-        public static let base64: Transform = Transform(transform: { $0.base64Encoded() })
-        public static let notTransformed: Transform = Transform(transform: { $0.rawValue })
-        public static func custom(_ transform: @escaping (Filename) -> String) -> Transform {
-            return Transform(transform: transform)
+        public static let base64: Encoder = Encoder(encode: { $0.base64Encoded() })
+        public static let noEncoding: Encoder = Encoder(encode: { $0.rawValue })
+        public static func custom(_ encode: @escaping (Filename) -> String) -> Encoder {
+            return Encoder(encode: encode)
         }
         
         public func finalForm(of filename: Filename) -> String {
-            return transform(filename)
+            return encode(filename)
         }
         
     }
@@ -83,22 +70,22 @@ public final class DiskFolderStorage : StorageProtocol {
     public let storageName: String
     public let folderURL: URL
     
-    private let diskStorage: Storage<FileURL, Data>
+    private let diskStorage: Storage<URL, Data>
     
-    public let transformFilename: Filename.Transform
+    public let filenameEncoder: Filename.Encoder
     
     public init(folderURL: URL,
-                diskStorage: Storage<FileURL, Data> = DiskStorage.main.asStorage(),
-                transformFilename: Filename.Transform = .base64) {
+                diskStorage: Storage<URL, Data> = DiskStorage.main.asStorage(),
+                filenameEncoder: Filename.Encoder = .base64) {
         self.diskStorage = diskStorage
         self.folderURL = folderURL
-        self.transformFilename = transformFilename
+        self.filenameEncoder = filenameEncoder
         self.storageName = "disk-\(folderURL.lastPathComponent)"
     }
     
-    public func fileURL(forFilename filename: Filename) -> FileURL {
-        let finalForm = transformFilename.finalForm(of: filename)
-        return FileURL(folderURL.appendingPathComponent(finalForm))
+    public func fileURL(forFilename filename: Filename) -> URL {
+        let finalForm = filenameEncoder.finalForm(of: filename)
+        return folderURL.appendingPathComponent(finalForm)
     }
     
     public func retrieve(forKey filename: Filename, completion: @escaping (Result<Data>) -> ()) {
@@ -115,31 +102,36 @@ public final class DiskFolderStorage : StorageProtocol {
 
 extension URL {
     
-    public init(directory: FileManager.SearchPathDirectory, domainMask: FileManager.SearchPathDomainMask = .userDomainMask) {
+    fileprivate init(directory: FileManager.SearchPathDirectory, domainMask: FileManager.SearchPathDomainMask = .userDomainMask) {
         let urls = FileManager.default.urls(for: directory, in: domainMask)
-        self = urls.first!
+        self = urls[0]
     }
     
 }
 
 extension DiskFolderStorage {
     
+    public static func url(forFolder folderName: String, in directory: FileManager.SearchPathDirectory, domainMask: FileManager.SearchPathDomainMask = .userDomainMask) -> URL {
+        let folderURL = URL(directory: directory, domainMask: domainMask).appendingPathComponent(folderName, isDirectory: true)
+        return folderURL
+    }
+    
     public static func inDirectory(_ directory: FileManager.SearchPathDirectory,
-                                   appending pathComponent: String,
+                                   folderName: String,
                                    domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
-                                   diskStorage: Storage<FileURL, Data>,
-                                   transformFilename: Filename.Transform) -> DiskFolderStorage {
-        let directoryURL = URL(directory: directory, domainMask: domainMask).appendingPathComponent(pathComponent)
+                                   diskStorage: Storage<URL, Data>,
+                                   filenameEncoder: Filename.Encoder) -> DiskFolderStorage {
+        let directoryURL = url(forFolder: folderName, in: directory, domainMask: domainMask)
         return DiskFolderStorage(folderURL: directoryURL,
                                  diskStorage: diskStorage,
-                                 transformFilename: transformFilename)
+                                 filenameEncoder: filenameEncoder)
     }
     
 }
 
 public final class DiskStorage : StorageProtocol {
     
-    public typealias Key = FileURL
+    public typealias Key = URL
     public typealias Value = Data
     
     public var storageName: String {
@@ -149,16 +141,16 @@ public final class DiskStorage : StorageProtocol {
     private let queue: DispatchQueue = DispatchQueue(label: "disk-storage-queue", qos: .userInitiated)
     private let fileManager = FileManager.default
     
-    fileprivate let creatingDirectories: Bool
+    internal let creatingDirectories: Bool
     
     public init(creatingDirectories: Bool = true) {
         self.creatingDirectories = creatingDirectories
     }
     
-    public func retrieve(forKey key: FileURL, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey key: URL, completion: @escaping (Result<Data>) -> ()) {
         queue.async {
             do {
-                let data = try Data.init(contentsOf: key.url)
+                let data = try Data.init(contentsOf: key)
                 completion(succeed(with: data))
             } catch {
                 completion(fail(with: error))
@@ -167,21 +159,21 @@ public final class DiskStorage : StorageProtocol {
     }
     
     public enum Error : Swift.Error {
-        case cantCreatFile
+        case cantCreateFile
         case cantCreateDirectory(Swift.Error)
     }
     
-    public func set(_ value: Data, forKey key: FileURL, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Data, forKey key: URL, completion: @escaping (Result<Void>) -> ()) {
         queue.async {
             do {
                 try self.createDirectoryURLIfNotExisting(for: key)
-                let path = key.url.path
+                let path = key.path
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
                                                attributes: nil) {
                     completion(.success)
                 } else {
-                    completion(fail(with: Error.cantCreatFile))
+                    completion(fail(with: Error.cantCreateFile))
                 }
             } catch {
                 completion(fail(with: error))
@@ -189,11 +181,14 @@ public final class DiskStorage : StorageProtocol {
         }
     }
     
-    public static func directoryURL(of fileURL: FileURL) -> URL {
-        return fileURL.url.deletingLastPathComponent()
+    public static func directoryURL(of fileURL: URL) -> URL {
+        return fileURL.deletingLastPathComponent()
     }
     
-    fileprivate func createDirectoryURLIfNotExisting(for fileURL: FileURL) throws {
+    fileprivate func createDirectoryURLIfNotExisting(for fileURL: URL) throws {
+        guard creatingDirectories else {
+            return
+        }
         let directoryURL = DiskStorage.directoryURL(of: fileURL)
         if !fileManager.fileExists(atPath: directoryURL.path) {
             do {
@@ -215,12 +210,12 @@ extension DiskStorage {
     public func folder(_ folderName: String,
                        in directory: FileManager.SearchPathDirectory,
                        domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
-                       transformFilename: Filename.Transform = .base64) -> DiskFolderStorage {
+                       filenameEncoder: Filename.Encoder = .base64) -> DiskFolderStorage {
         return DiskFolderStorage.inDirectory(
             directory,
-            appending: folderName,
+            folderName: folderName,
             diskStorage: self.asStorage(),
-            transformFilename: transformFilename
+            filenameEncoder: filenameEncoder
         )
     }
     
