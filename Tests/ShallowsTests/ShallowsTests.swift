@@ -343,9 +343,8 @@ class ShallowsTests: XCTestCase {
             }
         }
         
-//
     }
-    
+        
     static var allTests = [
         ("testFileSystemStorage", testFileSystemStorage),
     ]

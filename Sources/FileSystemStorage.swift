@@ -20,32 +20,6 @@ extension FileSystemStorageProtocol {
     
 }
 
-public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral {
-    
-    public var hashValue: Int {
-        return rawValue.hashValue
-    }
-    
-    public var rawValue: String
-    
-    public init(rawValue: String) {
-        self.rawValue = rawValue
-    }
-    
-    public init(stringLiteral value: String) {
-        self.init(rawValue: value)
-    }
-    
-    public init(unicodeScalarLiteral value: String) {
-        self.init(rawValue: value)
-    }
-    
-    public init(extendedGraphemeClusterLiteral value: String) {
-        self.init(rawValue: value)
-    }
-    
-}
-
 public final class FileSystemStorage : FileSystemStorageProtocol {
     
     public static func validFilename(for key: Filename) -> Filename {

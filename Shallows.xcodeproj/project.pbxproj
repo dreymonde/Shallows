@@ -8,47 +8,54 @@
 
 /* Begin PBXBuildFile section */
 		52D6D9871BEFF229002C0205 /* Shallows.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6D97C1BEFF229002C0205 /* Shallows.framework */; };
-		52D6D9981BEFF375002C0205 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9961BEFF375002C0205 /* Shallows.swift */; };
-		52D6D99B1BEFF375002C0205 /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9971BEFF375002C0205 /* ShallowsTests.swift */; };
-		52D6D9EA1BEFFFA4002C0205 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9961BEFF375002C0205 /* Shallows.swift */; };
-		52D6DA091BF00081002C0205 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9961BEFF375002C0205 /* Shallows.swift */; };
-		52D6DA261BF00118002C0205 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9961BEFF375002C0205 /* Shallows.swift */; };
-		7C00D0711EAD4ECF004F7657 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06E1EAD4ECF004F7657 /* Storage.swift */; };
-		7C00D0721EAD4ECF004F7657 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06E1EAD4ECF004F7657 /* Storage.swift */; };
-		7C00D0731EAD4ECF004F7657 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06E1EAD4ECF004F7657 /* Storage.swift */; };
-		7C00D0741EAD4ECF004F7657 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06E1EAD4ECF004F7657 /* Storage.swift */; };
-		7C00D0751EAD4ECF004F7657 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */; };
-		7C00D0761EAD4ECF004F7657 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */; };
-		7C00D0771EAD4ECF004F7657 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */; };
-		7C00D0781EAD4ECF004F7657 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */; };
-		7C00D0791EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */; };
-		7C00D07A1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */; };
-		7C00D07B1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */; };
-		7C00D07C1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */; };
-		7C00D07E1EAD4EE6004F7657 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */; };
-		7C00D07F1EAD4EE6004F7657 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */; };
-		7C00D0801EAD4EE6004F7657 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */; };
-		7C00D0811EAD4EE6004F7657 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */; };
-		7C00D0831EAE34C1004F7657 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */; };
-		7C00D0841EAE34C1004F7657 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */; };
-		7C00D0851EAE34C1004F7657 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */; };
-		7C00D0861EAE34C1004F7657 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */; };
-		7C00D0881EAE35EA004F7657 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */; };
-		7C00D0891EAE35EA004F7657 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */; };
-		7C00D08A1EAE35EA004F7657 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */; };
-		7C00D08B1EAE35EA004F7657 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */; };
-		7C0EA5501EB3521900F50EB2 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */; };
-		7C0EA5511EB3521900F50EB2 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */; };
-		7C0EA5521EB3521900F50EB2 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */; };
-		7C0EA5531EB3521900F50EB2 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */; };
-		7C1D89811EBF1666006F7841 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1D89801EBF1666006F7841 /* Zip.swift */; };
-		7C1D89821EBF1666006F7841 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1D89801EBF1666006F7841 /* Zip.swift */; };
-		7C1D89831EBF1666006F7841 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1D89801EBF1666006F7841 /* Zip.swift */; };
-		7C1D89841EBF1666006F7841 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1D89801EBF1666006F7841 /* Zip.swift */; };
-		DD7502861C68FDDC006590AF /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9971BEFF375002C0205 /* ShallowsTests.swift */; };
+		7C4B83DE2010D48400502FB0 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D42010D48300502FB0 /* Zip.swift */; };
+		7C4B83DF2010D48400502FB0 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D42010D48300502FB0 /* Zip.swift */; };
+		7C4B83E02010D48400502FB0 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D42010D48300502FB0 /* Zip.swift */; };
+		7C4B83E12010D48400502FB0 /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D42010D48300502FB0 /* Zip.swift */; };
+		7C4B83E22010D48400502FB0 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D52010D48300502FB0 /* MemoryStorage.swift */; };
+		7C4B83E32010D48400502FB0 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D52010D48300502FB0 /* MemoryStorage.swift */; };
+		7C4B83E42010D48400502FB0 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D52010D48300502FB0 /* MemoryStorage.swift */; };
+		7C4B83E52010D48400502FB0 /* MemoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D52010D48300502FB0 /* MemoryStorage.swift */; };
+		7C4B83E62010D48400502FB0 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D62010D48300502FB0 /* Storage.swift */; };
+		7C4B83E72010D48400502FB0 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D62010D48300502FB0 /* Storage.swift */; };
+		7C4B83E82010D48400502FB0 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D62010D48300502FB0 /* Storage.swift */; };
+		7C4B83E92010D48400502FB0 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D62010D48300502FB0 /* Storage.swift */; };
+		7C4B83EA2010D48400502FB0 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */; };
+		7C4B83EB2010D48400502FB0 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */; };
+		7C4B83EC2010D48400502FB0 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */; };
+		7C4B83ED2010D48400502FB0 /* NSCacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */; };
+		7C4B83EE2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */; };
+		7C4B83EF2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */; };
+		7C4B83F02010D48400502FB0 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */; };
+		7C4B83F12010D48400502FB0 /* ReadOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */; };
+		7C4B83F22010D48400502FB0 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D92010D48300502FB0 /* Shallows.swift */; };
+		7C4B83F32010D48400502FB0 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D92010D48300502FB0 /* Shallows.swift */; };
+		7C4B83F42010D48400502FB0 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D92010D48300502FB0 /* Shallows.swift */; };
+		7C4B83F52010D48400502FB0 /* Shallows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83D92010D48300502FB0 /* Shallows.swift */; };
+		7C4B83F62010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
+		7C4B83F72010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
+		7C4B83F82010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
+		7C4B83F92010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
+		7C4B83FA2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
+		7C4B83FB2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
+		7C4B83FC2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
+		7C4B83FD2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
+		7C4B83FE2010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
+		7C4B83FF2010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
+		7C4B84002010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
+		7C4B84012010D48400502FB0 /* FileSystemStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */; };
+		7C4B84022010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
+		7C4B84032010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
+		7C4B84042010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
+		7C4B84052010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
+		7C4B84082010D4D700502FB0 /* DiskStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84062010D4D600502FB0 /* DiskStorageTests.swift */; };
+		7C4B84092010D4D700502FB0 /* DiskStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84062010D4D600502FB0 /* DiskStorageTests.swift */; };
+		7C4B840A2010D4D700502FB0 /* DiskStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84062010D4D600502FB0 /* DiskStorageTests.swift */; };
+		7C4B840B2010D4D700502FB0 /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84072010D4D700502FB0 /* ShallowsTests.swift */; };
+		7C4B840C2010D4D700502FB0 /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84072010D4D700502FB0 /* ShallowsTests.swift */; };
+		7C4B840D2010D4D700502FB0 /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B84072010D4D700502FB0 /* ShallowsTests.swift */; };
 		DD7502881C68FEDE006590AF /* Shallows.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6DA0F1BF000BD002C0205 /* Shallows.framework */; };
 		DD7502921C690C7A006590AF /* Shallows.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D6D9F01BEFFFBE002C0205 /* Shallows.framework */; };
-		DD75029A1C690CBE006590AF /* ShallowsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D6D9971BEFF375002C0205 /* ShallowsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,19 +85,22 @@
 /* Begin PBXFileReference section */
 		52D6D97C1BEFF229002C0205 /* Shallows.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Shallows.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6D9861BEFF229002C0205 /* Shallows-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shallows-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		52D6D9961BEFF375002C0205 /* Shallows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Shallows.swift; path = Sources/Shallows.swift; sourceTree = "<group>"; };
-		52D6D9971BEFF375002C0205 /* ShallowsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShallowsTests.swift; path = Tests/ShallowsTests/ShallowsTests.swift; sourceTree = "<group>"; };
 		52D6D9E21BEFFF6E002C0205 /* Shallows.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Shallows.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6D9F01BEFFFBE002C0205 /* Shallows.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Shallows.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D6DA0F1BF000BD002C0205 /* Shallows.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Shallows.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7C00D06E1EAD4ECF004F7657 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Storage.swift; path = Sources/Storage.swift; sourceTree = "<group>"; };
-		7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MemoryStorage.swift; path = Sources/MemoryStorage.swift; sourceTree = "<group>"; };
-		7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReadOnlyStorage.swift; path = Sources/ReadOnlyStorage.swift; sourceTree = "<group>"; };
-		7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WritableStorage.swift; path = Sources/WritableStorage.swift; sourceTree = "<group>"; };
-		7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSCacheStorage.swift; path = Sources/NSCacheStorage.swift; sourceTree = "<group>"; };
-		7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FileSystemStorage.swift; path = Sources/FileSystemStorage.swift; sourceTree = "<group>"; };
-		7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncStorage.swift; path = Sources/SyncStorage.swift; sourceTree = "<group>"; };
-		7C1D89801EBF1666006F7841 /* Zip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Zip.swift; path = Sources/Zip.swift; sourceTree = "<group>"; };
+		7C4B83D32010D46A00502FB0 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		7C4B83D42010D48300502FB0 /* Zip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zip.swift; sourceTree = "<group>"; };
+		7C4B83D52010D48300502FB0 /* MemoryStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryStorage.swift; sourceTree = "<group>"; };
+		7C4B83D62010D48300502FB0 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
+		7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSCacheStorage.swift; sourceTree = "<group>"; };
+		7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadOnlyStorage.swift; sourceTree = "<group>"; };
+		7C4B83D92010D48300502FB0 /* Shallows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shallows.swift; sourceTree = "<group>"; };
+		7C4B83DA2010D48300502FB0 /* SyncStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
+		7C4B83DB2010D48400502FB0 /* WritableStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritableStorage.swift; sourceTree = "<group>"; };
+		7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileSystemStorage.swift; sourceTree = "<group>"; };
+		7C4B83DD2010D48400502FB0 /* DiskStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorage.swift; sourceTree = "<group>"; };
+		7C4B84062010D4D600502FB0 /* DiskStorageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorageTests.swift; sourceTree = "<group>"; };
+		7C4B84072010D4D700502FB0 /* ShallowsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShallowsTests.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* Shallows.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Shallows.plist; sourceTree = "<group>"; };
 		AD2FAA281CD0B6E100659CF4 /* ShallowsTests.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ShallowsTests.plist; sourceTree = "<group>"; };
 		DD75027A1C68FCFC006590AF /* Shallows-macOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shallows-macOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,16 +166,9 @@
 		52D6D9721BEFF229002C0205 = {
 			isa = PBXGroup;
 			children = (
-				7C1D89801EBF1666006F7841 /* Zip.swift */,
-				52D6D9961BEFF375002C0205 /* Shallows.swift */,
-				7C00D06E1EAD4ECF004F7657 /* Storage.swift */,
-				7C00D0701EAD4ECF004F7657 /* ReadOnlyStorage.swift */,
-				7C00D07D1EAD4EE6004F7657 /* WritableStorage.swift */,
-				7C00D06F1EAD4ECF004F7657 /* MemoryStorage.swift */,
-				7C00D0871EAE35EA004F7657 /* FileSystemStorage.swift */,
-				7C00D0821EAE34C1004F7657 /* NSCacheStorage.swift */,
-				7C0EA54F1EB3521900F50EB2 /* SyncStorage.swift */,
-				52D6D9971BEFF375002C0205 /* ShallowsTests.swift */,
+				7C4B83D32010D46A00502FB0 /* Package.swift */,
+				8933C7811EB5B7E0000D00A4 /* Sources */,
+				8933C7831EB5B7EB000D00A4 /* Tests */,
 				52D6D99C1BEFF38C002C0205 /* Configs */,
 				52D6D97D1BEFF229002C0205 /* Products */,
 			);
@@ -192,6 +195,33 @@
 				DD7502731C68FC20006590AF /* Tests */,
 			);
 			path = Configs;
+			sourceTree = "<group>";
+		};
+		8933C7811EB5B7E0000D00A4 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				7C4B83DD2010D48400502FB0 /* DiskStorage.swift */,
+				7C4B83DC2010D48400502FB0 /* FileSystemStorage.swift */,
+				7C4B83D52010D48300502FB0 /* MemoryStorage.swift */,
+				7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */,
+				7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */,
+				7C4B83D92010D48300502FB0 /* Shallows.swift */,
+				7C4B83D62010D48300502FB0 /* Storage.swift */,
+				7C4B83DA2010D48300502FB0 /* SyncStorage.swift */,
+				7C4B83DB2010D48400502FB0 /* WritableStorage.swift */,
+				7C4B83D42010D48300502FB0 /* Zip.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		8933C7831EB5B7EB000D00A4 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				7C4B84062010D4D600502FB0 /* DiskStorageTests.swift */,
+				7C4B84072010D4D700502FB0 /* ShallowsTests.swift */,
+			);
+			name = Tests;
+			path = Tests/ShallowsTests;
 			sourceTree = "<group>";
 		};
 		DD7502721C68FC1B006590AF /* Frameworks */ = {
@@ -382,31 +412,31 @@
 				TargetAttributes = {
 					52D6D97B1BEFF229002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0800;
 					};
 					52D6D9851BEFF229002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0920;
 					};
 					52D6D9E11BEFFF6E002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0800;
 					};
 					52D6D9EF1BEFFFBE002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0800;
 					};
 					52D6DA0E1BF000BD002C0205 = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0800;
 					};
 					DD7502791C68FCFC006590AF = {
 						CreatedOnToolsVersion = 7.2.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0920;
 					};
 					DD75028C1C690C7A006590AF = {
 						CreatedOnToolsVersion = 7.2.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 0920;
 					};
 				};
 			};
@@ -490,15 +520,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C00D0791EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */,
-				7C0EA5501EB3521900F50EB2 /* SyncStorage.swift in Sources */,
-				7C00D07E1EAD4EE6004F7657 /* WritableStorage.swift in Sources */,
-				7C00D0831EAE34C1004F7657 /* NSCacheStorage.swift in Sources */,
-				7C00D0751EAD4ECF004F7657 /* MemoryStorage.swift in Sources */,
-				7C1D89811EBF1666006F7841 /* Zip.swift in Sources */,
-				7C00D0711EAD4ECF004F7657 /* Storage.swift in Sources */,
-				7C00D0881EAE35EA004F7657 /* FileSystemStorage.swift in Sources */,
-				52D6D9981BEFF375002C0205 /* Shallows.swift in Sources */,
+				7C4B83E22010D48400502FB0 /* MemoryStorage.swift in Sources */,
+				7C4B83E62010D48400502FB0 /* Storage.swift in Sources */,
+				7C4B83FE2010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83F22010D48400502FB0 /* Shallows.swift in Sources */,
+				7C4B83DE2010D48400502FB0 /* Zip.swift in Sources */,
+				7C4B83EA2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
+				7C4B83F62010D48400502FB0 /* SyncStorage.swift in Sources */,
+				7C4B83FA2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7C4B84022010D48400502FB0 /* DiskStorage.swift in Sources */,
+				7C4B83EE2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,7 +537,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52D6D99B1BEFF375002C0205 /* ShallowsTests.swift in Sources */,
+				7C4B840B2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
+				7C4B84082010D4D700502FB0 /* DiskStorageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,15 +546,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C00D07B1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */,
-				7C0EA5521EB3521900F50EB2 /* SyncStorage.swift in Sources */,
-				7C00D0801EAD4EE6004F7657 /* WritableStorage.swift in Sources */,
-				7C00D0851EAE34C1004F7657 /* NSCacheStorage.swift in Sources */,
-				7C00D0771EAD4ECF004F7657 /* MemoryStorage.swift in Sources */,
-				7C1D89831EBF1666006F7841 /* Zip.swift in Sources */,
-				7C00D0731EAD4ECF004F7657 /* Storage.swift in Sources */,
-				7C00D08A1EAE35EA004F7657 /* FileSystemStorage.swift in Sources */,
-				52D6D9EA1BEFFFA4002C0205 /* Shallows.swift in Sources */,
+				7C4B83E42010D48400502FB0 /* MemoryStorage.swift in Sources */,
+				7C4B83E82010D48400502FB0 /* Storage.swift in Sources */,
+				7C4B84002010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83F42010D48400502FB0 /* Shallows.swift in Sources */,
+				7C4B83E02010D48400502FB0 /* Zip.swift in Sources */,
+				7C4B83EC2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
+				7C4B83F82010D48400502FB0 /* SyncStorage.swift in Sources */,
+				7C4B83FC2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7C4B84042010D48400502FB0 /* DiskStorage.swift in Sources */,
+				7C4B83F02010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -530,15 +563,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C00D07C1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */,
-				7C0EA5531EB3521900F50EB2 /* SyncStorage.swift in Sources */,
-				7C00D0811EAD4EE6004F7657 /* WritableStorage.swift in Sources */,
-				7C00D0861EAE34C1004F7657 /* NSCacheStorage.swift in Sources */,
-				7C00D0781EAD4ECF004F7657 /* MemoryStorage.swift in Sources */,
-				7C1D89841EBF1666006F7841 /* Zip.swift in Sources */,
-				7C00D0741EAD4ECF004F7657 /* Storage.swift in Sources */,
-				7C00D08B1EAE35EA004F7657 /* FileSystemStorage.swift in Sources */,
-				52D6DA091BF00081002C0205 /* Shallows.swift in Sources */,
+				7C4B83E52010D48400502FB0 /* MemoryStorage.swift in Sources */,
+				7C4B83E92010D48400502FB0 /* Storage.swift in Sources */,
+				7C4B84012010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83F52010D48400502FB0 /* Shallows.swift in Sources */,
+				7C4B83E12010D48400502FB0 /* Zip.swift in Sources */,
+				7C4B83ED2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
+				7C4B83F92010D48400502FB0 /* SyncStorage.swift in Sources */,
+				7C4B83FD2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7C4B84052010D48400502FB0 /* DiskStorage.swift in Sources */,
+				7C4B83F12010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,15 +580,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C00D07A1EAD4ECF004F7657 /* ReadOnlyStorage.swift in Sources */,
-				7C0EA5511EB3521900F50EB2 /* SyncStorage.swift in Sources */,
-				7C00D07F1EAD4EE6004F7657 /* WritableStorage.swift in Sources */,
-				7C00D0841EAE34C1004F7657 /* NSCacheStorage.swift in Sources */,
-				7C00D0761EAD4ECF004F7657 /* MemoryStorage.swift in Sources */,
-				7C1D89821EBF1666006F7841 /* Zip.swift in Sources */,
-				7C00D0721EAD4ECF004F7657 /* Storage.swift in Sources */,
-				7C00D0891EAE35EA004F7657 /* FileSystemStorage.swift in Sources */,
-				52D6DA261BF00118002C0205 /* Shallows.swift in Sources */,
+				7C4B83E32010D48400502FB0 /* MemoryStorage.swift in Sources */,
+				7C4B83E72010D48400502FB0 /* Storage.swift in Sources */,
+				7C4B83FF2010D48400502FB0 /* FileSystemStorage.swift in Sources */,
+				7C4B83F32010D48400502FB0 /* Shallows.swift in Sources */,
+				7C4B83DF2010D48400502FB0 /* Zip.swift in Sources */,
+				7C4B83EB2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
+				7C4B83F72010D48400502FB0 /* SyncStorage.swift in Sources */,
+				7C4B83FB2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7C4B84032010D48400502FB0 /* DiskStorage.swift in Sources */,
+				7C4B83EF2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,7 +597,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD7502861C68FDDC006590AF /* ShallowsTests.swift in Sources */,
+				7C4B840C2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
+				7C4B84092010D4D700502FB0 /* DiskStorageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,7 +606,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD75029A1C690CBE006590AF /* ShallowsTests.swift in Sources */,
+				7C4B840D2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
+				7C4B840A2010D4D700502FB0 /* DiskStorageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,7 +682,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -694,7 +731,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -721,7 +758,6 @@
 				PRODUCT_NAME = Shallows;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -744,7 +780,6 @@
 				PRODUCT_NAME = Shallows;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -758,7 +793,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shallows.Shallows-iOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -772,7 +806,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shallows.Shallows-iOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -793,7 +826,6 @@
 				PRODUCT_NAME = Shallows;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -817,7 +849,6 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -840,7 +871,6 @@
 				PRODUCT_NAME = Shallows;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
@@ -864,7 +894,6 @@
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
@@ -890,7 +919,6 @@
 				PRODUCT_NAME = Shallows;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -915,7 +943,6 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -923,6 +950,7 @@
 		DD7502831C68FCFC006590AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Configs/ShallowsTests.plist;
@@ -931,7 +959,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shallows.Shallows-macOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -939,6 +967,7 @@
 		DD7502841C68FCFC006590AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Configs/ShallowsTests.plist;
@@ -948,7 +977,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -956,12 +984,13 @@
 		DD7502961C690C7A006590AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Configs/ShallowsTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shallows.Shallows-tvOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 			};
@@ -970,13 +999,13 @@
 		DD7502971C690C7A006590AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Configs/ShallowsTests.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shallows.Shallows-tvOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 			};
