@@ -64,9 +64,6 @@ public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral 
 
 public final class DiskFolderStorage : StorageProtocol {
     
-    public typealias Key = Filename
-    public typealias Value = Data
-    
     public let storageName: String
     public let folderURL: URL
     
@@ -144,9 +141,6 @@ extension DiskFolderStorage {
 }
 
 public final class DiskStorage : StorageProtocol {
-    
-    public typealias Key = URL
-    public typealias Value = Data
     
     public var storageName: String {
         return "disk"

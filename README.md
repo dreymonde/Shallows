@@ -11,34 +11,24 @@
 
 ## Usage
 
-### Showcase
-
-Using **Shallows** for two-step JSON storage (memory and disk):
-
 ```swift
-struct Player : Codable {
+struct City : Codable {
     let name: String
-    let rating: Int
+    let foundationYear: Int
 }
 
-let memoryStorage = MemoryStorage<String, Player>()
-let diskStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "cache")
-    .mapJSONObject(Player.self)
-    .usingStringKeys()
-let combinedStorage = memoryStorage.combined(with: diskStorage)
-combinedStorage.retrieve(forKey: "Higgins") { (result) in
-    if let player = result.value {
-        print(player.name)
-    }
+let diskStorage = DiskStorage.main.folder("cities", in: .cachesDirectory)
+    .mapJSONObject(City.self)
+
+diskStorage.retrieve(forKey: "Beijing") { (result) in
+    if let city = result.value { print(city) }
 }
-combinedStorage.set(Player(name: "Mark", rating: 1), forKey: "Selby") { (result) in
-    if result.isSuccess {
-        print("Success!")
-    }
-}
+
+let kharkiv = City(name: "Kharkiv", foundationYear: 1654)
+diskStorage.set(kharkiv, forKey: "Kharkiv")
 ```
 
-### Guide
+## Guide
 
 A main type of **Shallows** is `Storage<Key, Value>`. It's an abstract, type-erased structure which doesn't contain any logic -- it needs to be provided with one. The most basic one is `MemoryStorage`:
 
@@ -67,34 +57,31 @@ storage.set(10, forKey: "some-key") { (result) in
 }
 ```
 
-#### Transforms
+### Transforms
 
 Keys and values can be mapped:
 
 ```swift
-let stringStorage = storage.mapValues(transformIn: { String($0) },
-                                  transformOut: { try Int($0).unwrap() }) // Storage<String, String>
-// ...
-enum EnumKey : String {
-    case first, second, third
+let storage = DiskStorage.main.folder("images", in: .cachesDirectory)
+let images = storage
+    .mapValues(to: UIImage.self,
+               transformIn: { data in try UIImage.init(data: data).unwrap() },
+               transformOut: { image in try UIImagePNGRepresentation(image).unwrap() })
+
+enum ImageKeys : String {
+    case kitten, puppy, fish
 }
-let keyedStorage: Storage<EnumKey, String> = stringStorage.mapKeys({ $0.rawValue })
+
+let keyedImages = images
+    .usingStringKeys()
+    .mapKeys(toRawRepresentableType: ImageKeys.self)
+
+keyedImages.retrieve(forKey: .kitten, completion: { result in /* .. */ })
 ```
-
-The concept of keys and values transformations is really powerful and it lies in the core of **Shallows**. For example, `FileSystemStorage` provides a `Storage<String, Data>` instances, and you can easily map `Data` to something useful. For example, `UIImage`:
-
-```swift
-// FileSystemStorage is a storage of Filename : Data
-let fileSystemStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-caches-1")
-let imageStorage = fileSystemStorage.mapValues(transformIn: { try UIImage(data: $0).unwrap() },
-                                           transformOut: { try UIImagePNGRepresentation($0).unwrap() })
-```
-
-Now you have an instance of type `Storage<String, UIImage>` which can be used to store images without much fuss.
 
 **NOTE:** There are several convenience methods defined on `Storage` with value of `Data`: `.mapString(withEncoding:)`, `.mapJSON()`, `.mapJSONDictionary()`, `.mapJSONObject(_:)` `.mapPlist(format:)`, `.mapPlistDictionary(format:)`, `.mapPlistObject(_:)`.
 
-#### Storages composition
+### Storages composition
 
 Another core concept of **Shallows** is composition. Hitting a disk every time you request an image can be slow and inefficient. Instead, you can compose `MemoryStorage` and `FileSystemStorage`:
 
@@ -108,11 +95,7 @@ It does several things:
 2. If disk storage stores a value, it will be pulled to memory storage and returned to a user.
 3. When setting an image, it will be set both to memory and disk storage.
 
-Great things about composing storages is that in the end, you still has your `Storage<Key, Value>` instance. That means that you can recompose storage layers however you want without breaking the usage code. It also makes the code that depends on `Storage` very easy to test.
-
-The huge advantage of **Shallows** is that it doesn't try to hide the actual mechanism - the behavior of your storages is perfectly clear, and still very simple to understand and easy to use. You control how many layers your storage has, how it acts and what it stores. **Shallows** is not an end-product - instead, it's a tool that will help you build exactly what you need.
-
-#### Read-only storage
+### Read-only storage
 
 If you don't want to expose writing to your storage, you can make it a read-only storage:
 
@@ -123,15 +106,15 @@ let readOnly = storage.asReadOnlyStorage() // ReadOnlyStorage<Key, Value>
 Read-only storages can also be mapped and composed:
 
 ```swift
-let immutableFileStorage = FileSystemStorage.inDirectory(.cachesDirectory, appending: "shallows-immutable")
+let immutableFileStorage = DiskStorage.main.folder("immutable", in: .applicationSupportDirectory)
     .mapString(withEncoding: .utf8)
     .asReadOnlyStorage()
-let storage = MemoryStorage<String, String>()
-    .combined(with: immutableFileStorage)
-    .asReadOnlyStorage() // ReadOnlyStorage<String, String>
+let storage = MemoryStorage<Filename, String>()
+    .backed(by: immutableFileStorage)
+    .asReadOnlyStorage() // ReadOnlyStorage<Filename, String>
 ```
 
-#### Write-only storage
+### Write-only storage
 
 In similar way, write-only storage is also available:
 
@@ -139,42 +122,38 @@ In similar way, write-only storage is also available:
 let writeOnly = storage.asWriteOnlyStorage() // WriteOnlyStorage<Key, Value>
 ```
 
-#### Single element storage
+### Single element storage
 
 You can have a storage with keys `Void`. That means that you can store only one element there. **Shallows** provides a convenience `.singleKey` method to create it:
 
 ```swift
-let settingsStorage = FileSystemStorage.inDirectory(.documentDirectory, appending: "settings")
+let settings = DiskStorage.main.folder("settings", in: .applicationSupportDirectory)
     .mapJSONDictionary()
     .singleKey("settings") // Storage<Void, [String : Any]>
-settingsStorage.retrieve { (result) in
+settings.retrieve { (result) in
     // ...
 }
 ```
 
-#### Synchronous storage
+### Synchronous storage
 
-Storages in **Shallows** are asynchronous by it's nature. However, in some situations (for example, when scripting or testing) it could be useful to have synchronous storages. You can make any storage synchronous by calling `.makeSyncStorage()` on it:
+Storages in **Shallows** are asynchronous by design. However, in some situations (for example, when scripting or testing) it could be useful to have synchronous storages. You can make any storage synchronous by calling `.makeSyncStorage()` on it:
 
 ```swift
-let strings = FileSystemStorage.inDirectory(.cachesDirectory, appending: "strings")
+let strings = DiskStorage.main.folder("strings", in: .cachesDirectory)
     .mapString(withEncoding: .utf8)
     .makeSyncStorage() // SyncStorage<String, String>
 let existing = try strings.retrieve(forKey: "hello")
 try strings.set(existing.uppercased(), forKey: "hello")
 ```
 
-However, be careful with that: some storages may be designed to complete more than one time (for example, some storages may quickly return value stored in a local storage and then ask the server for an update). Making a storage like this synchronous will kill that functionality.
-
-#### Mutating value for key
+### Mutating value for key
 
 **Shallows** provides a convenient `.update` method on storages:
 
 ```swift
 let arrays = MemoryStorage<String, [Int]>()
-arrays.update(forKey: "some-key", { $0.append(10) }) { (result) in
-    // ...
-}
+arrays.update(forKey: "some-key", { $0.append(10) })
 ```
 
 #### Zipping storages
@@ -191,16 +170,12 @@ zipped.retrieve(forKey: "some-key") { (result) in
         print(number)
     }
 }
-zipped.set(("shallows", 3), forKey: "another-key") { (result) in
-    if result.isSuccess {
-        print("Yay!")
-    }
-}
+zipped.set(("shallows", 3), forKey: "another-key")
 ```
 
 Isn't it nice?
 
-#### Different ways of composition
+### Different ways of composition
 
 Storages can be composed in different ways. If you look at the `combined` method, it actually looks like this:
 
@@ -229,7 +204,7 @@ public enum StorageCombinationSetStrategy {
 
 You can change these parameters to accomplish a behavior you want.
 
-#### Recovering from errors
+### Recovering from errors
 
 You can protect your storage instance from failures using `fallback(with:)` or `defaulting(to:)` methods:
 
@@ -259,7 +234,7 @@ storage.defaulting(to: []).update(forKey: "first", { $0.append(10) })
 
 That means that in case of failure retrieving existing value, `update` will use default value of `[]` instead of just failing the whole update.
 
-#### Using `NSCacheStorage`
+### Using `NSCacheStorage`
 
 `NSCache` is a tricky class: it supports only reference types, so you're forced to use, for example, `NSData` instead of `Data` and so on. To help you out, **Shallows** provides a set of convenience extensions for legacy Foundation types:
 
@@ -294,7 +269,7 @@ You can also conform to a `ReadableStorageProtocol` only. That way, you only nee
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.7.0
+github "dreymonde/Shallows" ~> 0.8.0
 ```
 
 [carthage-url]: https://github.com/Carthage/Carthage
