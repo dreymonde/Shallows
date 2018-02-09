@@ -272,6 +272,20 @@ You can also conform to a `ReadableStorageProtocol` only. That way, you only nee
 github "dreymonde/Shallows" ~> 0.8.0
 ```
 
+**AppFolder** is also available through [Cocoapods][cocoapods-url]:
+
+```ruby
+pod 'Shallows', '~> 0.8.0'
+```
+
+And Swift Package Manager:
+
+```swift
+dependencies: [
+    .Package(url: "https://github.com/dreymonde/Shallows.git", majorVersion: 0, minor: 8),
+]
+```
+
 [carthage-url]: https://github.com/Carthage/Carthage
 [swift-badge]: https://img.shields.io/badge/Swift-4.0-orange.svg?style=flat
 [swift-url]: https://swift.org
@@ -282,3 +296,4 @@ github "dreymonde/Shallows" ~> 0.8.0
 [brandon-kase-twitter-url]: https://twitter.com/bkase_
 [avenues-github-url]: https://github.com/dreymonde/Avenues
 [avenues-shallows-github-url]: https://github.com/dreymonde/Avenues-Shallows
+[cocoapods-url]: https://github.com/CocoaPods/CocoaPods
