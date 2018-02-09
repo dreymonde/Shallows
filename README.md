@@ -272,7 +272,7 @@ You can also conform to a `ReadableStorageProtocol` only. That way, you only nee
 github "dreymonde/Shallows" ~> 0.8.0
 ```
 
-**AppFolder** is also available through [Cocoapods][cocoapods-url]:
+**Shallows** is also available through [Cocoapods][cocoapods-url]:
 
 ```ruby
 pod 'Shallows', '~> 0.8.0'
