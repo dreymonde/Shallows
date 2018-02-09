@@ -217,8 +217,8 @@ extension DiskStorage {
     
     public static func folder(_ folderName: String,
                               in directory: FileManager.SearchPathDirectory,
-                              domainMask: FileManager.SearchPathDomainMask,
-                              filenameEncoder: Filename.Encoder) -> DiskFolderStorage {
+                              domainMask: FileManager.SearchPathDomainMask = .userDomainMask,
+                              filenameEncoder: Filename.Encoder = .base64) -> DiskFolderStorage {
         return DiskStorage.main.folder(folderName, in: directory, domainMask: domainMask, filenameEncoder: filenameEncoder)
     }
     
