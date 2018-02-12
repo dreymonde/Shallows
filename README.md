@@ -282,7 +282,7 @@ And Swift Package Manager:
 
 ```swift
 dependencies: [
-    .Package(url: "https://github.com/dreymonde/Shallows.git", majorVersion: 0, minor: 8),
+    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.8.0"),
 ]
 ```
 
