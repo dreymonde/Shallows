@@ -20,7 +20,7 @@ public struct Storage<Key, Value> : StorageProtocol {
     
     private let _retrieve: ReadOnlyStorage<Key, Value>
     private let _set: WriteOnlyStorage<Key, Value>
-        
+
     public init(storageName: String,
                 retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> (),
                 set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
@@ -51,11 +51,11 @@ public struct Storage<Key, Value> : StorageProtocol {
     }
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
-        return _retrieve
+        return _retrieve.renaming(to: storageName)
     }
     
     public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
-        return _set
+        return _set.renaming(to: storageName)
     }
     
 }
