@@ -12,48 +12,47 @@ extension StorageProtocol where Value == Data {
     
     public func mapJSON(readingOptions: JSONSerialization.ReadingOptions = [],
                         writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, Any> {
-        return mapValues(transformIn: { try JSONSerialization.jsonObject(with: $0, options: readingOptions) },
-                         transformOut: { try JSONSerialization.data(withJSONObject: $0, options: writingOptions) })
+        return Storage(readStorage: asReadOnlyStorage().mapJSON(options: readingOptions),
+                       writeStorage: asWriteOnlyStorage().mapJSON(options: writingOptions))
     }
     
     public func mapJSONDictionary(readingOptions: JSONSerialization.ReadingOptions = [],
                                   writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, [String : Any]> {
-        return mapJSON(readingOptions: readingOptions,
-                       writingOptions: writingOptions).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
-                                                                 transformOut: { $0 })
+        return Storage(readStorage: asReadOnlyStorage().mapJSONDictionary(options: readingOptions),
+                       writeStorage: asWriteOnlyStorage().mapJSONDictionary(options: writingOptions))
     }
     
     public func mapJSONObject<JSONObject : Codable>(_ objectType: JSONObject.Type,
                                                     decoder: JSONDecoder = JSONDecoder(),
                                                     encoder: JSONEncoder = JSONEncoder()) -> Storage<Key, JSONObject> {
-        return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
-                         transformOut: { try encoder.encode($0) })
+        return Storage(readStorage: asReadOnlyStorage().mapJSONObject(objectType, decoder: decoder),
+                       writeStorage: asWriteOnlyStorage().mapJSONObject(objectType, encoder: encoder))
     }
     
-    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml) -> Storage<Key, Any> {
-        return mapValues(transformIn: { data in
-            var formatRef = format
-            return try PropertyListSerialization.propertyList(from: data, options: [], format: &formatRef)
-        }, transformOut: { plist in
-            return try PropertyListSerialization.data(fromPropertyList: plist, format: format, options: 0)
-        })
+    public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml,
+                         readOptions: PropertyListSerialization.ReadOptions = [],
+                         writeOptions: PropertyListSerialization.WriteOptions = 0) -> Storage<Key, Any> {
+        return Storage(readStorage: asReadOnlyStorage().mapPlist(format: format, options: readOptions),
+                       writeStorage: asWriteOnlyStorage().mapPlist(format: format, options: writeOptions))
     }
     
-    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml) -> Storage<Key, [String : Any]> {
-        return mapPlist(format: format).mapValues(transformIn: throwing({ $0 as? [String : Any] }),
-                                                  transformOut: { $0 })
+    public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml,
+                                   readOptions: PropertyListSerialization.ReadOptions = [],
+                                   writeOptions: PropertyListSerialization.WriteOptions = 0) -> Storage<Key, [String : Any]> {
+        return Storage(readStorage: asReadOnlyStorage().mapPlistDictionary(format: format, options: readOptions),
+                       writeStorage: asWriteOnlyStorage().mapPlistDictionary(format: format, options: writeOptions))
     }
     
     public func mapPlistObject<PlistObject : Codable>(_ objectType: PlistObject.Type,
                                                       decoder: PropertyListDecoder = PropertyListDecoder(),
                                                       encoder: PropertyListEncoder = PropertyListEncoder()) -> Storage<Key, PlistObject> {
-        return mapValues(transformIn: { try decoder.decode(objectType, from: $0) },
-                         transformOut: { try encoder.encode($0) })
+        return Storage(readStorage: asReadOnlyStorage().mapPlistObject(objectType, decoder: decoder),
+                       writeStorage: asWriteOnlyStorage().mapPlistObject(objectType, encoder: encoder))
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Storage<Key, String> {
-        return mapValues(transformIn: throwing({ String(data: $0, encoding: encoding) }),
-                         transformOut: throwing({ $0.data(using: encoding) }))
+        return Storage(readStorage: asReadOnlyStorage().mapString(withEncoding: encoding),
+                       writeStorage: asWriteOnlyStorage().mapString(withEncoding: encoding))
     }
     
 }
