@@ -175,35 +175,6 @@ zipped.set(("shallows", 3), forKey: "another-key")
 
 Isn't it nice?
 
-### Different ways of composition
-
-Storages can be composed in different ways. If you look at the `combined` method, it actually looks like this:
-
-```swift
-public func combined<StorageType : StorageProtocol>(with storage: StorageType,
-                     pullStrategy: StorageCombinationPullStrategy,
-                     setStrategy: StorageCombinationSetStrategy) -> Storage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value
-```
-
-Where `pullStrategy` defaults to `.pullThenComplete` and `setStrategy` defaults to `.frontFirst`. Available options are:
-
-```swift
-public enum StorageCombinationPullStrategy {
-    case pullThenComplete
-    case completeThenPull
-    case neverPull
-}
-
-public enum StorageCombinationSetStrategy {
-    case backFirst
-    case frontFirst
-    case frontOnly
-    case backOnly
-}
-```
-
-You can change these parameters to accomplish a behavior you want.
-
 ### Recovering from errors
 
 You can protect your storage instance from failures using `fallback(with:)` or `defaulting(to:)` methods:
