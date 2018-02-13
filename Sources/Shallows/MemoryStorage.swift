@@ -1,14 +1,7 @@
 import Dispatch
 
-enum MemoryStorageError : ShallowsError {
+enum MemoryStorageError : Error {
     case noValue
-    
-    var isTransient: Bool {
-        switch self {
-        case .noValue:
-            return false
-        }
-    }
 }
 
 public struct ThreadSafe<Value> {
@@ -53,13 +46,7 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
             _storage.write(newValue)
         }
     }
-    
-    @available(*, deprecated, message: "`storageName` in inits no longer allowed")
-    public init(storage: [Key : Value] = [:], storageName: String) {
-        self._storage = ThreadSafe(storage)
-        self.storageName = storageName
-    }
-    
+        
     public init(storage: [Key : Value] = [:]) {
         self._storage = ThreadSafe(storage)
         self.storageName = "memory-storage-\(Key.self):\(Value.self)"

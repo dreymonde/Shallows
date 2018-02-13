@@ -114,6 +114,10 @@ func testDiskStorage() {
             let folderURL = DiskFolderStorage.url(forFolder: "Scholes", in: .cachesDirectory)
             let folder = DiskStorage.main.folder("Scholes", in: .cachesDirectory)
             try expect(folder.folderURL) == folderURL
+            
+            let folderURL2 = DiskFolderStorage.url(forFolder: "Rooney", in: .cachesDirectory)
+            let folder2 = DiskStorage.folder("Rooney", in: .cachesDirectory)
+            try expect(folder2.folderURL) == folderURL2
         }
         $0.it("encodes filename") {
             func storage(encoder: Filename.Encoder) -> DiskFolderStorage {

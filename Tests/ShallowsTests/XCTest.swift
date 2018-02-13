@@ -17,6 +17,7 @@ class ShallowsXCTests : XCTestCase {
     func testShallows() {
         testMemoryStorage()
         testDiskStorage()
+        testResult()
     }
     
 }

@@ -6,11 +6,6 @@ public protocol StorageDesign {
 
 extension StorageDesign {
     
-    @available(*, deprecated, renamed: "storageName")
-    public var name: String {
-        return storageName
-    }
-    
     public var storageName: String {
         return String(describing: Self.self)
     }
@@ -214,14 +209,7 @@ extension StorageProtocol {
             }
         })
     }
-    
-    @available(*, deprecated, message: "Use combined(with:retrieveStrategy:setStrategy:) instead")
-    public func combined<StorageType : StorageProtocol>(with storage: StorageType,
-                         pullingFromBack: Bool,
-                         pushingToBack: Bool) -> Storage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
-        return self.combined(with: storage, pullStrategy: pullingFromBack ? .pullThenComplete : .neverPull, setStrategy: pushingToBack ? .frontFirst : .frontOnly)
-    }
-    
+        
     public func combined<StorageType : StorageProtocol>(with storage: StorageType,
                          pullStrategy: StorageCombinationPullStrategy = .pullThenComplete,
                          setStrategy: StorageCombinationSetStrategy = .frontFirst) -> Storage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {

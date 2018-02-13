@@ -48,6 +48,16 @@ func testMemoryStorage() {
             let mem = MemoryStorage<Int, Int>().makeSyncStorage()
             try expect(try mem.retrieve(forKey: 10)).toThrow()
         }
+        $0.it("can be modified directly") {
+            let dict: [Int : Int] = [1: 5, 2: 6]
+            let mem = MemoryStorage<Int, Int>(storage: dict)
+            try expect(mem.storage) == dict
+            mem.storage[3] = 7
+            try expect(try mem.makeSyncStorage().retrieve(forKey: 3)) == 7
+            var copy = dict
+            copy[3] = 7
+            try expect(mem.storage) == copy
+        }
     }
     
 }

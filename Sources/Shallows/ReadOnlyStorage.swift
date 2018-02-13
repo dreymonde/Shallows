@@ -41,7 +41,7 @@ extension ReadableStorageProtocol {
 
 extension ReadOnlyStorageProtocol {
     
-    public func backed<StorageType : ReadableStorageProtocol>(by storage: StorageType) -> ReadOnlyStorage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
+    public func combined<StorageType : ReadableStorageProtocol>(with storage: StorageType) -> ReadOnlyStorage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
         return ReadOnlyStorage(storageName: "\(self.storageName)-\(storage.storageName)", retrieve: { (key, completion) in
             self.retrieve(forKey: key, completion: { (firstResult) in
                 if firstResult.isFailure {
@@ -52,6 +52,11 @@ extension ReadOnlyStorageProtocol {
                 }
             })
         })
+    }
+    
+    @available(*, deprecated, renamed: "combined(with:)")
+    public func backed<StorageType : ReadableStorageProtocol>(by storage: StorageType) -> ReadOnlyStorage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
+        return combined(with: storage)
     }
     
     public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,

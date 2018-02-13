@@ -6,6 +6,7 @@
 //  Copyright © 2017 Shallows. All rights reserved.
 //
 
+@available(*, unavailable)
 public protocol ShallowsError : Swift.Error {
     
     var isTransient: Bool { get }
@@ -41,17 +42,7 @@ public enum Result<Value> {
         }
         return nil
     }
-    
-    @available(*, deprecated, renamed: "value")
-    public var asOptional: Value? {
-        switch self {
-        case .success(let value):
-            return value
-        case .failure:
-            return nil
-        }
-    }
-    
+        
 }
 
 public func fail<Value>(with error: Error) -> Result<Value> {
@@ -72,11 +63,8 @@ extension Result where Value == Void {
 
 extension Optional {
     
-    public struct UnwrapError : ShallowsError {
-        init() { }
-        public var isTransient: Bool {
-            return false
-        }
+    public struct UnwrapError : Error {
+        public init() { }
     }
     
     public func unwrap() throws -> Wrapped {
