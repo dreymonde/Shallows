@@ -4,6 +4,15 @@ public protocol WritableStorageProtocol : StorageDesign {
     associatedtype Value
     
     func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ())
+    func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value>
+    
+}
+
+extension WritableStorageProtocol {
+    
+    public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
+        return WriteOnlyStorage(self)
+    }
     
 }
 
@@ -27,14 +36,6 @@ public struct WriteOnlyStorage<Key, Value> : WriteOnlyStorageProtocol {
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
         self._set(value, key, completion)
-    }
-    
-}
-
-extension WritableStorageProtocol {
-    
-    public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
-        return WriteOnlyStorage(self)
     }
     
 }

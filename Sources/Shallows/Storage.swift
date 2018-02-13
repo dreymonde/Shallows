@@ -18,35 +18,44 @@ public struct Storage<Key, Value> : StorageProtocol {
     
     public let storageName: String
     
-    private let _retrieve: (Key, @escaping (Result<Value>) -> ()) -> ()
-    private let _set: (Value, Key, @escaping (Result<Void>) -> ()) -> ()
-    
+    private let _retrieve: ReadOnlyStorage<Key, Value>
+    private let _set: WriteOnlyStorage<Key, Value>
+        
     public init(storageName: String,
                 retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> (),
                 set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
-        self._retrieve = retrieve
-        self._set = set
+        self._retrieve = ReadOnlyStorage(storageName: storageName, retrieve: retrieve)
+        self._set = WriteOnlyStorage(storageName: storageName, set: set)
         self.storageName = storageName
     }
     
     public init<StorageType : StorageProtocol>(_ storage: StorageType) where StorageType.Key == Key, StorageType.Value == Value {
-        self._retrieve = storage.retrieve
-        self._set = storage.set
+        self._retrieve = storage.asReadOnlyStorage()
+        self._set = storage.asWriteOnlyStorage()
         self.storageName = storage.storageName
     }
     
-    public init<ReadStorageType : ReadableStorageProtocol, WriteStorageType : WritableStorageProtocol>(readStorage: ReadStorageType, writeStorage: WriteStorageType) where ReadStorageType.Key == Key, ReadStorageType.Value == Value, WriteStorageType.Key == Key, WriteStorageType.Value == Value {
-        self._retrieve = readStorage.retrieve
-        self._set = writeStorage.set
+    public init(readStorage: ReadOnlyStorage<Key, Value>,
+                writeStorage: WriteOnlyStorage<Key, Value>) {
+        self._retrieve = readStorage
+        self._set = writeStorage
         self.storageName = readStorage.storageName
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
-        _retrieve(key, completion)
+        _retrieve.retrieve(forKey: key, completion: completion)
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> () = { _ in }) {
-        _set(value, key, completion)
+        _set.set(value, forKey: key, completion: completion)
+    }
+    
+    public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
+        return _retrieve
+    }
+    
+    public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
+        return _set
     }
     
 }
