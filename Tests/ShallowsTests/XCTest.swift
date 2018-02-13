@@ -48,8 +48,8 @@ func readme2() {
         let storage = DiskStorage.main.folder("images", in: .cachesDirectory)
         let images = storage
             .mapValues(to: UIImage.self,
-                       transformIn: { data in try UIImage.init(data: data).unwrap() },
-                       transformOut: { image in try UIImagePNGRepresentation(image).unwrap() })
+                       transformIn: { data in try UIImage.init(data: data).getValue() },
+                       transformOut: { image in try UIImagePNGRepresentation(image).getValue() })
         
         enum ImageKeys : String {
             case kitten, puppy, fish

@@ -20,7 +20,8 @@ internal func dispatched<In1, In2, In3>(to queue: DispatchQueue, _ function: @es
 
 extension StorageProtocol {
     
-    public func synchronizedCalls(on queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-storage-thread-safety-queue")) -> Storage<Key, Value> {
+    public func synchronizedCalls() -> Storage<Key, Value> {
+        let queue: DispatchQueue = DispatchQueue(label: "\(Self.self)-storage-thread-safety-queue")
         return Storage<Key, Value>(storageName: self.storageName,
                                  retrieve: dispatched(to: queue, self.retrieve(forKey:completion:)),
                                  set: dispatched(to: queue, self.set(_:forKey:completion:)))
@@ -135,25 +136,9 @@ extension WriteOnlyStorageProtocol {
 extension StorageProtocol {
     
     public func makeSyncStorage() -> SyncStorage<Key, Value> {
-        return SyncStorage(storageName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
-            let semaphore = DispatchSemaphore(value: 0)
-            var r_result: Result<Value>?
-            self.retrieve(forKey: key, completion: { (result) in
-                r_result = result
-                semaphore.signal()
-            })
-            semaphore.wait()
-            return try r_result!.getValue()
-        }, set: { (value, key) in
-            let semaphore = DispatchSemaphore(value: 0)
-            var r_result: Result<Void>?
-            self.set(value, forKey: key, completion: { (result) in
-                r_result = result
-                semaphore.signal()
-            })
-            semaphore.wait()
-            return try r_result!.getValue()
-        })
+        let readOnly = asReadOnlyStorage().makeSyncStorage()
+        let writeOnly = asWriteOnlyStorage().makeSyncStorage()
+        return SyncStorage(storageName: readOnly.storageName, retrieve: readOnly.retrieve, set: writeOnly.set)
     }
     
 }

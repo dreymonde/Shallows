@@ -36,10 +36,10 @@
 		7C4B83F72010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
 		7C4B83F82010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
 		7C4B83F92010D48400502FB0 /* SyncStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DA2010D48300502FB0 /* SyncStorage.swift */; };
-		7C4B83FA2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
-		7C4B83FB2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
-		7C4B83FC2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
-		7C4B83FD2010D48400502FB0 /* WritableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WritableStorage.swift */; };
+		7C4B83FA2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */; };
+		7C4B83FB2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */; };
+		7C4B83FC2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */; };
+		7C4B83FD2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */; };
 		7C4B84022010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
 		7C4B84032010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
 		7C4B84042010D48400502FB0 /* DiskStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4B83DD2010D48400502FB0 /* DiskStorage.swift */; };
@@ -86,6 +86,14 @@
 		7CC675F6203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
 		7CC675F7203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
 		7CC675F8203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
+		7CC675FA20337169004557EB /* Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F920337169004557EB /* Filename.swift */; };
+		7CC675FB20337169004557EB /* Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F920337169004557EB /* Filename.swift */; };
+		7CC675FC20337169004557EB /* Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F920337169004557EB /* Filename.swift */; };
+		7CC675FD20337169004557EB /* Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F920337169004557EB /* Filename.swift */; };
+		7CC675FF20337210004557EB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675FE20337210004557EB /* Result.swift */; };
+		7CC6760020337210004557EB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675FE20337210004557EB /* Result.swift */; };
+		7CC6760120337210004557EB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675FE20337210004557EB /* Result.swift */; };
+		7CC6760220337210004557EB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675FE20337210004557EB /* Result.swift */; };
 		7CD789C52010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
 		7CD789C62010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
 		7CD789C72010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
@@ -135,7 +143,7 @@
 		7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadOnlyStorage.swift; sourceTree = "<group>"; };
 		7C4B83D92010D48300502FB0 /* Shallows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shallows.swift; sourceTree = "<group>"; };
 		7C4B83DA2010D48300502FB0 /* SyncStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncStorage.swift; sourceTree = "<group>"; };
-		7C4B83DB2010D48400502FB0 /* WritableStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritableStorage.swift; sourceTree = "<group>"; };
+		7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WriteOnlyStorage.swift; sourceTree = "<group>"; };
 		7C4B83DD2010D48400502FB0 /* DiskStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorage.swift; sourceTree = "<group>"; };
 		7C4B84062010D4D600502FB0 /* DiskStorageSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskStorageSpec.swift; sourceTree = "<group>"; };
 		7C4B84072010D4D700502FB0 /* ShallowsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShallowsTests.swift; sourceTree = "<group>"; };
@@ -151,6 +159,8 @@
 		7CC675ED20335951004557EB /* ResultSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSpec.swift; sourceTree = "<group>"; };
 		7CC675F120335CC0004557EB /* ZipSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipSpec.swift; sourceTree = "<group>"; };
 		7CC675F5203364A7004557EB /* CompositionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionSpec.swift; sourceTree = "<group>"; };
+		7CC675F920337169004557EB /* Filename.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filename.swift; sourceTree = "<group>"; };
+		7CC675FE20337210004557EB /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		7CD789C42010F3120057F6E8 /* DiskExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExtensions.swift; sourceTree = "<group>"; };
 		7CD789C92010F3EC0057F6E8 /* MemoryStorageSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryStorageSpec.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* Shallows.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Shallows.plist; sourceTree = "<group>"; };
@@ -267,15 +277,16 @@
 		7C4B84352010D84A00502FB0 /* Shallows */ = {
 			isa = PBXGroup;
 			children = (
-				7CD789C32010F2FD0057F6E8 /* DiskStorage */,
-				7C4B83D52010D48300502FB0 /* MemoryStorage.swift */,
-				7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */,
-				7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */,
 				7C4B83D92010D48300502FB0 /* Shallows.swift */,
 				7C4B83D62010D48300502FB0 /* Storage.swift */,
+				7C4B83D82010D48300502FB0 /* ReadOnlyStorage.swift */,
+				7C4B83DB2010D48400502FB0 /* WriteOnlyStorage.swift */,
 				7C4B83DA2010D48300502FB0 /* SyncStorage.swift */,
-				7C4B83DB2010D48400502FB0 /* WritableStorage.swift */,
+				7C4B83D52010D48300502FB0 /* MemoryStorage.swift */,
+				7CD789C32010F2FD0057F6E8 /* DiskStorage */,
+				7C4B83D72010D48300502FB0 /* NSCacheStorage.swift */,
 				7C4B83D42010D48300502FB0 /* Zip.swift */,
+				7CC675FE20337210004557EB /* Result.swift */,
 			);
 			path = Shallows;
 			sourceTree = "<group>";
@@ -285,6 +296,7 @@
 			children = (
 				7C4B83DD2010D48400502FB0 /* DiskStorage.swift */,
 				7CD789C42010F3120057F6E8 /* DiskExtensions.swift */,
+				7CC675F920337169004557EB /* Filename.swift */,
 			);
 			path = DiskStorage;
 			sourceTree = "<group>";
@@ -615,10 +627,12 @@
 				7C4B83DE2010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EA2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
 				7C4B83F62010D48400502FB0 /* SyncStorage.swift in Sources */,
-				7C4B83FA2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7CC675FF20337210004557EB /* Result.swift in Sources */,
+				7C4B83FA2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */,
 				7C4B84022010D48400502FB0 /* DiskStorage.swift in Sources */,
 				7C4B83EE2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 				7CD789C52010F3120057F6E8 /* DiskExtensions.swift in Sources */,
+				7CC675FA20337169004557EB /* Filename.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,10 +668,12 @@
 				7C4B83E02010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EC2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
 				7C4B83F82010D48400502FB0 /* SyncStorage.swift in Sources */,
-				7C4B83FC2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7CC6760120337210004557EB /* Result.swift in Sources */,
+				7C4B83FC2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */,
 				7C4B84042010D48400502FB0 /* DiskStorage.swift in Sources */,
 				7C4B83F02010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 				7CD789C72010F3120057F6E8 /* DiskExtensions.swift in Sources */,
+				7CC675FC20337169004557EB /* Filename.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -671,10 +687,12 @@
 				7C4B83E12010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83ED2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
 				7C4B83F92010D48400502FB0 /* SyncStorage.swift in Sources */,
-				7C4B83FD2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7CC6760220337210004557EB /* Result.swift in Sources */,
+				7C4B83FD2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */,
 				7C4B84052010D48400502FB0 /* DiskStorage.swift in Sources */,
 				7C4B83F12010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 				7CD789C82010F3120057F6E8 /* DiskExtensions.swift in Sources */,
+				7CC675FD20337169004557EB /* Filename.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -688,10 +706,12 @@
 				7C4B83DF2010D48400502FB0 /* Zip.swift in Sources */,
 				7C4B83EB2010D48400502FB0 /* NSCacheStorage.swift in Sources */,
 				7C4B83F72010D48400502FB0 /* SyncStorage.swift in Sources */,
-				7C4B83FB2010D48400502FB0 /* WritableStorage.swift in Sources */,
+				7CC6760020337210004557EB /* Result.swift in Sources */,
+				7C4B83FB2010D48400502FB0 /* WriteOnlyStorage.swift in Sources */,
 				7C4B84032010D48400502FB0 /* DiskStorage.swift in Sources */,
 				7C4B83EF2010D48400502FB0 /* ReadOnlyStorage.swift in Sources */,
 				7CD789C62010F3120057F6E8 /* DiskExtensions.swift in Sources */,
+				7CC675FB20337169004557EB /* Filename.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

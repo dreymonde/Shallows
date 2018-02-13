@@ -34,14 +34,14 @@ func testDiskStorage() {
             $0.it("to base64") {
                 let data = example.data(using: .utf8)!
                 let base64 = data.base64EncodedString()
-                try expect(Filename.Encoder.base64.finalForm(of: filename)) == base64
+                try expect(Filename.Encoder.base64.encodedString(representing: filename)) == base64
             }
             $0.it("without encoding") {
-                try expect(Filename.Encoder.noEncoding.finalForm(of: filename)) == example
+                try expect(Filename.Encoder.noEncoding.encodedString(representing: filename)) == example
             }
             $0.it("with custom encoding") {
                 let custom = Filename.Encoder.custom({ $0.rawValue.uppercased() })
-                try expect(custom.finalForm(of: filename)) == example.uppercased()
+                try expect(custom.encodedString(representing: filename)) == example.uppercased()
             }
         }
     }
@@ -126,7 +126,7 @@ func testDiskStorage() {
             func checkStorage(for encoder: Filename.Encoder) throws {
                 let example: Filename = "Nineties"
                 let str = storage(encoder: encoder)
-                try expect(str.fileURL(forFilename: example)) == str.folderURL.appendingPathComponent(encoder.finalForm(of: example))
+                try expect(str.fileURL(forFilename: example)) == str.folderURL.appendingPathComponent(encoder.encodedString(representing: example))
             }
             try checkStorage(for: .base64)
             try checkStorage(for: .noEncoding)

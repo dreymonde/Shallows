@@ -255,48 +255,15 @@ extension StorageProtocol {
     
     public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
                                   _ transform: @escaping (OtherKey) throws -> Key) -> Storage<OtherKey, Value> {
-        return Storage<OtherKey, Value>(storageName: storageName, retrieve: { key, completion in
-            do {
-                let newKey = try transform(key)
-                self.retrieve(forKey: newKey, completion: completion)
-            } catch {
-                completion(.failure(error))
-            }
-        }, set: { value, key, completion in
-            do {
-                let newKey = try transform(key)
-                self.set(value, forKey: newKey, completion: completion)
-            } catch {
-                completion(.failure(error))
-            }
-        })
+        return Storage(readStorage: asReadOnlyStorage().mapKeys(transform),
+                       writeStorage: asWriteOnlyStorage().mapKeys(transform))
     }
     
     public func mapValues<OtherValue>(to type: OtherValue.Type = OtherValue.self,
                                       transformIn: @escaping (Value) throws -> OtherValue,
                                       transformOut: @escaping (OtherValue) throws -> Value) -> Storage<Key, OtherValue> {
-        return Storage<Key, OtherValue>(storageName: storageName, retrieve: { (key, completion) in
-            self.retrieve(forKey: key, completion: { (result) in
-                switch result {
-                case .success(let value):
-                    do {
-                        let newValue = try transformIn(value)
-                        completion(.success(newValue))
-                    } catch {
-                        completion(.failure(error))
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            })
-        }, set: { (value, key, completion) in
-            do {
-                let newValue = try transformOut(value)
-                self.set(newValue, forKey: key, completion: completion)
-            } catch {
-                completion(.failure(error))
-            }
-        })
+        return Storage(readStorage: asReadOnlyStorage().mapValues(transformIn),
+                       writeStorage: asWriteOnlyStorage().mapValues(transformOut))
     }
     
 }
@@ -317,50 +284,11 @@ extension StorageProtocol {
 extension StorageProtocol {
     
     public func fallback(with produceValue: @escaping (Error) throws -> Value) -> Storage<Key, Value> {
-        return Storage(storageName: self.storageName, retrieve: { (key, completion) in
-            self.retrieve(forKey: key, completion: { (result) in
-                switch result {
-                case .failure(let error):
-                    do {
-                        let fallbackValue = try produceValue(error)
-                        completion(.success(fallbackValue))
-                    } catch let fallbackError {
-                        completion(.failure(fallbackError))
-                    }
-                case .success(let value):
-                    completion(.success(value))
-                }
-            })
-        }, set: self.set)
+        let readOnly = asReadOnlyStorage().fallback(with: produceValue)
+        return Storage(readStorage: readOnly, writeStorage: asWriteOnlyStorage())
     }
     
     public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> Storage<Key, Value> {
-        return fallback(with: { _ in defaultValue() })
-    }
-    
-}
-
-extension ReadOnlyStorageProtocol {
-    
-    public func fallback(with produceValue: @escaping (Error) throws -> Value) -> ReadOnlyStorage<Key, Value> {
-        return ReadOnlyStorage(storageName: self.storageName, retrieve: { (key, completion) in
-            self.retrieve(forKey: key, completion: { (result) in
-                switch result {
-                case .failure(let error):
-                    do {
-                        let fallbackValue = try produceValue(error)
-                        completion(.success(fallbackValue))
-                    } catch let fallbackError {
-                        completion(.failure(fallbackError))
-                    }
-                case .success(let value):
-                    completion(.success(value))
-                }
-            })
-        })
-    }
-    
-    public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> ReadOnlyStorage<Key, Value> {
         return fallback(with: { _ in defaultValue() })
     }
     

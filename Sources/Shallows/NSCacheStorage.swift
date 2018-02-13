@@ -7,11 +7,10 @@ public final class NSCacheStorage<Key : NSObject, Value : AnyObject> : StoragePr
     }
     
     public let storage: NSCache<Key, Value>
-    public let storageName: String
+    public let storageName: String = "nscache"
     
-    public init(storage: NSCache<Key, Value> = NSCache(), storageName: String = "\(NSCache<Key, Value>.self)") {
+    public init(storage: NSCache<Key, Value> = NSCache()) {
         self.storage = storage
-        self.storageName = storageName
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
