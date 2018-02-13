@@ -80,6 +80,12 @@
 		7CC675EE20335951004557EB /* ResultSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675ED20335951004557EB /* ResultSpec.swift */; };
 		7CC675EF20335951004557EB /* ResultSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675ED20335951004557EB /* ResultSpec.swift */; };
 		7CC675F020335951004557EB /* ResultSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675ED20335951004557EB /* ResultSpec.swift */; };
+		7CC675F220335CC0004557EB /* ZipSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F120335CC0004557EB /* ZipSpec.swift */; };
+		7CC675F320335CC0004557EB /* ZipSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F120335CC0004557EB /* ZipSpec.swift */; };
+		7CC675F420335CC0004557EB /* ZipSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F120335CC0004557EB /* ZipSpec.swift */; };
+		7CC675F6203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
+		7CC675F7203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
+		7CC675F8203364A7004557EB /* CompositionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC675F5203364A7004557EB /* CompositionSpec.swift */; };
 		7CD789C52010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
 		7CD789C62010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
 		7CD789C72010F3120057F6E8 /* DiskExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD789C42010F3120057F6E8 /* DiskExtensions.swift */; };
@@ -143,6 +149,8 @@
 		7C4B84152010D5F900502FB0 /* Case.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Case.swift; sourceTree = "<group>"; };
 		7C4B84312010D68300502FB0 /* XCTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTest.swift; sourceTree = "<group>"; };
 		7CC675ED20335951004557EB /* ResultSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSpec.swift; sourceTree = "<group>"; };
+		7CC675F120335CC0004557EB /* ZipSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipSpec.swift; sourceTree = "<group>"; };
+		7CC675F5203364A7004557EB /* CompositionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionSpec.swift; sourceTree = "<group>"; };
 		7CD789C42010F3120057F6E8 /* DiskExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExtensions.swift; sourceTree = "<group>"; };
 		7CD789C92010F3EC0057F6E8 /* MemoryStorageSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryStorageSpec.swift; sourceTree = "<group>"; };
 		AD2FAA261CD0B6D800659CF4 /* Shallows.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Shallows.plist; sourceTree = "<group>"; };
@@ -298,6 +306,8 @@
 				7C4B84072010D4D700502FB0 /* ShallowsTests.swift */,
 				7CC675ED20335951004557EB /* ResultSpec.swift */,
 				7C4B84312010D68300502FB0 /* XCTest.swift */,
+				7CC675F120335CC0004557EB /* ZipSpec.swift */,
+				7CC675F5203364A7004557EB /* CompositionSpec.swift */,
 			);
 			name = Tests;
 			path = Tests/ShallowsTests;
@@ -618,8 +628,10 @@
 			files = (
 				7C4B84192010D5F900502FB0 /* Expectation.swift in Sources */,
 				7C4B841C2010D5F900502FB0 /* Reporter.swift in Sources */,
+				7CC675F220335CC0004557EB /* ZipSpec.swift in Sources */,
 				7C4B840B2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
 				7C4B841F2010D5F900502FB0 /* Context.swift in Sources */,
+				7CC675F6203364A7004557EB /* CompositionSpec.swift in Sources */,
 				7C4B84322010D68300502FB0 /* XCTest.swift in Sources */,
 				7C4B84252010D5F900502FB0 /* GlobalContext.swift in Sources */,
 				7CC675EE20335951004557EB /* ResultSpec.swift in Sources */,
@@ -689,8 +701,10 @@
 			files = (
 				7C4B841A2010D5F900502FB0 /* Expectation.swift in Sources */,
 				7C4B841D2010D5F900502FB0 /* Reporter.swift in Sources */,
+				7CC675F320335CC0004557EB /* ZipSpec.swift in Sources */,
 				7C4B840C2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
 				7C4B84202010D5F900502FB0 /* Context.swift in Sources */,
+				7CC675F7203364A7004557EB /* CompositionSpec.swift in Sources */,
 				7C4B84332010D68300502FB0 /* XCTest.swift in Sources */,
 				7C4B84262010D5F900502FB0 /* GlobalContext.swift in Sources */,
 				7CC675EF20335951004557EB /* ResultSpec.swift in Sources */,
@@ -709,8 +723,10 @@
 			files = (
 				7C4B841B2010D5F900502FB0 /* Expectation.swift in Sources */,
 				7C4B841E2010D5F900502FB0 /* Reporter.swift in Sources */,
+				7CC675F420335CC0004557EB /* ZipSpec.swift in Sources */,
 				7C4B840D2010D4D700502FB0 /* ShallowsTests.swift in Sources */,
 				7C4B84212010D5F900502FB0 /* Context.swift in Sources */,
+				7CC675F8203364A7004557EB /* CompositionSpec.swift in Sources */,
 				7C4B84342010D68300502FB0 /* XCTest.swift in Sources */,
 				7C4B84272010D5F900502FB0 /* GlobalContext.swift in Sources */,
 				7CC675F020335951004557EB /* ResultSpec.swift in Sources */,

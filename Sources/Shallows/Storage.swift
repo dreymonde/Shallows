@@ -35,6 +35,12 @@ public struct Storage<Key, Value> : StorageProtocol {
         self.storageName = storage.storageName
     }
     
+    public init<ReadStorageType : ReadableStorageProtocol, WriteStorageType : WritableStorageProtocol>(readStorage: ReadStorageType, writeStorage: WriteStorageType) where ReadStorageType.Key == Key, ReadStorageType.Value == Value, WriteStorageType.Key == Key, WriteStorageType.Value == Value {
+        self._retrieve = readStorage.retrieve
+        self._set = writeStorage.set
+        self.storageName = readStorage.storageName
+    }
+    
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
         _retrieve(key, completion)
     }
@@ -45,16 +51,16 @@ public struct Storage<Key, Value> : StorageProtocol {
     
 }
 
-internal func storageConnectionSignFromOptions(pullingFromBack: Bool, pushingToBack: Bool) -> String {
+internal func storageName(left: String, right: String, pullingFromBack: Bool, pushingToBack: Bool) -> String {
     switch (pullingFromBack, pushingToBack) {
     case (true, true):
-        return "<->"
+        return left + "<->" + right
     case (true, false):
-        return "<-"
+        return left + "<-" + right
     case (false, true):
-        return "->"
+        return left + "->" + right
     case (false, false):
-        return "-"
+        return left + "-" + right
     }
 }
 
@@ -85,17 +91,8 @@ extension Storage {
         
         public func retrieve<StorageType : ReadableStorageProtocol>(forKey key: Key,
                              backedBy backStorage: StorageType,
-                             strategy: StorageCombinationPullStrategy,
                              completion: @escaping (Result<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value{
-            frontStorage.retrieve(forKey: key, backedBy: backStorage, strategy: strategy, completion: completion)
-        }
-        
-        public func set<StorageType : StorageProtocol>(_ value: Value,
-                        forKey key: Key,
-                        pushingTo storage: StorageType,
-                        strategy: StorageCombinationSetStrategy,
-                        completion: @escaping (Result<Void>) -> ()) where StorageType.Key == Key, StorageType.Value == Value{
-            frontStorage.set(value, forKey: key, pushingTo: storage, strategy: strategy, completion: completion)
+            frontStorage.retrieve(forKey: key, backedBy: backStorage, completion: completion)
         }
         
     }
@@ -178,27 +175,20 @@ extension StorageProtocol {
         }
     }
     
+}
+
+extension StorageProtocol {
+    
     fileprivate func retrieve<StorageType : ReadableStorageProtocol>(forKey key: Key,
                               backedBy storage: StorageType,
-                              strategy: StorageCombinationPullStrategy,
                               completion: @escaping (Result<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
                 shallows_print("Storage (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(storage.storageName)")
                 storage.retrieve(forKey: key, completion: { (secondResult) in
-                    if case .success(let value) = secondResult {
-                        switch strategy {
-                        case .pullThenComplete:
-                            shallows_print("Success retrieving \(key) from \(storage.storageName). Setting value back to \(self.storageName)")
-                            self.set(value, forKey: key, completion: { _ in completion(secondResult) })
-                        case .completeThenPull:
-                            shallows_print("Success retrieving \(key) from \(storage.storageName). Completing, then value back to \(self.storageName)")
-                            completion(secondResult)
-                            self.set(value, forKey: key, completion: { _ in })
-                        case .neverPull:
-                            shallows_print("Success retrieving \(key) from \(storage.storageName). Not pulling.")
-                            completion(secondResult)
-                        }
+                    if let value = secondResult.value {
+                        shallows_print("Success retrieving \(key) from \(storage.storageName). Setting value back to \(self.storageName)")
+                        self.set(value, forKey: key, completion: { _ in completion(secondResult) })
                     } else {
                         shallows_print("Storage miss for final destination (\(storage.storageName)). Completing with failure result")
                         completion(secondResult)
@@ -209,17 +199,28 @@ extension StorageProtocol {
             }
         })
     }
-        
+    
+}
+
+extension StorageProtocol {
+    
+    @available(*, unavailable, message: "strategies are no longer supported")
     public func combined<StorageType : StorageProtocol>(with storage: StorageType,
                          pullStrategy: StorageCombinationPullStrategy = .pullThenComplete,
                          setStrategy: StorageCombinationSetStrategy = .frontFirst) -> Storage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
-        return Storage<Key, Value>(storageName: "(\(self.storageName))\(storageConnectionSignFromOptions(pullingFromBack: pullStrategy != .neverPull, pushingToBack: setStrategy != .frontOnly))(\(storage.storageName))", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: storage, strategy: pullStrategy, completion: completion)
+        fatalError()
+    }
+    
+    public func combined<StorageType : StorageProtocol>(with backStorage: StorageType) -> Storage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
+        let name = Shallows.storageName(left: self.storageName, right: backStorage.storageName, pullingFromBack: true, pushingToBack: true)
+        return Storage(storageName: name, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: backStorage, completion: completion)
         }, set: { (value, key, completion) in
-            self.set(value, forKey: key, pushingTo: storage, strategy: setStrategy, completion: completion)
+            self.set(value, forKey: key, pushingTo: backStorage, completion: completion)
         })
     }
     
+    @available(*, deprecated, message: "Strategy no longer works")
     public func pushing<WritableStorageType : WritableStorageProtocol>(to backStorage: WritableStorageType,
                         strategy: StorageCombinationSetStrategy = .frontFirst) -> Storage<Key, Value> where WritableStorageType.Key == Key, WritableStorageType.Value == Value {
         return Storage<Key, Value>(storageName: "\(self.storageName)>\(backStorage.storageName)", retrieve: { (key, completion) in
@@ -229,10 +230,20 @@ extension StorageProtocol {
         })
     }
     
+    public func backed<ReadableStorageType : ReadableStorageProtocol>(by readableStorage: ReadableStorageType) -> Storage<Key, Value> where ReadableStorageType.Key == Key, ReadableStorageType.Value == Value {
+        let name = Shallows.storageName(left: storageName, right: readableStorage.storageName, pullingFromBack: true, pushingToBack: false)
+        return Storage<Key, Value>(storageName: name, retrieve: { (key, completion) in
+            self.retrieve(forKey: key, backedBy: readableStorage, completion: completion)
+        }, set: { (value, key, completion) in
+            self.set(value, forKey: key, completion: completion)
+        })
+    }
+    
+    @available(*, deprecated, message: "Strategy no longer works")
     public func backed<ReadableStorageType : ReadableStorageProtocol>(by storage: ReadableStorageType,
-                       strategy: StorageCombinationPullStrategy = .pullThenComplete) -> Storage<Key, Value> where ReadableStorageType.Key == Key, ReadableStorageType.Value == Value {
+                       strategy: StorageCombinationPullStrategy) -> Storage<Key, Value> where ReadableStorageType.Key == Key, ReadableStorageType.Value == Value {
         return Storage<Key, Value>(storageName: "\(self.storageName)+\(storage.storageName)", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, backedBy: storage, strategy: strategy, completion: completion)
+            self.retrieve(forKey: key, backedBy: storage, completion: completion)
         }, set: { value, key, completion in
             self.set(value, forKey: key, completion: completion)
         })

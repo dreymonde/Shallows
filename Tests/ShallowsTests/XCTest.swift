@@ -18,6 +18,8 @@ class ShallowsXCTests : XCTestCase {
         testMemoryStorage()
         testDiskStorage()
         testResult()
+        testZip()
+        testComposition()
     }
     
 }

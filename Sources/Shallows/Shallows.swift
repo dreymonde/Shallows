@@ -77,7 +77,7 @@ extension Optional {
     
 }
 
-public enum EmptyCacheError : Error {
+public enum EmptyCacheError : Error, Equatable {
     case cacheIsAlwaysEmpty
 }
 
@@ -129,4 +129,12 @@ public enum ShallowsLog {
     
     public static var isEnabled = false
     
+}
+
+public func + <Key, Value, Read : ReadOnlyStorageProtocol, Write : WriteOnlyStorageProtocol>(lhs: Read, rhs: Write) -> Storage<Key, Value> where Read.Key == Key, Read.Value == Value, Write.Key == Key, Write.Value == Value {
+    return Storage(readStorage: lhs, writeStorage: rhs)
+}
+
+public func + <Key, Value, Read : ReadOnlyStorageProtocol, Write : WriteOnlyStorageProtocol>(lhs: Write, rhs: Read) -> Storage<Key, Value> where Read.Key == Key, Read.Value == Value, Write.Key == Key, Write.Value == Value {
+    return Storage(readStorage: rhs, writeStorage: lhs)
 }
