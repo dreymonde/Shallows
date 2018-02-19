@@ -11,6 +11,9 @@ public protocol WritableStorageProtocol : StorageDesign {
 extension WritableStorageProtocol {
     
     public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
+        if let alreadyNormalized = self as? WriteOnlyStorage<Key, Value> {
+            return alreadyNormalized
+        }
         return WriteOnlyStorage(self)
     }
     

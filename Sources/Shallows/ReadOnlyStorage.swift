@@ -11,6 +11,9 @@ public protocol ReadableStorageProtocol : StorageDesign {
 extension ReadableStorageProtocol {
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
+        if let alreadyNormalized = self as? ReadOnlyStorage<Key, Value> {
+            return alreadyNormalized
+        }
         return ReadOnlyStorage(self)
     }
     

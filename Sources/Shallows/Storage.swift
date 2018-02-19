@@ -160,6 +160,9 @@ extension WritableStorageProtocol {
 extension StorageProtocol {
     
     public func asStorage() -> Storage<Key, Value> {
+        if let alreadyNormalized = self as? Storage<Key, Value> {
+            return alreadyNormalized
+        }
         return Storage(self)
     }
     
