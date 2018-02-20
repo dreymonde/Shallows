@@ -86,7 +86,7 @@ keyedImages.retrieve(forKey: .kitten, completion: { result in /* .. */ })
 Another core concept of **Shallows** is composition. Hitting a disk every time you request an image can be slow and inefficient. Instead, you can compose `MemoryStorage` and `FileSystemStorage`:
 
 ```swift
-let efficient = MemoryStorage<String, UIImage>().combined(with: imageStorage)
+let efficient = MemoryStorage<Filename, UIImage>().combined(with: imageStorage)
 ```
 
 It does several things:
