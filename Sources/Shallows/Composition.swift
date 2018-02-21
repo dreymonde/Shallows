@@ -52,7 +52,7 @@ extension StorageProtocol {
             self.set(value, forKey: key, completion: completion)
         })
     }
-        
+    
 }
 
 extension StorageProtocol {
