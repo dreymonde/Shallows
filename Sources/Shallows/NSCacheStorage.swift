@@ -6,20 +6,20 @@ public final class NSCacheStorage<Key : NSObject, Value : AnyObject> : StoragePr
         case noValue(Key)
     }
     
-    public let storage: NSCache<Key, Value>
+    public let cache: NSCache<Key, Value>
     public let storageName: String = "nscache"
     
     public init(storage: NSCache<Key, Value> = NSCache()) {
-        self.storage = storage
+        self.cache = storage
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
-        storage.setObject(value, forKey: key)
+        cache.setObject(value, forKey: key)
         completion(.success)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
-        if let object = storage.object(forKey: key) {
+        if let object = cache.object(forKey: key) {
             completion(.success(object))
         } else {
             completion(.failure(Error.noValue(key)))

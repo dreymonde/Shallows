@@ -20,6 +20,7 @@ class ShallowsXCTests : XCTestCase {
         testResult()
         testZip()
         testComposition()
+        testAdditional()
     }
     
 }
