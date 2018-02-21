@@ -1,5 +1,43 @@
 import Dispatch
 
+public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
+    
+    public let storageName: String
+    
+    private var _storage: ThreadSafe<[Key : Value]>
+    
+    public var storage: [Key : Value] {
+        get {
+            return _storage.read()
+        }
+        set {
+            _storage.write(newValue)
+        }
+    }
+    
+    public init(storage: [Key : Value] = [:]) {
+        self._storage = ThreadSafe(storage)
+        self.storageName = "memory-storage-\(Key.self):\(Value.self)"
+    }
+    
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
+        _storage.write({ (dict: inout [Key : Value]) in dict[key] = value })
+        completion(.success)
+    }
+    
+    public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
+        let result: Result<Value> = {
+            if let value = _storage.read()[key] {
+                return .success(value)
+            } else {
+                return .failure(MemoryStorageError.noValue)
+            }
+        }()
+        completion(result)
+    }
+    
+}
+
 enum MemoryStorageError : Error {
     case noValue
 }
@@ -27,44 +65,6 @@ public struct ThreadSafe<Value> {
         queue.sync(flags: .barrier) {
             value = newValue
         }
-    }
-    
-}
-
-public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
-    
-    public let storageName: String
-    
-    private var _storage: ThreadSafe<[Key : Value]>
-    
-    public var storage: [Key : Value] {
-        get {
-            return _storage.read()
-        }
-        set {
-            _storage.write(newValue)
-        }
-    }
-        
-    public init(storage: [Key : Value] = [:]) {
-        self._storage = ThreadSafe(storage)
-        self.storageName = "memory-storage-\(Key.self):\(Value.self)"
-    }
-    
-    public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
-        _storage.write({ (dict: inout [Key : Value]) in dict[key] = value })
-        completion(.success)
-    }
-    
-    public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
-        let result: Result<Value> = {
-            if let value = _storage.read()[key] {
-                return .success(value)
-            } else {
-                return .failure(MemoryStorageError.noValue)
-            }
-        }()
-        completion(result)
     }
     
 }
