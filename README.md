@@ -172,7 +172,7 @@ let arrays = MemoryStorage<String, [Int]>()
 arrays.update(forKey: "some-key", { $0.append(10) })
 ```
 
-#### Zipping storages
+### Zipping storages
 
 Zipping is a very powerful feature of **Shallows**. It allows you to compose your storages in a way that you get result only when both of them completes for your request. For example:
 
