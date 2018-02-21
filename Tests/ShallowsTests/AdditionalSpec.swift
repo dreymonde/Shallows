@@ -7,8 +7,51 @@
 //
 
 import Shallows
+import Dispatch
 
 func testAdditional() {
+    
+    describe("update") {
+        $0.it("retrieves, updates and sets value") {
+            let storage = MemoryStorage<Int, Int>(storage: [1: 10])
+            let sema = DispatchSemaphore(value: 0)
+            var val: Int?
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                val = result.value
+                sema.signal()
+            })
+            sema.wait()
+            try expect(val) == 11
+            try expect(storage.storage[1]) == 11
+        }
+        $0.it("fails if retrieve fails") {
+            let read = ReadOnlyStorage<Int, Int>.alwaysFailing(with: "read fails")
+            let write = MemoryStorage<Int, Int>(storage: [1: 10])
+            let storage = Storage(read: read, write: write.asWriteOnlyStorage())
+            let sema = DispatchSemaphore(value: 0)
+            var er: Error?
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                er = result.error
+                sema.signal()
+            })
+            sema.wait()
+            try expect(er as? String) == "read fails"
+            try expect(write.storage[1]) == 10
+        }
+        $0.it("fails if set fails") {
+            let read = ReadOnlyStorage<Int, Int>.alwaysSucceeding(with: 10)
+            let write = WriteOnlyStorage<Int, Int>.alwaysFailing(with: "write fails")
+            let storage = Storage(read: read, write: write)
+            let sema = DispatchSemaphore(value: 0)
+            var er: Error?
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                er = result.error
+                sema.signal()
+            })
+            sema.wait()
+            try expect(er as? String) == "write fails"
+        }
+    }
     
     describe("renaming") {
         $0.it("renames read-only storage") {
