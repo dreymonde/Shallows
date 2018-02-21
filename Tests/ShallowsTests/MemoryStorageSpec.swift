@@ -23,7 +23,7 @@ func testMemoryStorage() {
         }
         $0.it("can modify the value") {
             var threadSafe = ThreadSafe<Int>(15)
-            threadSafe.write({ (int: inout Int) in int -= 5 })
+            threadSafe.write(with: { $0 -= 5 })
             try expect(threadSafe.read()) == 10
         }
     }

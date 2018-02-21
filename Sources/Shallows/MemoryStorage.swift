@@ -21,7 +21,7 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
     }
     
     public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
-        _storage.write({ (dict: inout [Key : Value]) in dict[key] = value })
+        _storage.write(with: { $0[key] = value })
         completion(.success)
     }
     
@@ -55,7 +55,7 @@ public struct ThreadSafe<Value> {
         return queue.sync { value }
     }
     
-    public mutating func write(_ modify: (inout Value) -> ()) {
+    public mutating func write(with modify: (inout Value) -> ()) {
         queue.sync(flags: .barrier) {
             modify(&value)
         }
