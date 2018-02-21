@@ -45,19 +45,6 @@ public struct ReadOnlyStorage<Key, Value> : ReadOnlyStorageProtocol {
 
 extension ReadOnlyStorageProtocol {
     
-    public func backed<StorageType : ReadableStorageProtocol>(by storage: StorageType) -> ReadOnlyStorage<Key, Value> where StorageType.Key == Key, StorageType.Value == Value {
-        return ReadOnlyStorage(storageName: "\(self.storageName)-\(storage.storageName)", retrieve: { (key, completion) in
-            self.retrieve(forKey: key, completion: { (firstResult) in
-                if firstResult.isFailure {
-                    shallows_print("Storage (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(storage.storageName)")
-                    storage.retrieve(forKey: key, completion: completion)
-                } else {
-                    completion(firstResult)
-                }
-            })
-        })
-    }
-    
     public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
                                   _ transform: @escaping (OtherKey) throws -> Key) -> ReadOnlyStorage<OtherKey, Value> {
         return ReadOnlyStorage<OtherKey, Value>(storageName: storageName, retrieve: { key, completion in

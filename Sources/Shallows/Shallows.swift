@@ -6,13 +6,6 @@
 //  Copyright © 2017 Shallows. All rights reserved.
 //
 
-@available(*, unavailable)
-public protocol ShallowsError : Swift.Error {
-    
-    var isTransient: Bool { get }
-    
-}
-
 public enum EmptyCacheError : Error, Equatable {
     case cacheIsAlwaysEmpty
 }
