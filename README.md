@@ -18,7 +18,7 @@ struct City : Codable {
 }
 
 let diskStorage = DiskStorage.main.folder("cities", in: .cachesDirectory)
-    .mapJSONObject(City.self)
+    .mapJSONObject(City.self) // Storage<Filename, City>
 
 diskStorage.retrieve(forKey: "Beijing") { (result) in
     if let city = result.value { print(city) }
@@ -62,11 +62,11 @@ storage.set(10, forKey: "some-key") { (result) in
 Keys and values can be mapped:
 
 ```swift
-let storage = DiskStorage.main.folder("images", in: .cachesDirectory)
+let storage = DiskStorage.main.folder("images", in: .cachesDirectory) // Storage<Filename, Data>
 let images = storage
     .mapValues(to: UIImage.self,
                transformIn: { data in try UIImage.init(data: data).unwrap() },
-               transformOut: { image in try UIImagePNGRepresentation(image).unwrap() })
+               transformOut: { image in try UIImagePNGRepresentation(image).unwrap() }) // Storage<Filename, UIImage>
 
 enum ImageKeys : String {
     case kitten, puppy, fish
@@ -74,7 +74,7 @@ enum ImageKeys : String {
 
 let keyedImages = images
     .usingStringKeys()
-    .mapKeys(toRawRepresentableType: ImageKeys.self)
+    .mapKeys(toRawRepresentableType: ImageKeys.self) // Storage<ImageKeys, UIImage>
 
 keyedImages.retrieve(forKey: .kitten, completion: { result in /* .. */ })
 ```
@@ -122,6 +122,22 @@ In similar way, write-only storage is also available:
 let writeOnly = storage.asWriteOnlyStorage() // WriteOnlyStorage<Key, Value>
 ```
 
+### Different ways of composition
+
+**Compositions available for `Storage`**:
+
+- `.combined(with:)` (see [Storages composition](#Storages-composition))
+- `.backed(by:)` will work the same as `combined(with:)`, but it will not push the value to the back storage
+- `.pushing(to:)` will not retrieve the value from the back storage, but will push to it on `set`
+
+**Compositions available for `ReadOnlyStorage`**:
+
+- `.backed(by:)`
+
+**Compositions available for `WriteOnlyStorage`**:
+
+- `.pushing(to:)`
+
 ### Single element storage
 
 You can have a storage with keys `Void`. That means that you can store only one element there. **Shallows** provides a convenience `.singleKey` method to create it:
@@ -142,7 +158,7 @@ Storages in **Shallows** are asynchronous by design. However, in some situations
 ```swift
 let strings = DiskStorage.main.folder("strings", in: .cachesDirectory)
     .mapString(withEncoding: .utf8)
-    .makeSyncStorage() // SyncStorage<String, String>
+    .makeSyncStorage() // SyncStorage<Filename, String>
 let existing = try strings.retrieve(forKey: "hello")
 try strings.set(existing.uppercased(), forKey: "hello")
 ```
@@ -226,7 +242,7 @@ func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -
 
 Where `Key` and `Value` are associated types.
 
-**NOTE:** Please be aware that you should care about thread-safety of your implementation. Very often `retrieve` and `set` will not be called from the main thread, so you should make sure that no race conditions will occur.
+**NOTE:** Please be aware that you are responsible for the thread-safety of your implementation. Very often `retrieve` and `set` will not be called from the main thread, so you should make sure that no race conditions will occur.
 
 To use it as `Storage<Key, Value>` instance, simply call `.asStorage()` on it:
 
@@ -234,7 +250,7 @@ To use it as `Storage<Key, Value>` instance, simply call `.asStorage()` on it:
 let storage = MyStorage().asStorage()
 ```
 
-You can also conform to a `ReadableStorageProtocol` only. That way, you only need to define a `retrieve(forKey:completion:)` method.
+You can also conform to a `ReadOnlyStorageProtocol` only. That way, you only need to define a `retrieve(forKey:completion:)` method.
 
 ## Installation
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
