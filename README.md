@@ -256,20 +256,20 @@ You can also conform to a `ReadOnlyStorageProtocol` only. That way, you only nee
 **Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
 ```ruby
-github "dreymonde/Shallows" ~> 0.8.0
+github "dreymonde/Shallows" ~> 0.9.0
 ```
 
 **Shallows** is also available through [Cocoapods][cocoapods-url]:
 
 ```ruby
-pod 'Shallows', '~> 0.8.0'
+pod 'Shallows', '~> 0.9.0'
 ```
 
 And Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.8.0"),
+    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.9.0"),
 ]
 ```
 
