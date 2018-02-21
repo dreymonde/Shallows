@@ -313,11 +313,11 @@
 			isa = PBXGroup;
 			children = (
 				7C4B84302010D65400502FB0 /* Spectre */,
+				7C4B84312010D68300502FB0 /* XCTest.swift */,
 				7C4B84062010D4D600502FB0 /* DiskStorageSpec.swift */,
 				7CD789C92010F3EC0057F6E8 /* MemoryStorageSpec.swift */,
 				7C4B84072010D4D700502FB0 /* ShallowsTests.swift */,
 				7CC675ED20335951004557EB /* ResultSpec.swift */,
-				7C4B84312010D68300502FB0 /* XCTest.swift */,
 				7CC675F120335CC0004557EB /* ZipSpec.swift */,
 				7CC675F5203364A7004557EB /* CompositionSpec.swift */,
 			);

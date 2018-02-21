@@ -22,24 +22,32 @@ public struct Storage<Key, Value> : StorageProtocol {
     private let _set: WriteOnlyStorage<Key, Value>
 
     public init(storageName: String,
+                read: ReadOnlyStorage<Key, Value>,
+                write: WriteOnlyStorage<Key, Value>) {
+        self.storageName = storageName
+        self._retrieve = read.renaming(to: storageName)
+        self._set = write.renaming(to: storageName)
+    }
+    
+    public init(storageName: String,
                 retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> (),
                 set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
+        self.storageName = storageName
         self._retrieve = ReadOnlyStorage(storageName: storageName, retrieve: retrieve)
         self._set = WriteOnlyStorage(storageName: storageName, set: set)
-        self.storageName = storageName
     }
     
     public init<StorageType : StorageProtocol>(_ storage: StorageType) where StorageType.Key == Key, StorageType.Value == Value {
+        self.storageName = storage.storageName
         self._retrieve = storage.asReadOnlyStorage()
         self._set = storage.asWriteOnlyStorage()
-        self.storageName = storage.storageName
     }
     
-    public init(readStorage: ReadOnlyStorage<Key, Value>,
-                writeStorage: WriteOnlyStorage<Key, Value>) {
-        self._retrieve = readStorage
-        self._set = writeStorage
-        self.storageName = readStorage.storageName
+    public init(read: ReadOnlyStorage<Key, Value>,
+                write: WriteOnlyStorage<Key, Value>) {
+        self.init(storageName: read.storageName,
+                  read: read,
+                  write: write)
     }
     
     public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
@@ -51,11 +59,11 @@ public struct Storage<Key, Value> : StorageProtocol {
     }
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
-        return _retrieve.renaming(to: storageName)
+        return _retrieve
     }
     
     public func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value> {
-        return _set.renaming(to: storageName)
+        return _set
     }
     
 }
@@ -267,15 +275,15 @@ extension StorageProtocol {
     
     public func mapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
                                   _ transform: @escaping (OtherKey) throws -> Key) -> Storage<OtherKey, Value> {
-        return Storage(readStorage: asReadOnlyStorage().mapKeys(transform),
-                       writeStorage: asWriteOnlyStorage().mapKeys(transform))
+        return Storage(read: asReadOnlyStorage().mapKeys(transform),
+                       write: asWriteOnlyStorage().mapKeys(transform))
     }
     
     public func mapValues<OtherValue>(to type: OtherValue.Type = OtherValue.self,
                                       transformIn: @escaping (Value) throws -> OtherValue,
                                       transformOut: @escaping (OtherValue) throws -> Value) -> Storage<Key, OtherValue> {
-        return Storage(readStorage: asReadOnlyStorage().mapValues(transformIn),
-                       writeStorage: asWriteOnlyStorage().mapValues(transformOut))
+        return Storage(read: asReadOnlyStorage().mapValues(transformIn),
+                       write: asWriteOnlyStorage().mapValues(transformOut))
     }
     
 }
@@ -297,7 +305,7 @@ extension StorageProtocol {
     
     public func fallback(with produceValue: @escaping (Error) throws -> Value) -> Storage<Key, Value> {
         let readOnly = asReadOnlyStorage().fallback(with: produceValue)
-        return Storage(readStorage: readOnly, writeStorage: asWriteOnlyStorage())
+        return Storage(read: readOnly, write: asWriteOnlyStorage())
     }
     
     public func defaulting(to defaultValue: @autoclosure @escaping () -> Value) -> Storage<Key, Value> {

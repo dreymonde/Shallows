@@ -92,5 +92,5 @@ public func zip<Key, Value1, Value2>(_ lhs: WriteOnlyStorage<Key, Value1>, _ rhs
 public func zip<Storage1 : StorageProtocol, Storage2 : StorageProtocol>(_ lhs: Storage1, _ rhs: Storage2) -> Storage<Storage1.Key, (Storage1.Value, Storage2.Value)> where Storage1.Key == Storage2.Key {
     let readOnlyZipped = zip(lhs.asReadOnlyStorage(), rhs.asReadOnlyStorage())
     let writeOnlyZipped = zip(lhs.asWriteOnlyStorage(), rhs.asWriteOnlyStorage())
-    return Storage(readStorage: readOnlyZipped, writeStorage: writeOnlyZipped)
+    return Storage(read: readOnlyZipped, write: writeOnlyZipped)
 }

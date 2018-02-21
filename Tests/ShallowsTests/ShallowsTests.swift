@@ -14,12 +14,14 @@ extension String : Error { }
 
 extension Storage {
     
+    static func alwaysFailing(with error: Error) -> Storage<Key, Value> {
+        return Storage(read: .alwaysFailing(with: error),
+                       write: .alwaysFailing(with: error))
+    }
+    
     static func alwaysSucceeding(with value: Value) -> Storage<Key, Value> {
-        return Storage(storageName: "", retrieve: { (_, completion) in
-            completion(succeed(with: value))
-        }, set: { (_, _, completion) in
-            completion(.success)
-        })
+        return Storage(read: .alwaysSucceeding(with: value),
+                       write: .alwaysSucceeding())
     }
     
 }

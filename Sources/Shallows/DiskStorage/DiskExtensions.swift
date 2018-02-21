@@ -12,47 +12,47 @@ extension StorageProtocol where Value == Data {
     
     public func mapJSON(readingOptions: JSONSerialization.ReadingOptions = [],
                         writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, Any> {
-        return Storage(readStorage: asReadOnlyStorage().mapJSON(options: readingOptions),
-                       writeStorage: asWriteOnlyStorage().mapJSON(options: writingOptions))
+        return Storage(read: asReadOnlyStorage().mapJSON(options: readingOptions),
+                       write: asWriteOnlyStorage().mapJSON(options: writingOptions))
     }
     
     public func mapJSONDictionary(readingOptions: JSONSerialization.ReadingOptions = [],
                                   writingOptions: JSONSerialization.WritingOptions = []) -> Storage<Key, [String : Any]> {
-        return Storage(readStorage: asReadOnlyStorage().mapJSONDictionary(options: readingOptions),
-                       writeStorage: asWriteOnlyStorage().mapJSONDictionary(options: writingOptions))
+        return Storage(read: asReadOnlyStorage().mapJSONDictionary(options: readingOptions),
+                       write: asWriteOnlyStorage().mapJSONDictionary(options: writingOptions))
     }
     
     public func mapJSONObject<JSONObject : Codable>(_ objectType: JSONObject.Type,
                                                     decoder: JSONDecoder = JSONDecoder(),
                                                     encoder: JSONEncoder = JSONEncoder()) -> Storage<Key, JSONObject> {
-        return Storage(readStorage: asReadOnlyStorage().mapJSONObject(objectType, decoder: decoder),
-                       writeStorage: asWriteOnlyStorage().mapJSONObject(objectType, encoder: encoder))
+        return Storage(read: asReadOnlyStorage().mapJSONObject(objectType, decoder: decoder),
+                       write: asWriteOnlyStorage().mapJSONObject(objectType, encoder: encoder))
     }
     
     public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml,
                          readOptions: PropertyListSerialization.ReadOptions = [],
                          writeOptions: PropertyListSerialization.WriteOptions = 0) -> Storage<Key, Any> {
-        return Storage(readStorage: asReadOnlyStorage().mapPlist(format: format, options: readOptions),
-                       writeStorage: asWriteOnlyStorage().mapPlist(format: format, options: writeOptions))
+        return Storage(read: asReadOnlyStorage().mapPlist(format: format, options: readOptions),
+                       write: asWriteOnlyStorage().mapPlist(format: format, options: writeOptions))
     }
     
     public func mapPlistDictionary(format: PropertyListSerialization.PropertyListFormat = .xml,
                                    readOptions: PropertyListSerialization.ReadOptions = [],
                                    writeOptions: PropertyListSerialization.WriteOptions = 0) -> Storage<Key, [String : Any]> {
-        return Storage(readStorage: asReadOnlyStorage().mapPlistDictionary(format: format, options: readOptions),
-                       writeStorage: asWriteOnlyStorage().mapPlistDictionary(format: format, options: writeOptions))
+        return Storage(read: asReadOnlyStorage().mapPlistDictionary(format: format, options: readOptions),
+                       write: asWriteOnlyStorage().mapPlistDictionary(format: format, options: writeOptions))
     }
     
     public func mapPlistObject<PlistObject : Codable>(_ objectType: PlistObject.Type,
                                                       decoder: PropertyListDecoder = PropertyListDecoder(),
                                                       encoder: PropertyListEncoder = PropertyListEncoder()) -> Storage<Key, PlistObject> {
-        return Storage(readStorage: asReadOnlyStorage().mapPlistObject(objectType, decoder: decoder),
-                       writeStorage: asWriteOnlyStorage().mapPlistObject(objectType, encoder: encoder))
+        return Storage(read: asReadOnlyStorage().mapPlistObject(objectType, decoder: decoder),
+                       write: asWriteOnlyStorage().mapPlistObject(objectType, encoder: encoder))
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> Storage<Key, String> {
-        return Storage(readStorage: asReadOnlyStorage().mapString(withEncoding: encoding),
-                       writeStorage: asWriteOnlyStorage().mapString(withEncoding: encoding))
+        return Storage(read: asReadOnlyStorage().mapString(withEncoding: encoding),
+                       write: asWriteOnlyStorage().mapString(withEncoding: encoding))
     }
     
 }

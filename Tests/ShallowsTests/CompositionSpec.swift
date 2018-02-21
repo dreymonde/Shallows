@@ -67,6 +67,34 @@ func testComposition() {
                 try expect(first.storage[1]) == 10
                 try expect(second.storage[1]) == 10
             }
+            $0.it("doesnt set to back if front fails") {
+                let first = Storage<Int, Int>.alwaysFailing(with: "first is failing")
+                let second = MemoryStorage<Int, Int>()
+                let combined = first.combined(with: second)
+                let sema = DispatchSemaphore(value: 0)
+                var er: Error?
+                combined.set(10, forKey: 1, completion: { (res) in
+                    er = res.error
+                    sema.signal()
+                })
+                sema.wait()
+                try expect(er != nil).to.beTrue()
+                try expect(second.storage[1] == nil).to.beTrue()
+            }
+            $0.it("sets to front and fails if back fails") {
+                let front = MemoryStorage<Int, Int>()
+                let back = Storage<Int, Int>.alwaysFailing(with: "back fails")
+                let combined = front.combined(with: back)
+                let sema = DispatchSemaphore(value: 0)
+                var er: Error?
+                combined.set(10, forKey: 1, completion: { (res) in
+                    er = res.error
+                    sema.signal()
+                })
+                sema.wait()
+                try expect(er != nil).to.beTrue()
+                try expect(front.storage[1]) == 10
+            }
         }
     }
     
