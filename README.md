@@ -20,12 +20,13 @@ struct City : Codable {
 let diskStorage = DiskStorage.main.folder("cities", in: .cachesDirectory)
     .mapJSONObject(City.self) // Storage<Filename, City>
 
-diskStorage.retrieve(forKey: "Beijing") { (result) in
+let kharkiv = City(name: "Kharkiv", foundationYear: 1654)
+diskStorage.set(kharkiv, forKey: "kharkiv")
+
+diskStorage.retrieve(forKey: "kharkiv") { (result) in
     if let city = result.value { print(city) }
 }
 
-let kharkiv = City(name: "Kharkiv", foundationYear: 1654)
-diskStorage.set(kharkiv, forKey: "Kharkiv")
 ```
 
 ## Guide
