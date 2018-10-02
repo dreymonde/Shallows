@@ -94,11 +94,14 @@ public final class DiskStorage : StorageProtocol {
     
     private let queue: DispatchQueue = DispatchQueue(label: "disk-storage-queue", qos: .userInitiated)
     private let fileManager = FileManager.default
+    private let fileAttributes: [FileAttributeKey : Any]?
     
     internal let creatingDirectories: Bool
     
-    public init(creatingDirectories: Bool = true) {
+    public init(creatingDirectories: Bool = true,
+                fileAttributes: [FileAttributeKey : Any]? = .none) {
         self.creatingDirectories = creatingDirectories
+        self.fileAttributes = fileAttributes
     }
     
     public func retrieve(forKey key: URL, completion: @escaping (Result<Data>) -> ()) {
@@ -124,7 +127,7 @@ public final class DiskStorage : StorageProtocol {
                 let path = key.path
                 if self.fileManager.createFile(atPath: path,
                                                contents: value,
-                                               attributes: nil) {
+                                               attributes: self.fileAttributes) {
                     completion(.success)
                 } else {
                     completion(fail(with: Error.cantCreateFile))

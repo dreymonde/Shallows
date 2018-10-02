@@ -95,6 +95,23 @@ func testDiskStorage() {
             }
             $0.after(clear)
         }
+        $0.describe("saves with attributes"){
+            let filename = "_attributed_ronaldo.json"
+            let dirURL = currentDirURL.appendingPathComponent("_tmp_test", isDirectory: true)
+            let tempFileURL = dirURL.appendingPathComponent(filename)
+            let disk = DiskStorage(creatingDirectories: true, fileAttributes: [.creationDate: NSDate(timeIntervalSince1970: 0)])
+                .mapString()
+                .makeSyncStorage()
+            let clear = { deleteEverything(at: dirURL) }
+            $0.before(clear)
+
+            $0.it("writes with attributes") {
+                try disk.set("25:12", forKey: tempFileURL)
+                let attrs = try FileManager.default.attributesOfItem(atPath: tempFileURL.path)
+                try expect(attrs[.creationDate] as? NSDate) == NSDate(timeIntervalSince1970: 0)
+            }
+            $0.after(clear)
+        }
     }
     
     describe("folder storage") {
