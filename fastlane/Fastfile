@@ -42,6 +42,6 @@ platform :ios do
   	git_commit(path: [podspec_name], message: "#{version} release")
   	add_git_tag(tag: "#{version}")
   	push_to_git_remote
-  	pod_push
+  	pod_push(allow_warnings: true)
   end
 end
