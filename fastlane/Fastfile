@@ -14,7 +14,6 @@
 # update_fastlane
 
 default_platform(:ios)
-podspec_name = "Shallows.podspec"
 
 platform :ios do
 
@@ -34,6 +33,8 @@ platform :ios do
 	end
 
   def release(type)
+  	podspec_name = "Shallows.podspec"
+
   	pod_lib_lint
   	version = version_bump_podspec(path: podspec_name, bump_type: type)
 
