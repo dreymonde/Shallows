@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Shallows"
-  s.version      = "0.9.1"
+  s.version      = "0.10.0"
   s.summary      = "Your lightweight persistence toolbox."
   s.description  = <<-DESC
     Shallows is a generic abstraction layer over lightweight data storage and persistence. It provides a Storage<Key, Value> type, instances of which can be easily transformed and composed with each other. It gives you an ability to create highly sophisticated, effective and reliable caching/persistence solutions.
