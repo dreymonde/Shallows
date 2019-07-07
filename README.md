@@ -24,7 +24,7 @@ let kharkiv = City(name: "Kharkiv", foundationYear: 1654)
 diskStorage.set(kharkiv, forKey: "kharkiv")
 
 diskStorage.retrieve(forKey: "kharkiv") { (result) in
-    if let city = result.value { print(city) }
+    if let city = try? result.get() { print(city) }
 }
 
 ```
@@ -182,7 +182,7 @@ let strings = MemoryStorage<String, String>()
 let numbers = MemoryStorage<String, Int>()
 let zipped = zip(strings, numbers) // Storage<String, (String, Int)>
 zipped.retrieve(forKey: "some-key") { (result) in
-    if let (string, number) = result.value {
+    if let (string, number) = try? result.get() {
         print(string)
         print(number)
     }
@@ -237,8 +237,8 @@ let nscache = NSCacheStorage<NSURL, NSData>()
 To create your own caching layer, you should conform to `StorageProtocol`. That means that you should define these two methods:
 
 ```swift
-func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ())
-func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ())
+func retrieve(forKey key: Key, completion: @escaping (Result<Value, Error>) -> ())
+func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void, Error>) -> ())
 ```
 
 Where `Key` and `Value` are associated types.
@@ -254,28 +254,19 @@ let storage = MyStorage().asStorage()
 You can also conform to a `ReadOnlyStorageProtocol` only. That way, you only need to define a `retrieve(forKey:completion:)` method.
 
 ## Installation
-**Shallows** is available through [Carthage][carthage-url]. To install, just write into your Cartfile:
 
-```ruby
-github "dreymonde/Shallows" ~> 0.10.0
-```
-
-**Shallows** is also available through [Cocoapods][cocoapods-url]:
-
-```ruby
-pod 'Shallows', '~> 0.10.0'
-```
-
-And Swift Package Manager:
+Starting with **0.11.0**, **Shallows** is available exclusively through Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.10.0"),
+    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.11.0"),
 ]
 ```
 
+Previous versions are also available through [Carthage][carthage-url] and [Cocoapods][cocoapods-url].
+
 [carthage-url]: https://github.com/Carthage/Carthage
-[swift-badge]: https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat
+[swift-badge]: https://img.shields.io/badge/Swift-5.1-orange.svg?style=flat
 [swift-url]: https://swift.org
 [platform-badge]: https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg
 [platform-url]: https://developer.apple.com/swift/
