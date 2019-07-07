@@ -6,7 +6,7 @@
 //  Copyright © 2018 Shallows. All rights reserved.
 //
 
-import Shallows
+@testable import Shallows
 import Foundation
 
 func testComposition() {

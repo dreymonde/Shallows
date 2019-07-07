@@ -10,7 +10,7 @@ import Dispatch
 
 public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyStorage<Key, Value1>, _ rhs: ReadOnlyStorage<Key, Value2>) -> ReadOnlyStorage<Key, (Value1, Value2)> {
     return ReadOnlyStorage(storageName: lhs.storageName + "+" + rhs.storageName, retrieve: { (key, completion) in
-        let container = CompletionContainer<Result<Value1>, Result<Value2>>() { left, right in
+        let container = CompletionContainer<ShallowsResult<Value1>, ShallowsResult<Value2>>() { left, right in
             completion(zip(left, right))
         }
         lhs.retrieve(forKey: key, completion: { container.completeLeft(with: $0) })
@@ -20,7 +20,7 @@ public func zip<Key, Value1, Value2>(_ lhs: ReadOnlyStorage<Key, Value1>, _ rhs:
 
 public func zip<Key, Value1, Value2>(_ lhs: WriteOnlyStorage<Key, Value1>, _ rhs: WriteOnlyStorage<Key, Value2>) -> WriteOnlyStorage<Key, (Value1, Value2)> {
     return WriteOnlyStorage(storageName: lhs.storageName + "+" + rhs.storageName, set: { (value, key, completion) in
-        let container = CompletionContainer<Result<Void>, Result<Void>>(completion: { (left, right) in
+        let container = CompletionContainer<ShallowsResult<Void>, ShallowsResult<Void>>(completion: { (left, right) in
             let zipped = zip(left, right)
             switch zipped {
             case .success:
@@ -86,11 +86,11 @@ public struct ZippedResultError : Error {
     
 }
 
-public func zip<Value1, Value2>(_ lhs: Result<Value1>, _ rhs: Result<Value2>) -> Result<(Value1, Value2)> {
+public func zip<Value1, Value2>(_ lhs: ShallowsResult<Value1>, _ rhs: ShallowsResult<Value2>) -> ShallowsResult<(Value1, Value2)> {
     switch (lhs, rhs) {
     case (.success(let left), .success(let right)):
-        return Result.success((left, right))
+        return ShallowsResult.success((left, right))
     default:
-        return Result.failure(ZippedResultError(left: lhs.error, right: rhs.error))
+        return ShallowsResult.failure(ZippedResultError(left: lhs.error, right: rhs.error))
     }
 }

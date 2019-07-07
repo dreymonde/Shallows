@@ -3,7 +3,7 @@ public protocol ReadableStorageProtocol : StorageDesign {
     associatedtype Key
     associatedtype Value
     
-    func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ())
+    func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ())
     func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value>
     
 }
@@ -25,9 +25,9 @@ public struct ReadOnlyStorage<Key, Value> : ReadOnlyStorageProtocol {
     
     public let storageName: String
     
-    private let _retrieve: (Key, @escaping (Result<Value>) -> ()) -> ()
+    private let _retrieve: (Key, @escaping (ShallowsResult<Value>) -> ()) -> ()
     
-    public init(storageName: String, retrieve: @escaping (Key, @escaping (Result<Value>) -> ()) -> ()) {
+    public init(storageName: String, retrieve: @escaping (Key, @escaping (ShallowsResult<Value>) -> ()) -> ()) {
         self._retrieve = retrieve
         self.storageName = storageName
     }
@@ -37,7 +37,7 @@ public struct ReadOnlyStorage<Key, Value> : ReadOnlyStorageProtocol {
         self.storageName = storage.storageName
     }
     
-    public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
+    public func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ()) {
         _retrieve(key, completion)
     }
     

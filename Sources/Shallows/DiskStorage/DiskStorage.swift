@@ -45,12 +45,12 @@ public final class DiskFolderStorage : StorageProtocol {
         return folderURL.appendingPathComponent(finalForm)
     }
     
-    public func retrieve(forKey filename: Filename, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey filename: Filename, completion: @escaping (ShallowsResult<Data>) -> ()) {
         let fileURL = self.fileURL(forFilename: filename)
         diskStorage.retrieve(forKey: fileURL, completion: completion)
     }
     
-    public func set(_ data: Data, forKey filename: Filename, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ data: Data, forKey filename: Filename, completion: @escaping (ShallowsResult<Void>) -> ()) {
         let fileURL = self.fileURL(forFilename: filename)
         diskStorage.set(data, forKey: fileURL, completion: completion)
     }
@@ -101,7 +101,7 @@ public final class DiskStorage : StorageProtocol {
         self.creatingDirectories = creatingDirectories
     }
     
-    public func retrieve(forKey key: URL, completion: @escaping (Result<Data>) -> ()) {
+    public func retrieve(forKey key: URL, completion: @escaping (ShallowsResult<Data>) -> ()) {
         queue.async {
             do {
                 let data = try Data.init(contentsOf: key)
@@ -117,7 +117,7 @@ public final class DiskStorage : StorageProtocol {
         case cantCreateDirectory(Swift.Error)
     }
     
-    public func set(_ value: Data, forKey key: URL, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Data, forKey key: URL, completion: @escaping (ShallowsResult<Void>) -> ()) {
         queue.async {
             do {
                 try self.createDirectoryURLIfNotExisting(for: key)

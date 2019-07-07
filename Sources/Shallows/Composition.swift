@@ -59,7 +59,7 @@ extension StorageProtocol {
     
     fileprivate func retrieve<StorageType : ReadableStorageProtocol>(forKey key: Key,
                                                                      backedBy storage: StorageType,
-                                                                     completion: @escaping (Result<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
+                                                                     completion: @escaping (ShallowsResult<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
         self.retrieve(forKey: key, completion: { (firstResult) in
             if firstResult.isFailure {
                 shallows_print("Storage (\(self.storageName)) miss for key: \(key). Attempting to retrieve from \(storage.storageName)")
@@ -85,7 +85,7 @@ extension WritableStorageProtocol {
     fileprivate func set<StorageType : WritableStorageProtocol>(_ value: Value,
                                                                 forKey key: Key,
                                                                 pushingTo storage: StorageType,
-                                                                completion: @escaping (Result<Void>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
+                                                                completion: @escaping (ShallowsResult<Void>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
         self.set(value, forKey: key, completion: { (result) in
             if result.isFailure {
                 shallows_print("Failed setting \(key) to \(self.storageName). Aborting")
@@ -120,13 +120,13 @@ extension Storage {
         public func set<StorageType : WritableStorageProtocol>(_ value: Value,
                                                                forKey key: Key,
                                                                pushingTo backStorage: StorageType,
-                                                               completion: @escaping (Result<Void>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
+                                                               completion: @escaping (ShallowsResult<Void>) -> ()) where StorageType.Key == Key, StorageType.Value == Value {
             frontStorage.set(value, forKey: key, pushingTo: backStorage, completion: completion)
         }
         
         public func retrieve<StorageType : ReadableStorageProtocol>(forKey key: Key,
                                                                     backedBy backStorage: StorageType,
-                                                                    completion: @escaping (Result<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value{
+                                                                    completion: @escaping (ShallowsResult<Value>) -> ()) where StorageType.Key == Key, StorageType.Value == Value{
             frontStorage.retrieve(forKey: key, backedBy: backStorage, completion: completion)
         }
         

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Shallows
+@testable import Shallows
 
 func testZip() {
     

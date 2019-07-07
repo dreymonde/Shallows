@@ -8,52 +8,51 @@
 
 import Foundation
 
-public enum Result<Value> {
+public typealias ShallowsResult<Value> = Swift.Result<Value, Swift.Error>
+
+extension Swift.Result {
     
-    case success(Value)
-    case failure(Error)
-    
-    public var isFailure: Bool {
+    internal var isFailure: Bool {
         if case .failure = self {
             return true
         }
         return false
     }
-    
-    public var isSuccess: Bool {
+
+    internal var isSuccess: Bool {
         return !isFailure
     }
-    
-    public var value: Value? {
+
+    internal var value: Success? {
         if case .success(let value) = self {
             return value
         }
         return nil
     }
-    
-    public var error: Error? {
+
+    internal var error: Error? {
         if case .failure(let error) = self {
             return error
         }
         return nil
     }
-    
+
 }
 
-public func fail<Value>(with error: Error) -> Result<Value> {
+public func fail<Value>(with error: Error) -> ShallowsResult<Value> {
     return .failure(error)
 }
 
-public func succeed<Value>(with value: Value) -> Result<Value> {
+public func succeed<Value>(with value: Value) -> ShallowsResult<Value> {
     return .success(value)
 }
 
-extension Result where Value == Void {
-    
-    public static var success: Result<Void> {
+extension Swift.Result where Success == Void {
+
+    internal static var success: ShallowsResult<Void> {
         return .success(())
     }
-    
+
 }
 
 extension Optional {

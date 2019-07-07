@@ -3,7 +3,7 @@ public protocol WritableStorageProtocol : StorageDesign {
     associatedtype Key
     associatedtype Value
     
-    func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ())
+    func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> ())
     func asWriteOnlyStorage() -> WriteOnlyStorage<Key, Value>
     
 }
@@ -25,9 +25,9 @@ public struct WriteOnlyStorage<Key, Value> : WriteOnlyStorageProtocol {
     
     public let storageName: String
     
-    private let _set: (Value, Key, @escaping (Result<Void>) -> ()) -> ()
+    private let _set: (Value, Key, @escaping (ShallowsResult<Void>) -> ()) -> ()
     
-    public init(storageName: String, set: @escaping (Value, Key, @escaping (Result<Void>) -> ()) -> ()) {
+    public init(storageName: String, set: @escaping (Value, Key, @escaping (ShallowsResult<Void>) -> ()) -> ()) {
         self._set = set
         self.storageName = storageName
     }
@@ -37,7 +37,7 @@ public struct WriteOnlyStorage<Key, Value> : WriteOnlyStorageProtocol {
         self.storageName = storage.storageName
     }
     
-    public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> ()) {
         self._set(value, key, completion)
     }
     

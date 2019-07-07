@@ -29,19 +29,6 @@ extension StorageProtocol {
     
 }
 
-extension Result {
-    
-    func getValue() throws -> Value {
-        switch self {
-        case .success(let value):
-            return value
-        case .failure(let error):
-            throw error
-        }
-    }
-    
-}
-
 public struct SyncStorage<Key, Value> {
     
     public let storageName: String
@@ -104,13 +91,13 @@ extension ReadOnlyStorageProtocol {
     public func makeSyncStorage() -> ReadOnlySyncStorage<Key, Value> {
         return ReadOnlySyncStorage(storageName: "\(self.storageName)-sync", retrieve: { (key) throws -> Value in
             let semaphore = DispatchSemaphore(value: 0)
-            var r_result: Result<Value>?
+            var r_result: ShallowsResult<Value>?
             self.retrieve(forKey: key, completion: { (result) in
                 r_result = result
                 semaphore.signal()
             })
             semaphore.wait()
-            return try r_result!.getValue()
+            return try r_result!.get()
         })
     }
     
@@ -121,13 +108,13 @@ extension WriteOnlyStorageProtocol {
     public func makeSyncStorage() -> WriteOnlySyncStorage<Key, Value> {
         return WriteOnlySyncStorage(storageName: self.storageName + "-sync", set: { (value, key) in
             let semaphore = DispatchSemaphore(value: 0)
-            var r_result: Result<Void>?
+            var r_result: ShallowsResult<Void>?
             self.set(value, forKey: key, completion: { (result) in
                 r_result = result
                 semaphore.signal()
             })
             semaphore.wait()
-            return try r_result!.getValue()
+            return try r_result!.get()
         })
     }
     

@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Shallows
+@testable import Shallows
 #if os(iOS)
     import UIKit
 #endif

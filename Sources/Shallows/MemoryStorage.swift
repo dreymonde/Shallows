@@ -20,13 +20,13 @@ public final class MemoryStorage<Key : Hashable, Value> : StorageProtocol {
         self.storageName = "memory-storage-\(Key.self):\(Value.self)"
     }
     
-    public func set(_ value: Value, forKey key: Key, completion: @escaping (Result<Void>) -> ()) {
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> ()) {
         _storage.write(with: { $0[key] = value })
         completion(.success)
     }
     
-    public func retrieve(forKey key: Key, completion: @escaping (Result<Value>) -> ()) {
-        let result: Result<Value> = {
+    public func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ()) {
+        let result: ShallowsResult<Value> = {
             if let value = _storage.read()[key] {
                 return .success(value)
             } else {
