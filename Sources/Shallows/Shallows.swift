@@ -6,6 +6,8 @@
 //  Copyright © 2017 Shallows. All rights reserved.
 //
 
+@_exported import Future
+
 public enum EmptyCacheError : Error, Equatable {
     case cacheIsAlwaysEmpty
 }
@@ -37,10 +39,10 @@ extension WriteOnlyStorageProtocol {
 extension Storage {
  
     public static func empty() -> Storage<Key, Value> {
-        return Storage(storageName: "empty", retrieve: { (_, completion) in
-            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
-        }, set: { (_, _, completion) in
-            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        return Storage(storageName: "empty", retrieve: { (_) in
+            return Future(error: EmptyCacheError.cacheIsAlwaysEmpty)
+        }, set: { (_, _) in
+            return Future(error: EmptyCacheError.cacheIsAlwaysEmpty)
         })
     }
     
@@ -49,8 +51,8 @@ extension Storage {
 extension ReadOnlyStorage {
     
     public static func empty() -> ReadOnlyStorage<Key, Value> {
-        return ReadOnlyStorage(storageName: "empty", retrieve: { (_, completion) in
-            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        return ReadOnlyStorage(storageName: "empty", retrieve: { (_) in
+            return Future(error: EmptyCacheError.cacheIsAlwaysEmpty)
         })
     }
     
@@ -59,8 +61,8 @@ extension ReadOnlyStorage {
 extension WriteOnlyStorage {
     
     public static func empty() -> WriteOnlyStorage<Key, Value> {
-        return WriteOnlyStorage(storageName: "empty", set: { (_, _, completion) in
-            completion(.failure(EmptyCacheError.cacheIsAlwaysEmpty))
+        return WriteOnlyStorage(storageName: "empty", set: { (_, _) in
+            return Future(error: EmptyCacheError.cacheIsAlwaysEmpty)
         })
     }
     
@@ -79,7 +81,8 @@ internal func shallows_print(_ item: Any) {
 }
 
 public enum ShallowsLog {
-    
     public static var isEnabled = false
-    
 }
+
+public typealias ShallowsFuture<Value> = Future<Value, Swift.Error>
+public typealias ShallowsPromise<Value> = Promise<Value, Swift.Error>

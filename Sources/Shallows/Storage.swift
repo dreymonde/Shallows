@@ -30,8 +30,8 @@ public struct Storage<Key, Value> : StorageProtocol {
     }
     
     public init(storageName: String,
-                retrieve: @escaping (Key, @escaping (ShallowsResult<Value>) -> ()) -> (),
-                set: @escaping (Value, Key, @escaping (ShallowsResult<Void>) -> ()) -> ()) {
+                retrieve: @escaping (Key) -> (ShallowsFuture<Value>),
+                set: @escaping (Value, Key) -> (ShallowsFuture<Void>)) {
         self.storageName = storageName
         self._retrieve = ReadOnlyStorage(storageName: storageName, retrieve: retrieve)
         self._set = WriteOnlyStorage(storageName: storageName, set: set)
@@ -50,12 +50,13 @@ public struct Storage<Key, Value> : StorageProtocol {
                   write: write)
     }
     
-    public func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ()) {
-        _retrieve.retrieve(forKey: key, completion: completion)
+    public func retrieve(forKey key: Key) -> ShallowsFuture<Value> {
+        return _retrieve.retrieve(forKey: key)
     }
     
-    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
-        _set.set(value, forKey: key, completion: completion)
+    @discardableResult
+    public func set(_ value: Value, forKey key: Key) -> ShallowsFuture<Void> {
+        return _set.set(value, forKey: key)
     }
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
@@ -90,25 +91,15 @@ extension StorageProtocol {
         return Storage(self)
     }
     
+    @discardableResult
     public func update(forKey key: Key,
-                       _ modify: @escaping (inout Value) -> (),
-                       completion: @escaping (ShallowsResult<Value>) -> () = { _ in }) {
-        retrieve(forKey: key) { (result) in
-            switch result {
-            case .success(var value):
+                       _ modify: @escaping (inout Value) -> ()) -> ShallowsFuture<Value> {
+        return retrieve(forKey: key)
+            .flatMap({ (value) -> ShallowsFuture<Value> in
+                var value = value
                 modify(&value)
-                self.set(value, forKey: key, completion: { (setResult) in
-                    switch setResult {
-                    case .success:
-                        completion(.success(value))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                })
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+                return self.set(value, forKey: key).map({ value })
+            })
     }
     
 }
@@ -166,24 +157,26 @@ extension StorageProtocol {
 
 extension ReadableStorageProtocol where Key == Void {
     
-    public func retrieve(completion: @escaping (ShallowsResult<Value>) -> ()) {
-        retrieve(forKey: (), completion: completion)
+    public func retrieve() -> ShallowsFuture<Value> {
+        return retrieve(forKey: ())
     }
     
 }
 
 extension WritableStorageProtocol where Key == Void {
     
-    public func set(_ value: Value, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
-        set(value, forKey: (), completion: completion)
+    @discardableResult
+    public func set(_ value: Value) -> ShallowsFuture<Void> {
+        return set(value, forKey: ())
     }
     
 }
 
 extension StorageProtocol where Key == Void {
     
-    public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (ShallowsResult<Value>) -> () = {_ in }) {
-        self.update(forKey: (), modify, completion: completion)
+    @discardableResult
+    public func update(_ modify: @escaping (inout Value) -> ()) -> ShallowsFuture<Value> {
+        return self.update(forKey: (), modify)
     }
     
 }
