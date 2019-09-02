@@ -102,6 +102,15 @@ extension StorageProtocol {
             })
     }
     
+    public func update(forKey key: Key,
+                       _ modify: @escaping (inout Value) -> (),
+                       completion: @escaping (ShallowsResult<Value>) -> Void) {
+        self.update(forKey: key, modify).on(success: { (value) in
+            completion(.success(value))
+        }, failure: { (error) in
+            completion(.failure(error))
+        })
+    }
 }
 
 extension StorageProtocol {
@@ -177,6 +186,10 @@ extension StorageProtocol where Key == Void {
     @discardableResult
     public func update(_ modify: @escaping (inout Value) -> ()) -> ShallowsFuture<Value> {
         return self.update(forKey: (), modify)
+    }
+    
+    public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (ShallowsResult<Value>) -> Void) {
+        self.update(forKey: (), modify, completion: completion)
     }
     
 }

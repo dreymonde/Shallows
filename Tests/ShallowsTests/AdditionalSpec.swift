@@ -16,10 +16,10 @@ func testAdditional() {
             let storage = MemoryStorage<Int, Int>(storage: [1: 10])
             let sema = DispatchSemaphore(value: 0)
             var val: Int?
-            storage.update(forKey: 1, { $0 += 1 }).on { (value) in
-                val = value
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                val = result.value
                 sema.signal()
-            }
+            })
             sema.wait()
             try expect(val) == 11
             try expect(storage.storage[1]) == 11
@@ -30,8 +30,8 @@ func testAdditional() {
             let storage = Storage(read: read, write: write.asWriteOnlyStorage())
             let sema = DispatchSemaphore(value: 0)
             var er: Error?
-            storage.update(forKey: 1, { $0 += 1 }).on(failure: { (error) in
-                er = error
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                er = result.error
                 sema.signal()
             })
             sema.wait()
@@ -44,8 +44,8 @@ func testAdditional() {
             let storage = Storage(read: read, write: write)
             let sema = DispatchSemaphore(value: 0)
             var er: Error?
-            storage.update(forKey: 1, { $0 += 1 }).on(failure: { (error) in
-                er = error
+            storage.update(forKey: 1, { $0 += 1 }, completion: { (result) in
+                er = result.error
                 sema.signal()
             })
             sema.wait()
