@@ -57,10 +57,38 @@ extension StorageProtocol where Value == Data {
     
 }
 
+public struct DecodingError<T>: Error {
+    @Printed public var originalData: Data
+    public var rawError: Error
+}
+
+@propertyWrapper
+public struct Printed: CustomStringConvertible {
+    public var wrappedValue: Data
+    
+    public init(wrappedValue: Data) {
+        self.wrappedValue = wrappedValue
+    }
+    
+    public var description: String {
+        if let string = String.init(data: wrappedValue, encoding: .utf8) {
+            return string
+        } else {
+            return "__raw-unmappable-data__"
+        }
+    }
+}
+
 extension ReadOnlyStorageProtocol where Value == Data {
     
     public func mapJSON(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyStorage<Key, Any> {
-        return mapValues({ try JSONSerialization.jsonObject(with: $0, options: options) })
+        return mapValues({ data in
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: options)
+            } catch {
+                throw DecodingError<JSONSerialization>(originalData: data, rawError: error)
+            }
+        })
     }
     
     public func mapJSONDictionary(options: JSONSerialization.ReadingOptions = []) -> ReadOnlyStorage<Key, [String : Any]> {
@@ -69,14 +97,24 @@ extension ReadOnlyStorageProtocol where Value == Data {
     
     public func mapJSONObject<JSONObject : Decodable>(_ objectType: JSONObject.Type,
                                                       decoder: JSONDecoder = JSONDecoder()) -> ReadOnlyStorage<Key, JSONObject> {
-        return mapValues({ try decoder.decode(objectType, from: $0) })
+        return mapValues({ data in
+            do {
+                return try decoder.decode(objectType, from: data)
+            } catch {
+                throw DecodingError<JSONDecoder>(originalData: data, rawError: error)
+            }
+        })
     }
     
     public func mapPlist(format: PropertyListSerialization.PropertyListFormat = .xml,
                          options: PropertyListSerialization.ReadOptions = []) -> ReadOnlyStorage<Key, Any> {
         return mapValues({ data in
-            var formatRef = format
-            return try PropertyListSerialization.propertyList(from: data, options: options, format: &formatRef)
+            do {
+                var formatRef = format
+                return try PropertyListSerialization.propertyList(from: data, options: options, format: &formatRef)
+            } catch {
+                throw DecodingError<PropertyListSerialization>(originalData: data, rawError: error)
+            }
         })
     }
     
@@ -87,7 +125,13 @@ extension ReadOnlyStorageProtocol where Value == Data {
     
     public func mapPlistObject<PlistObject : Decodable>(_ objectType: PlistObject.Type,
                                                         decoder: PropertyListDecoder = PropertyListDecoder()) -> ReadOnlyStorage<Key, PlistObject> {
-        return mapValues({ try decoder.decode(objectType, from: $0) })
+        return mapValues({ data in
+            do {
+                return try decoder.decode(objectType, from: data)
+            } catch {
+                throw DecodingError<PropertyListDecoder>(originalData: data, rawError: error)
+            }
+        })
     }
     
     public func mapString(withEncoding encoding: String.Encoding = .utf8) -> ReadOnlyStorage<Key, String> {

@@ -62,11 +62,14 @@ extension Optional {
     }
     
     public func unwrap() throws -> Wrapped {
+        return try unwrap(orThrow: UnwrapError())
+    }
+    
+    public func unwrap(orThrow thr: @autoclosure () -> Error) throws -> Wrapped {
         if let wrapped = self {
             return wrapped
         } else {
-            throw UnwrapError()
+            throw thr()
         }
     }
-    
 }
