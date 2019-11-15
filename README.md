@@ -255,15 +255,50 @@ You can also conform to a `ReadOnlyStorageProtocol` only. That way, you only nee
 
 ## Installation
 
-Starting with **0.11.0**, **Shallows** is available exclusively through Swift Package Manager:
+#### Swift Package Manager
+
+Starting with Xcode 11, **Shallows** is officially available *only* via Swift Package Manager.
+
+In Xcode 11 or greater, in you project, select: `File > Swift Packages > Add Pacakage Dependency`
+
+In the search bar type
+
+```
+https://github.com/dreymonde/Shallows
+``` 
+
+Then proceed with installation.
+
+> If you can't find anything in the panel of the Swift Packages you probably haven't added yet your github account.
+You can do that under the **Preferences** panel of your Xcode, in the **Accounts** section.
+
+For command-line based apps, you can just add this directly to your **Package.swift** file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dreymonde/Shallows.git", from: "0.11.0"),
+    .package(url: "https://github.com/dreymonde/Shallows", from: "0.11.0"),
 ]
 ```
 
-Previous versions are also available through [Carthage][carthage-url] and [Cocoapods][cocoapods-url].
+#### Manual
+
+Of course, you always have an option of just copying-and-pasting the code.
+
+#### Deprecated dependency managers
+
+Last **Shallows** version to support [Carthage][carthage-url] and [Cocoapods][cocoapods-url] is **0.10.0**. Carthage and Cocoapods will no longer be officially supported.
+
+Carthage:
+
+```ruby
+github "dreymonde/Shallows" ~> 0.10.0
+```
+
+Cocoapods:
+
+```ruby
+pod 'Shallows', '~> 0.10.0'
+```
 
 [carthage-url]: https://github.com/Carthage/Carthage
 [swift-badge]: https://img.shields.io/badge/Swift-5.1-orange.svg?style=flat
