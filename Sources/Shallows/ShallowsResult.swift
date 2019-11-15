@@ -39,11 +39,11 @@ extension Swift.Result {
 
 }
 
-internal func fail<Value>(with error: Error) -> ShallowsResult<Value> {
+public func fail<Value>(with error: Error) -> ShallowsResult<Value> {
     return .failure(error)
 }
 
-internal func succeed<Value>(with value: Value) -> ShallowsResult<Value> {
+public func succeed<Value>(with value: Value) -> ShallowsResult<Value> {
     return .success(value)
 }
 

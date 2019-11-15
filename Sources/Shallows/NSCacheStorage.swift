@@ -13,16 +13,16 @@ public final class NSCacheStorage<Key : NSObject, Value : AnyObject> : StoragePr
         self.cache = storage
     }
     
-    public func set(_ value: Value, forKey key: Key) -> ShallowsFuture<Void> {
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> ()) {
         cache.setObject(value, forKey: key)
-        return ShallowsFuture(value: ())
+        completion(.success)
     }
     
-    public func retrieve(forKey key: Key) -> ShallowsFuture<Value> {
+    public func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ()) {
         if let object = cache.object(forKey: key) {
-            return Future(value: object)
+            completion(.success(object))
         } else {
-            return Future(error: Error.noValue(key))
+            completion(.failure(Error.noValue(key)))
         }
     }
     

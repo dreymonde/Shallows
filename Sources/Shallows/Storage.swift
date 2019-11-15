@@ -30,8 +30,8 @@ public struct Storage<Key, Value> : StorageProtocol {
     }
     
     public init(storageName: String,
-                retrieve: @escaping (Key) -> (ShallowsFuture<Value>),
-                set: @escaping (Value, Key) -> (ShallowsFuture<Void>)) {
+                retrieve: @escaping (Key, @escaping (ShallowsResult<Value>) -> ()) -> (),
+                set: @escaping (Value, Key, @escaping (ShallowsResult<Void>) -> ()) -> ()) {
         self.storageName = storageName
         self._retrieve = ReadOnlyStorage(storageName: storageName, retrieve: retrieve)
         self._set = WriteOnlyStorage(storageName: storageName, set: set)
@@ -50,13 +50,12 @@ public struct Storage<Key, Value> : StorageProtocol {
                   write: write)
     }
     
-    public func retrieve(forKey key: Key) -> ShallowsFuture<Value> {
-        return _retrieve.retrieve(forKey: key)
+    public func retrieve(forKey key: Key, completion: @escaping (ShallowsResult<Value>) -> ()) {
+        _retrieve.retrieve(forKey: key, completion: completion)
     }
     
-    @discardableResult
-    public func set(_ value: Value, forKey key: Key) -> ShallowsFuture<Void> {
-        return _set.set(value, forKey: key)
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
+        _set.set(value, forKey: key, completion: completion)
     }
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
@@ -91,25 +90,25 @@ extension StorageProtocol {
         return Storage(self)
     }
     
-    @discardableResult
-    public func update(forKey key: Key,
-                       _ modify: @escaping (inout Value) -> ()) -> ShallowsFuture<Value> {
-        return retrieve(forKey: key)
-            .flatMap({ (value) -> ShallowsFuture<Value> in
-                var value = value
-                modify(&value)
-                return self.set(value, forKey: key).map({ value })
-            })
-    }
-    
     public func update(forKey key: Key,
                        _ modify: @escaping (inout Value) -> (),
-                       completion: @escaping (ShallowsResult<Value>) -> Void) {
-        self.update(forKey: key, modify).on(success: { (value) in
-            completion(.success(value))
-        }, failure: { (error) in
-            completion(.failure(error))
-        })
+                       completion: @escaping (ShallowsResult<Value>) -> () = { _ in }) {
+        retrieve(forKey: key) { (result) in
+            switch result {
+            case .success(var value):
+                modify(&value)
+                self.set(value, forKey: key, completion: { (setResult) in
+                    switch setResult {
+                    case .success:
+                        completion(.success(value))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                })
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 }
 
@@ -166,29 +165,23 @@ extension StorageProtocol {
 
 extension ReadableStorageProtocol where Key == Void {
     
-    public func retrieve() -> ShallowsFuture<Value> {
-        return retrieve(forKey: ())
+    public func retrieve(completion: @escaping (ShallowsResult<Value>) -> ()) {
+        retrieve(forKey: (), completion: completion)
     }
     
 }
 
 extension WritableStorageProtocol where Key == Void {
     
-    @discardableResult
-    public func set(_ value: Value) -> ShallowsFuture<Void> {
-        return set(value, forKey: ())
+    public func set(_ value: Value, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
+        set(value, forKey: (), completion: completion)
     }
     
 }
 
 extension StorageProtocol where Key == Void {
     
-    @discardableResult
-    public func update(_ modify: @escaping (inout Value) -> ()) -> ShallowsFuture<Value> {
-        return self.update(forKey: (), modify)
-    }
-    
-    public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (ShallowsResult<Value>) -> Void) {
+    public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (ShallowsResult<Value>) -> () = {_ in }) {
         self.update(forKey: (), modify, completion: completion)
     }
     

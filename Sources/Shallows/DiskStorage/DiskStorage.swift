@@ -45,14 +45,14 @@ public final class DiskFolderStorage : StorageProtocol {
         return folderURL.appendingPathComponent(finalForm)
     }
     
-    public func retrieve(forKey filename: Filename) -> ShallowsFuture<Data> {
+    public func retrieve(forKey filename: Filename, completion: @escaping (ShallowsResult<Data>) -> ()) {
         let fileURL = self.fileURL(forFilename: filename)
-        return diskStorage.retrieve(forKey: fileURL)
+        diskStorage.retrieve(forKey: fileURL, completion: completion)
     }
     
-    public func set(_ data: Data, forKey filename: Filename) -> ShallowsFuture<Void> {
+    public func set(_ data: Data, forKey filename: Filename, completion: @escaping (ShallowsResult<Void>) -> ()) {
         let fileURL = self.fileURL(forFilename: filename)
-        return diskStorage.set(data, forKey: fileURL)
+        diskStorage.set(data, forKey: fileURL, completion: completion)
     }
     
 }
@@ -101,15 +101,13 @@ public final class DiskStorage : StorageProtocol {
         self.creatingDirectories = creatingDirectories
     }
     
-    public func retrieve(forKey key: URL) -> ShallowsFuture<Data> {
-        return ShallowsFuture { promise in
-            queue.async {
-                do {
-                    let data = try Data.init(contentsOf: key)
-                    promise.succeed(value: data)
-                } catch {
-                    promise.fail(error: error)
-                }
+    public func retrieve(forKey key: URL, completion: @escaping (ShallowsResult<Data>) -> ()) {
+        queue.async {
+            do {
+                let data = try Data.init(contentsOf: key)
+                completion(succeed(with: data))
+            } catch {
+                completion(fail(with: error))
             }
         }
     }
@@ -119,22 +117,20 @@ public final class DiskStorage : StorageProtocol {
         case cantCreateDirectory(Swift.Error)
     }
     
-    public func set(_ value: Data, forKey key: URL) -> ShallowsFuture<Void> {
-        return ShallowsFuture { promise in
-            queue.async {
-                do {
-                    try self.createDirectoryURLIfNotExisting(for: key)
-                    let path = key.path
-                    if self.fileManager.createFile(atPath: path,
-                                                   contents: value,
-                                                   attributes: nil) {
-                        promise.succeed(value: ())
-                    } else {
-                        promise.fail(error: Error.cantCreateFile)
-                    }
-                } catch {
-                    promise.fail(error: error)
+    public func set(_ value: Data, forKey key: URL, completion: @escaping (ShallowsResult<Void>) -> ()) {
+        queue.async {
+            do {
+                try self.createDirectoryURLIfNotExisting(for: key)
+                let path = key.path
+                if self.fileManager.createFile(atPath: path,
+                                               contents: value,
+                                               attributes: nil) {
+                    completion(.success)
+                } else {
+                    completion(fail(with: Error.cantCreateFile))
                 }
+            } catch {
+                completion(fail(with: error))
             }
         }
     }
