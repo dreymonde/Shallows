@@ -58,12 +58,12 @@ extension StorageProtocol where Value == Data {
 }
 
 public struct DecodingError<T>: Error {
-    @Printed public var originalData: Data
+    @StringPrinted public var originalData: Data
     public var rawError: Error
 }
 
 @propertyWrapper
-public struct Printed: CustomStringConvertible {
+public struct StringPrinted: CustomStringConvertible {
     public var wrappedValue: Data
     
     public init(wrappedValue: Data) {
