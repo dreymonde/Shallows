@@ -18,6 +18,7 @@ class ShallowsXCTests : XCTestCase {
         testMemoryStorage()
         testDiskStorage()
         testResult()
+        testZip()
         testComposition()
         testAdditional()
     }
@@ -102,14 +103,14 @@ func readme6() {
 }
 
 func readme7() {
-//    let strings = MemoryStorage<String, String>()
-//    let numbers = MemoryStorage<String, Int>()
-//    let zipped = zip(strings, numbers) // Storage<String, (String, Int)>
-//    zipped.retrieve(forKey: "some-key") { (result) in
-//        if let (string, number) = result.value {
-//            print(string)
-//            print(number)
-//        }
-//    }
-//    zipped.set(("shallows", 3), forKey: "another-key")
+    let strings = MemoryStorage<String, String>()
+    let numbers = MemoryStorage<String, Int>()
+    let zipped = zip(strings, numbers) // Storage<String, (String, Int)>
+    zipped.retrieve(forKey: "some-key") { (result) in
+        if let (string, number) = result.value {
+            print(string)
+            print(number)
+        }
+    }
+    zipped.set(("shallows", 3), forKey: "another-key")
 }
