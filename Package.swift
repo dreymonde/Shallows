@@ -10,6 +10,14 @@ let package = Package(
         .library(
             name: "Shallows",
             targets: ["Shallows"]),
+        .library(
+            name: "ShallowsStatic",
+            type: .static,
+            targets: ["Shallows"]),
+        .library(
+            name: "ShallowsDynamic",
+            type: .dynamic,
+            targets: ["Shallows"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
