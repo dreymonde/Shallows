@@ -36,6 +36,15 @@ func testDiskStorage() {
                 let base64 = data.base64EncodedString()
                 try expect(Filename.Encoder.base64.encodedString(representing: filename)) == base64
             }
+            $0.it("to base64url") {
+                let data = example.data(using: .utf8)!
+                let base64 = data.base64EncodedString()
+                    .replacingOccurrences(of: "+", with: "-")
+                    .replacingOccurrences(of: "/", with: "_")
+                try expect(Filename.Encoder.base64URL.encodedString(representing: filename)) == base64
+//                try expect(base64.contains("+")) == false
+//                try expect(base64.contains("/")) == false
+            }
             $0.it("without encoding") {
                 try expect(Filename.Encoder.noEncoding.encodedString(representing: filename)) == example
             }

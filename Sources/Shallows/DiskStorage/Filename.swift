@@ -40,6 +40,12 @@ public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral 
         return data.base64EncodedString()
     }
     
+    public func base64URLEncoded() -> String {
+        return base64Encoded()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+    }
+    
     public struct Encoder {
         
         private let encode: (Filename) -> String
@@ -48,7 +54,9 @@ public struct Filename : RawRepresentable, Hashable, ExpressibleByStringLiteral 
             self.encode = encode
         }
         
+        @available(*, deprecated, message: "for any new storages, please use .base64URL")
         public static let base64: Encoder = Encoder(encode: { $0.base64Encoded() })
+        public static let base64URL: Encoder = Encoder(encode: { $0.base64URLEncoded() })
         public static let noEncoding: Encoder = Encoder(encode: { $0.rawValue })
         public static func custom(_ encode: @escaping (Filename) -> String) -> Encoder {
             return Encoder(encode: encode)
