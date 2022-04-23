@@ -1,7 +1,6 @@
 # Shallows
 
-[![Swift][swift-badge]][swift-url]
-[![Platform][platform-badge]][platform-url]
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdreymonde%2FShallows%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/dreymonde/Shallows) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdreymonde%2FShallows%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/dreymonde/Shallows)
 
 **Shallows** is a generic abstraction layer over lightweight data storage and persistence. It provides a `Storage<Key, Value>` type, instances of which can be easily transformed and composed with each other. It gives you an ability to create highly sophisticated, effective and reliable caching/persistence solutions.
 
@@ -26,6 +25,10 @@ diskStorage.set(kharkiv, forKey: "kharkiv")
 diskStorage.retrieve(forKey: "kharkiv") { (result) in
     if let city = try? result.get() { print(city) }
 }
+
+// or
+
+let city = try await diskStorage.retrieve(forKey: "kharkiv")
 
 ```
 
