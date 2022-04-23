@@ -164,15 +164,6 @@ func testDiskStorage() {
             let value = try folder.retrieve(forKey: "any-key")
             try expect(value) == "great"
         }
-        $0.it("writes and reads") {
-            let folder = DiskFolderStorage(folderURL: currentDirURL, diskStorage: MemoryStorage().asStorage())
-                .mapString()
-                .singleKey("Oh my god")
-                .makeSyncStorage()
-            try folder.set("Wigan-ManUTD")
-            let back = try folder.retrieve()
-            try expect(back) == "Wigan-ManUTD"
-        }
         $0.it("can clear its folder") {
             let folder = DiskFolderStorage(folderURL: currentDirURL.appendingPathComponent("_should_be_cleared", isDirectory: true))
             let folderURL = folder.folderURL
@@ -187,6 +178,15 @@ func testDiskStorage() {
             folder.clear()
             try expect(exists()).to.beFalse()
         }
+//        $0.it("writes and reads") {
+//            let folder = DiskFolderStorage(folderURL: currentDirURL, diskStorage: MemoryStorage().asStorage())
+//                .mapString()
+//                .singleKey("Oh my god")
+//                .makeSyncStorage()
+//            try folder.set("Wigan-ManUTD")
+//            let back = try folder.retrieve()
+//            try expect(back) == "Wigan-ManUTD"
+//        }
     }
     
 }
