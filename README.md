@@ -262,7 +262,7 @@ You can also conform to a `ReadOnlyStorageProtocol` only. That way, you only nee
 
 Starting with Xcode 11, **Shallows** is officially available *only* via Swift Package Manager.
 
-In Xcode 11 or greater, in you project, select: `File > Swift Packages > Add Pacakage Dependency`
+In Xcode 11 or greater, in you project, select: `File > Swift Packages > Add Package Dependency`
 
 In the search bar type
 
@@ -279,7 +279,7 @@ For command-line based apps, you can just add this directly to your **Package.sw
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dreymonde/Shallows", from: "0.11.0"),
+    .package(url: "https://github.com/dreymonde/Shallows", from: "0.13.0"),
 ]
 ```
 
