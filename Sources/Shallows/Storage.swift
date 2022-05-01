@@ -54,8 +54,13 @@ public struct Storage<Key, Value> : StorageProtocol {
         _retrieve.retrieve(forKey: key, completion: completion)
     }
     
-    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
+    public func set(_ value: Value, forKey key: Key, completion: @escaping (ShallowsResult<Void>) -> ()) {
         _set.set(value, forKey: key, completion: completion)
+    }
+
+    @available(swift, deprecated: 5.5, message: "use async version or provide completion handler explicitly")
+    public func set(_ value: Value, forKey key: Key) {
+        _set.set(value, forKey: key, completion: { _ in })
     }
     
     public func asReadOnlyStorage() -> ReadOnlyStorage<Key, Value> {
@@ -89,7 +94,8 @@ extension StorageProtocol {
         }
         return Storage(self)
     }
-    
+
+    @available(swift, deprecated: 5.5, message: "`update` is deprecated because it was creating potentially wrong assumptions regarding the serial nature of this function. `update` cannot guarantee that no concurrent calls to `retrieve` or `set` from other places will be made during the update")
     public func update(forKey key: Key,
                        _ modify: @escaping (inout Value) -> (),
                        completion: @escaping (ShallowsResult<Value>) -> () = { _ in }) {
@@ -173,14 +179,19 @@ extension ReadableStorageProtocol where Key == Void {
 
 extension WritableStorageProtocol where Key == Void {
     
-    public func set(_ value: Value, completion: @escaping (ShallowsResult<Void>) -> () = { _ in }) {
+    public func set(_ value: Value, completion: @escaping (ShallowsResult<Void>) -> ()) {
         set(value, forKey: (), completion: completion)
     }
-    
+
+    @available(swift, deprecated: 5.5, message: "use async version or provide completion handler explicitly")
+    public func set(_ value: Value) {
+        set(value, completion: { _ in })
+    }
 }
 
 extension StorageProtocol where Key == Void {
-    
+
+    @available(swift, deprecated: 5.5, message: "`update` is deprecated because it was creating potentially wrong assumptions regarding the serial nature of this function. `update` cannot guarantee that no concurrent calls to `retrieve` or `set` from other places will be made during the update")
     public func update(_ modify: @escaping (inout Value) -> (), completion: @escaping (ShallowsResult<Value>) -> () = {_ in }) {
         self.update(forKey: (), modify, completion: completion)
     }
