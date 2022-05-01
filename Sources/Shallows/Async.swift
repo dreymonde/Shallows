@@ -89,6 +89,22 @@ extension ReadOnlyStorageProtocol {
         })
     }
 
+    public func asyncMapKeys<OtherKey>(
+        to type: OtherKey.Type = OtherKey.self,
+        _ transform: @escaping (OtherKey) async throws -> Key)
+    -> ReadOnlyStorage<OtherKey, Value> {
+        return ReadOnlyStorage<OtherKey, Value>(storageName: storageName, retrieve: { key, completion in
+            Task {
+                do {
+                    let newKey = try await transform(key)
+                    self.retrieve(forKey: newKey, completion: completion)
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+        })
+    }
+
     public func validate(_ isValid: @escaping (Value) async throws -> Bool) -> ReadOnlyStorage<Key, Value> {
         return asyncMapValues(to: Value.self) { value in
             if try await isValid(value) {
@@ -121,6 +137,22 @@ extension WriteOnlyStorageProtocol {
         })
     }
 
+    public func asyncMapKeys<OtherKey>(
+        to type: OtherKey.Type = OtherKey.self,
+        _ transform: @escaping (OtherKey) async throws -> Key)
+    -> WriteOnlyStorage<OtherKey, Value> {
+        return WriteOnlyStorage<OtherKey, Value>(storageName: storageName, set: { value, key, completion in
+            Task {
+                do {
+                    let newKey = try await transform(key)
+                    self.set(value, forKey: newKey, completion: completion)
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+        })
+    }
+
     public func validate(_ isValid: @escaping (Value) async throws -> Bool) -> WriteOnlyStorage<Key, Value> {
         return asyncMapValues(to: Value.self) { value in
             if try await isValid(value) {
@@ -142,6 +174,12 @@ extension StorageProtocol {
                                       transformOut: @escaping (OtherValue) async throws -> Value) -> Storage<Key, OtherValue> {
         return Storage(read: asReadOnlyStorage().asyncMapValues(transformIn),
                        write: asWriteOnlyStorage().asyncMapValues(transformOut))
+    }
+
+    public func asyncMapKeys<OtherKey>(to type: OtherKey.Type = OtherKey.self,
+                                  _ transform: @escaping (OtherKey) async throws -> Key) -> Storage<OtherKey, Value> {
+        return Storage(read: asReadOnlyStorage().asyncMapKeys(transform),
+                       write: asWriteOnlyStorage().asyncMapKeys(transform))
     }
 
     public func validate(_ isValid: @escaping (Value) async throws -> Bool) -> Storage<Key, Value> {
